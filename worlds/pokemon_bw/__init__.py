@@ -109,6 +109,10 @@ class PokemonBWWorld(World):
         from .generate.encounter import wild, checklist, static, plando
         from .generate import trainers
 
+        if self.options.randomize_wild_pokemon.value and "Randomize" not in self.options.randomize_wild_pokemon.value:
+            self.options.randomize_wild_pokemon.value.add("Randomize")
+
+
         # Load values from UT if this is a regenerated world
         if hasattr(self.multiworld, "re_gen_passthrough"):
             if self.game in self.multiworld.re_gen_passthrough:
