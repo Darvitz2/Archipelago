@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import settings
 from BaseClasses import PlandoOptions
 from Options import (Choice, PerGameCommonOptions, OptionSet, Range, Toggle,
-                     PlandoTexts, OptionError, OptionDict, Option)
+                     PlandoTexts, OptionError, Option, OptionCounter)
 
 if typing.TYPE_CHECKING:
     from worlds.AutoWorld import World
@@ -30,14 +30,14 @@ class Goal(Choice):
     - **Champion** - Become the champion by defeating Alder
     - **Cynthia** - Defeat Cynthia in Undella Town
     - **Cobalion** - Reach and defeat/catch Cobalion in Mistralton Cave
-    - **Regional pokedex** - Complete the Unova pokedex (requires wild Pokemon being randomized)
-    - **National pokedex** - Complete the national pokedex (requires wild Pokemon being randomized)
-    - **Custom pokedex** - Complete all dexsanity locations (requires wild Pokemon being randomized and dexsanity being set to at least 100)
     - **TM/HM hunt** - Get all TMs and HMs
     - **Seven Sages hunt** - Find the Seven Sages
     - **Legendary hunt** - Find and defeat/catch all (stationary available) legendary encounters, including Volcarona
     - **Pokemon master** - Complete the requirements of all other goals combined
     """
+    # - **Regional pokedex** - Complete the Unova pokedex (requires wild Pokemon being randomized)
+    # - **National pokedex** - Complete the national pokedex (requires wild Pokemon being randomized)
+    # - **Custom pokedex** - Complete all dexsanity locations (requires wild Pokemon being randomized and dexsanity being set to at least 100)
     display_name = "Goal"
     option_ghetsis = 0
     option_champion = 1
@@ -186,16 +186,17 @@ class RandomizeLegendaryPokemon(OptionSet):
     valid_keys = [
         "Randomize",
         "Keep legendary",
+        "Similar base stats",
         "Same type",
     ]
     default = []
 
 
-class PokemonRandomizationAdjustments(OptionDict):
+class PokemonRandomizationAdjustments(OptionCounter):
     """
     Adjust various parameters in various pokemon randomization options (more modifiers are planned).
     Any minimum parameter cannot be higher than its corresponding maximum parameter.
-    - **Stats leniency** - The minimum difference between base stat totals of vanilla and randomized species (for option with **Similar base stats** activated). Allowed values are integers in range 0 to 1530.
+    - **Stats leniency** - The minimum difference between base stat totals of vanilla and randomized species (for options with **Similar base stats** activated). Allowed values are integers in range 0 to 1530.
     """
     display_name = "Pokemon Randomization Adjustments"
     valid_keys = [
@@ -516,7 +517,7 @@ class RandomizeTMHMCompatibility(OptionSet):
     default = []
 
 
-class StatsRandomizationAdjustments(OptionDict):
+class StatsRandomizationAdjustments(OptionCounter):
     """
     Adjust various parameters in various randomization options (more modifiers are planned).
     Any minimum parameter cannot be higher than its corresponding maximum parameter.
