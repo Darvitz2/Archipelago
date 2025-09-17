@@ -19,6 +19,11 @@ If you find one, please report it to the #future-game-design thread for this gam
 - A .nds file for the english version of Pokémon Black and White
   - The english versions for USA and Europe are the same
 
+## Optional Software
+
+- Universal Tracker + BizHawk w/ Universal Tracker
+  - Check UT's channel and its threads on the discord server for more information and instructions
+
 ## Joining a MultiWorld Game
 
 ### Obtain your NDS patch file

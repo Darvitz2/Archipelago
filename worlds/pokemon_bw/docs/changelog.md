@@ -1,6 +1,10 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.3.3
+
+
+
 ## 0.3.2
 
 - Made option descriptions in template yamls look nicer
