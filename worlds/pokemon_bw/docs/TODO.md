@@ -25,6 +25,7 @@
 - incorrect evolution logic, give warning in release notes
 - case insensitivity for all optionsets, by making new class with overridden methods and have everything inheriting from that
 - add detected rom header in patching process if wrong
+- fix client writing flags in early/late setup without updating its cache
 
 # 0.2.2
 
