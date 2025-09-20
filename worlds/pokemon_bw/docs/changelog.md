@@ -3,7 +3,11 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 
 ## 0.3.3
 
-
+This update only ports over the fixes from the 0.2.2 update, which was released right before this:
+- Fixed fossils not being revivable after the Plasma grunts stole the Dragon Skull
+- Fixed Professor Juniper ignoring the national dex for her TM rewards
+- Fixed Professor Juniper not always being in the lab
+- Fixed Champion goal triggering after fighting Ghetsis
 
 ## 0.3.2
 
@@ -54,6 +58,21 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Fixed rare(?) BizHawk client crashing due to slotdata not being received yet
 - Fixed items getting lost after soft resetting after receiving an item after the last save
 - Fixed TM/HM checking NPC not showing up when `pokemon_master` is chosen as the goal
+
+## 0.2.2
+
+This update was published after 0.3.2, thereby including a few retroactive bug fixes and QoL things:
+- Fixed rare(?) BizHawk client crashing due to slotdata not being received yet
+- Fixed items getting lost after soft resetting after receiving an item after the last save
+- Made key items and other important items get checked and re-added if not in save file after connecting
+- Fixed TM/HM checking NPC not showing up when pokemon_master is chosen as the goal
+- Changed the item description of a few non-vanilla key items
+
+New fixes:
+- Fixed fossils not being revivable after the Plasma grunts stole the Dragon Skull
+- Fixed Professor Juniper ignoring the national dex for hre TM rewards
+- Fixed Professor Juniper not always being in the lab
+- Fixed Champion goal triggering after fighting Ghetsis
 
 ## 0.2.1
 

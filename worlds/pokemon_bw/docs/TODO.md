@@ -1,5 +1,6 @@
 # Important stuff
 
+- route 8 bianca items logic, apparently said to be in logic without light/dark stone, but blocked by grunts wanting the stone
 
 # 0.3.3
 
@@ -14,27 +15,17 @@
 - add ut compatibility version, give warning about incorrect logic if version mismatch
 - look at encounter plando actually just overwriting when multiple plandos on same slot, or do they lead to logic errors due to species being checked and then overwritten
 - check catchable species against DONE set of checklist and conditionally raise error
-- fossils not revivable under certain conditions
-- juniper only checking regional dex for locations before obtaining the national dex
 - UT not loading encounter plando from slot data correctly
 - change dialog of grunts on route 8, people tend to get confused
-- juniper not always in lab?
 - aha prizes flipped?
 - shopping mall nine seller giving ? item when pressing b
-- champion goal sending goal even after fighting ghetsis
 - incorrect evolution logic, give warning in release notes
 - case insensitivity for all optionsets, by making new class with overridden methods and have everything inheriting from that
 - add detected rom header in patching process if wrong
 - fix client writing flags in early/late setup without updating its cache
-
-# 0.2.2
-
-important bug fixing update
-- fossils not revivable under certain conditions
-- fix pokemon master goal (see fixes from 0.3.x)
-- juniper only checking regional dex for locations before obtaining the national dex
-- juniper not always in lab?
-- champion goal sending goal even after fighting ghetsis
+- reduce different forms weight in randomization
+- remove arceus types
+- castelia and driftveil seen pokemon location maybe only checking regional dex
 
 # 0.4.0
 
@@ -79,6 +70,7 @@ important bug fixing update
 - pitch webhost and template yaml notes, both individual, but template copying from webhost by default
 - Fix locations in pokédex if something written to encounter tables
 - route 18 reappearing and undella bay reappearing items get still detected after pickup
+- make reusable tms option add funny dialog
 
 # Single reports, cannot recreate, need to wait for more reports
 

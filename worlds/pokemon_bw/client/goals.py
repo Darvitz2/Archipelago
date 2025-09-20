@@ -37,11 +37,11 @@ def get_method(client: "PokemonBWClient", ctx: "BizHawkClientContext") -> Callab
 
 
 async def defeat_ghetsis(client: "PokemonBWClient", ctx: "BizHawkClientContext") -> bool:
-    return client.flags_cache[2400//8] & 1 != 0
+    return client.flags_cache[0x1D3//8] & 8 != 0
 
 
 async def become_champion(client: "PokemonBWClient", ctx: "BizHawkClientContext") -> bool:
-    return client.flags_cache[2427//8] & 8 != 0
+    return client.flags_cache[0x1D4//8] & 16 != 0
 
 
 async def defeat_cynthia(client: "PokemonBWClient", ctx: "BizHawkClientContext") -> bool:
@@ -67,7 +67,7 @@ async def find_seven_sages(client: "PokemonBWClient", ctx: "BizHawkClientContext
             (client.save_data_address + client.var_offset + (2 * 0xCC), 1, client.ram_read_write_domain),
         )
     )
-    return read[0][0] >= 6 and client.flags_cache[2400//8] & 1 != 0
+    return read[0][0] >= 6 and await defeat_ghetsis(client, ctx)
 
 
 async def encounter_legendaries(client: "PokemonBWClient", ctx: "BizHawkClientContext") -> bool:
