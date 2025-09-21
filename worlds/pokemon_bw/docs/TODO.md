@@ -1,8 +1,7 @@
 # Important stuff
 
-- route 8 bianca items logic, apparently said to be in logic without light/dark stone, but blocked by grunts wanting the stone
 
-# 0.3.3
+# 0.3.4
 
 - remove unique moves from trainer pokemon if randomized, and no option to re-enable them
 - Chargestone cave make north to south shortcut open after traversing it for the first time (maybe when battled N)
@@ -26,6 +25,11 @@
 - reduce different forms weight in randomization
 - remove arceus types
 - castelia and driftveil seen pokemon location maybe only checking regional dex
+- route 8 bianca items logic, apparently said to be in logic without light/dark stone, but blocked by grunts wanting the stone
+- juniper seen number locations now checking for caught only
+- somehow account for excluded locations in shuffle badges/tms
+- flash requirement for dark caves logic modifier, default on
+- item from lenora after relic castle not showing up in ut
 
 # 0.4.0
 
@@ -78,6 +82,7 @@
 - scientist nathan no text after battle?
 - ranger claude talking french after battle?
 - Some hidden items are not checkable immediately?
-- grunt in pinwheel forest with dragon skull not talking anymore after obtaining the dragon skull
+- grunt in pinwheel forest with vanilla dragon skull not talking anymore after obtaining the dragon skull
 - stone grunts not disappearing?
 - sequence break problem with npcs not moving, see channel
+- incredibly low catch chances? idk how that could be related to the apworld in any way
