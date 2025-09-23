@@ -104,6 +104,7 @@ class PokemonBWWorld(World):
         self.master_ball_seller_cost: int = 0
 
         self.ut_active: bool = False
+        self.location_id_to_alias: dict[int, str] = {}
 
     def generate_early(self) -> None:
         from .generate.encounter import wild, checklist, static, plando
