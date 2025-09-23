@@ -447,3 +447,8 @@ connections: dict[str, ERCData] = {
     "Route 17 - Fishing":                  ERCData("Route 17 South", "r17 - F", can_fish, None),
     "Route 17 - Fishing (Rippling Water)": ERCData("Route 17 South", "r17 - FR", (has_trio_badge, can_fish), None),
 }
+
+
+connection_by_region: dict[str, str] = {
+    reg.entering_region: con for con, reg in connections.items()
+}

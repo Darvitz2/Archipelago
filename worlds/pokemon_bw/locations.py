@@ -120,3 +120,40 @@ def count_to_be_filled_locations(regions: dict[str, Region]) -> int:
             if location.item is None:
                 count += 1
     return count
+
+
+def extend_dexsanity_hints(world: "PokemonBWWorld", hint_data: dict[int, dict[int, str]]) -> None:
+    from .data.locations.encounters.region_connections import connection_by_region
+    from .data.pokemon.pokedex import by_number
+
+    if world.options.dexsanity == 0:
+        return
+
+    places_for_location: dict[str, set[str]] = {}
+    for slot, entry in world.wild_encounter.items():
+        catching_place = connection_by_region[slot[:slot.rindex(" ")]]
+        pokemon = by_number[entry.species_id[0]]
+        location = "Pokédex - " + pokemon
+        if location not in places_for_location:
+            places_for_location[location] = set()
+        places_for_location[location].add(catching_place)
+    for static_slot, entry in world.static_encounter.items():
+        catching_place = static_slot[:static_slot.rindex("Encounter")]
+        pokemon = by_number[entry.species_id[0]]
+        location = "Pokédex - " + pokemon
+        if location not in places_for_location:
+            places_for_location[location] = set()
+        places_for_location[location].add(catching_place)
+    for trade_slot, entry in world.trade_encounter.items():
+        catching_place = trade_slot[:trade_slot.rindex("Encounter")]
+        pokemon = by_number[entry.species_id[0]]
+        location = "Pokédex - " + pokemon
+        if location not in places_for_location:
+            places_for_location[location] = set()
+        places_for_location[location].add(catching_place)
+    for loc in world.get_locations():
+        if loc.name in places_for_location:
+            hint_data[world.player][loc.address] = ", ".join(places_for_location[loc.name])
+    for location, places in places_for_location.items():
+        loc_id = world.location_name_to_id[location]
+        hint_data[world.player][loc_id] = ", ".join(places)

@@ -210,6 +210,10 @@ class PokemonBWWorld(World):
         place_badges_fill(self, progitempool, fill_locations)
         place_tm_hm_fill(self, progitempool, usefulitempool, filleritempool, fill_locations)
 
+    def extend_hint_information(self, hint_data: dict[int, dict[int, str]]):
+        hint_data[self.player] = {}
+        locations.extend_dexsanity_hints(self, hint_data)
+
     def generate_output(self, output_directory: str) -> None:
         if self.options.version == "black":
             rom.PokemonBlackPatch(
