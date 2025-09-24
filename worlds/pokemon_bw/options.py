@@ -65,6 +65,7 @@ class RandomizeWildPokemon(OptionSet):
     - **Prevent rare encounters** - Randomizes the encounter slots with the lowest chance in each area to the same pokemon. Takes priority over **Area 1-to-1**.
     """
     display_name = "Randomize Wild Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Ensure all obtainable",
@@ -87,6 +88,7 @@ class RandomizeTrainerPokemon(OptionSet):
     #                           Gym leaders will always have themed teams, regardless of this modifier.
     # - **Themed gym trainers** - All pokemon of gym trainers will share the type assigned to the gym leader.
     display_name = "Randomize Trainer Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Similar base stats",
@@ -112,6 +114,7 @@ class RandomizeStarterPokemon(OptionSet):
     - **Type variety** - Every starter will have types that are different from the other two.
     """
     display_name = "Randomize Starter Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Any base",
@@ -131,6 +134,7 @@ class RandomizeStaticPokemon(OptionSet):
     - **No legendaries** - Exclude legendaries from being placed into static encounters.
     """
     display_name = "Randomize Static Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Similar base stats",
@@ -148,6 +152,7 @@ class RandomizeGiftPokemon(OptionSet):
     - **No legendaries** - Exclude legendaries from being placed into gift encounters.
     """
     display_name = "Randomize Gift Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Similar base stats",
@@ -165,6 +170,7 @@ class RandomizeTradePokemon(OptionSet):
     - **No legendaries** - Exclude legendaries from being placed into trades.
     """
     display_name = "Randomize Trade Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize offer",
         "Randomize request",
@@ -183,6 +189,7 @@ class RandomizeLegendaryPokemon(OptionSet):
     - **Same type** - Tries to keep at least one type of every encounter.
     """
     display_name = "Randomize Legendary Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep legendary",
@@ -199,6 +206,7 @@ class PokemonRandomizationAdjustments(OptionCounter):
     - **Stats leniency** - The minimum difference between base stat totals of vanilla and randomized species (for options with **Similar base stats** activated). Allowed values are integers in range 0 to 1530.
     """
     display_name = "Pokemon Randomization Adjustments"
+    valid_keys_casefold = True
     valid_keys = [
         "Stats leniency",
     ]
@@ -260,17 +268,28 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
                 continue
             if not isinstance(plando, typing.Mapping):
                 raise OptionError(f"Expected Encounter Plando entries to be Mappings, got {type(plando)}")
-            if "map" not in plando:
+            plando: typing.Mapping
+            plando_casefold = {}
+            for key in plando:
+                casefold = str(key).casefold()
+                if casefold not in ("map", "seasons", "season", "method", "slots", "slot", "species"):
+                    raise OptionError(f"Unknown argument in Encounter Plando Entry: {str(key)}")
+                if casefold in ("season", "slot"):
+                    casefold += "s"
+                if casefold in plando_casefold:
+                    raise OptionError(f"Duplicate argument with different casing in Encounter Plando Entry: {str(key)}")
+                plando_casefold[casefold] = plando[key]
+            if "map" not in plando_casefold:
                 raise OptionError("Encounter Plando entry is missing the map argument")
-            if "method" not in plando:
+            if "method" not in plando_casefold:
                 raise OptionError("Encounter Plando entry is missing the method argument")
-            if "species" not in plando:
+            if "species" not in plando_casefold:
                 raise OptionError("Encounter Plando entry is missing the species argument")
-            map_ = plando["map"]
-            seasons = plando.get("seasons", [])
-            method = plando["method"]
-            slots = plando.get("slots", [])
-            species = plando["species"]
+            map_ = plando_casefold["map"]
+            seasons = plando_casefold.get("seasons", [])
+            method = plando_casefold["method"]
+            slots = plando_casefold.get("slots", [])
+            species = plando_casefold["species"]
             # IMPORTANT strings are also Iterables
             if not isinstance(map_, str):
                 raise OptionError(f"Expected map argument to be a string, got {type(map_)}")
@@ -325,18 +344,18 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
             if plando.map not in encounter_maps.maps:
                 reasons.append(f"Unknown map {plando.map}")
             for season in plando.seasons:
-                if season not in ("Spring", "Summer", "Autumn", "Winter"):
+                if season.casefold() not in ("spring", "summer", "autumn", "winter"):
                     reasons.append(f"Unknown season {season}")
                 if plando.map not in encounter_maps.multiple_seasons:
                     reasons.append(f"Map {plando.map} does not have multiple seasons")
-            if plando.method not in (
-                "Grass", "Dark grass", "Rustling grass", "Surfing", "Surfing rippling", "Fishing", "Fishing rippling"
+            if plando.method.casefold() not in (
+                "grass", "dark grass", "rustling grass", "surfing", "surfing rippling", "fishing", "fishing rippling"
             ):
                 reasons.append(f"Unknown method {plando.method}")
             for slot in plando.slots:
                 if slot >= 12 or slot < 0:
                     reasons.append(f"Slot {slot} out of bounds (0-11)")
-                elif slot >= 5 and plando.method not in ("Grass", "Dark grass", "Rustling grass"):
+                elif slot >= 5 and plando.method.casefold() not in ("grass", "dark grass", "rustling grass"):
                     reasons.append(f"Slot {slot} out of bounds for method {plando.method} (0-5)")
             if len(plando.species) == 0:
                 reasons.append("No species provided")
@@ -351,6 +370,18 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
                 "\n".join(invalid) +
                 "\nRefer to the Text Plando guide of this game for further information."
             )
+
+    def to_slot_data(self) -> list[dict[str, str | list[str] | list[int]]]:
+        return [
+            {
+                "map": plando.map,
+                "seasons": plando.seasons,
+                "method": plando.method,
+                "slots": plando.slots,
+                "species": plando.species,
+            }
+            for plando in self
+        ]
 
     @classmethod
     def get_option_name(cls, value: list[PlandoEncounter]) -> str:
@@ -377,6 +408,7 @@ class RandomizeBaseStats(OptionSet):
     - **Follow evolutions** - Evolved species will use their pre-evolution's base stats and add on top of that.
     """
     display_name = "Randomize Base Stats"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep total",
@@ -395,6 +427,7 @@ class RandomizeEvolutions(OptionSet):
     - **Allow more or less branches** - Allows all species to be able to evolve into more or less species than before.
     """
     display_name = "Randomize Evolutions"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep method",
@@ -413,6 +446,7 @@ class RandomizeCatchRates(OptionSet):
     - **Follow evolutions** - Evolved species will have a catch rate equal to or lower than their pre-evolution(s).
     """
     display_name = "Randomize Catch Rates"
+    valid_keys_casefold = True
     valid_keys = [
         "Shuffle",
         "Randomize",
@@ -432,6 +466,7 @@ class RandomizeLevelUpMovesets(OptionSet):
     - **Follow evolutions** - Evolved species will have at least 50% of the level up moveset(s) of their pre-evolution(s). Overrides all **Keep ...** modifiers.
     """
     display_name = "Randomize Level Up Movesets"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep types",
@@ -452,6 +487,7 @@ class RandomizeTypes(OptionSet):
     - **Follow evolutions** - Evolved species will share at least one type with (one of) their pre-evolutions.
     """
     display_name = "Randomize Types"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Only secondary type",
@@ -470,6 +506,7 @@ class RandomizeAbilities(OptionSet):
     - **Include hidden abilities** - Includes hidden abilities being randomized. Note that only a few select pokemon that originate from these games can have their hidden ability.
     """
     display_name = "Randomize Abilities"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "One per pokemon",
@@ -487,6 +524,7 @@ class RandomizeGenderRatio(OptionSet):
     - **Follow evolutions** - Evolved species will have the same gender ratio as (one of) their pre-evolution(s).
     """
     display_name = "Randomize Gender Ratio"
+    valid_keys_casefold = True
     valid_keys = [
         "Shuffle",
         "Randomize",
@@ -506,6 +544,7 @@ class RandomizeTMHMCompatibility(OptionSet):
     - **Follow evolutions** - Evolved species will have at least 50% of the learnable TMs and HMs of their pre-evolution(s). Overrides all **Keep ...** modifiers.
     """
     display_name = "Randomize TM/HM Compatibility"
+    valid_keys_casefold = True
     valid_keys = [
         "Force all TMs",
         "Force all HMs",
@@ -540,6 +579,7 @@ class StatsRandomizationAdjustments(OptionCounter):
     # - **Gender ratio maximum** - The maximum gender ratio, if randomized.
     #                              A gender ratio of 0 is always female and 255 is always male.
     display_name = "Stats Randomization Adjustments"
+    valid_keys_casefold = True
     valid_keys = [
         # "Stats total minimum",
         # "Stats total maximum",
@@ -677,6 +717,7 @@ class DoorShuffle(OptionSet):
     - **Decoupled** - Removes the requirement for all shuffled door warps leading to each other.
     """
     display_name = "Door Shuffle"
+    valid_keys_casefold = True
     valid_keys = [
         "Gates",
         "Buildings per map",
@@ -711,6 +752,7 @@ class AdjustLevels(OptionSet):
     - **Trainer** - Normalizes trainer pokemon levels, excluding Cynthia.
     """
     display_name = "Adjust levels"
+    valid_keys_casefold = True
     valid_keys = [
         "Wild",
         "Trainer",
@@ -766,6 +808,7 @@ class ReplaceEvoMethods(OptionSet):
     - **Stats** - Replaces Tyrogue's stat based evolutions with level up while holding a protein, iron, or carbos.
     """
     display_name = "Replace Evolution Methods"
+    valid_keys_casefold = True
     valid_keys = [
         "Locations",
         "Friendship",
@@ -792,6 +835,7 @@ class MasterBallSeller(OptionSet):
     - **Cost: 10000** - Makes Master Balls (potentially) cost 10000 Pokédollars.
     """
     display_name = "Replace Evolution Methods"
+    valid_keys_casefold = True
     valid_keys = [
         "N's Castle",
         "PC",
@@ -842,6 +886,7 @@ class ModifyItemPool(OptionSet):
     - **Ban bad filler** - Bans niche berries and mail from being generated as filler items.
     """
     display_name = "Modify Item Pool"
+    valid_keys_casefold = True
     valid_keys = [
         "Useless key items",
         "Useful filler",
@@ -861,6 +906,7 @@ class ModifyLogic(OptionSet):
     - **Require Flash** - Makes Mistralton Cave and Challenger's Cave logically require TM70 Flash.
     """
     display_name = "Modify Item Pool"
+    valid_keys_casefold = True
     valid_keys = [
         "Require Dowsing Machine",
         "Prioritize key item locations",
@@ -869,7 +915,7 @@ class ModifyLogic(OptionSet):
     default = ["Require Dowsing Machine", "Prioritize key item locations", "Require Flash"]
 
 
-class FunnyDialogue(Toggle):
+class FunnyDialog(Toggle):
     """
     Adds humorous dialogue submitted by the folks in the Pokemon Black and White thread of the
     Archipelago Discord server. This option requires Text Plando being enabled in the host settings.
@@ -888,6 +934,7 @@ class PokemonBWTextPlando(PlandoTexts):
     ```
     Refer to the Text Plando guide of this game for further information.
     """
+    # TODO definitely not done
     display_name = "Text Plando"
     default = [
         # ("story 160 0 7", "[vMisc_0] received [vPkmn_1]![NextLine] Congratulations![Terminate]", 100),
@@ -986,6 +1033,6 @@ class PokemonBWOptions(PerGameCommonOptions):
     # traps_percentage: TrapsPercentage
     modify_item_pool: ModifyItemPool
     modify_logic: ModifyLogic
-    # funny_dialogue: FunnyDialogue
+    # funny_dialogue: FunnyDialog
     # text_plando: TextPlando
     reusable_tms: ReusableTMs

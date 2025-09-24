@@ -240,7 +240,7 @@ class PokemonBWWorld(World):
                 "randomize_wild_pokemon": self.options.randomize_wild_pokemon.value,
                 "randomize_trainer_pokemon": self.options.randomize_trainer_pokemon.value,
                 "pokemon_randomization_adjustments": self.options.pokemon_randomization_adjustments.value,
-                "encounter_plando": self.options.encounter_plando.value,
+                "encounter_plando": self.options.encounter_plando.to_slot_data(),
                 "shuffle_badges": self.options.shuffle_badges.current_key,
                 "shuffle_tm_hm": self.options.shuffle_tm_hm.current_key,
                 "dexsanity": self.options.dexsanity.value,
