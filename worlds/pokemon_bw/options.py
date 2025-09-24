@@ -1,3 +1,4 @@
+
 import logging
 import typing
 from copy import deepcopy
@@ -10,6 +11,27 @@ from Options import (Choice, PerGameCommonOptions, OptionSet, Range, Toggle,
 
 if typing.TYPE_CHECKING:
     from worlds.AutoWorld import World
+
+
+class CasefoldOptionSet(OptionSet):
+    valid_keys_casefold = True
+
+    def __init__(self, value: typing.Iterable[str]):
+        self.value = set(val.casefold() for val in value)
+        super(OptionSet, self).__init__()
+
+    def __contains__(self, item: str):
+        return item.casefold() in self.value
+
+    def verify_keys(self) -> None:
+        if self.valid_keys:
+            dataset = set(word.casefold() for word in self.value)
+            extra = dataset - set(key.casefold() for key in self._valid_keys)
+            if extra:
+                raise OptionError(
+                    f"Found unexpected key {', '.join(extra)} in {getattr(self, 'display_name', self)}. "
+                    f"Allowed keys: {self._valid_keys}."
+                )
 
 
 class GameVersion(Choice):
@@ -53,7 +75,7 @@ class Goal(Choice):
     default = 0
 
 
-class RandomizeWildPokemon(OptionSet):
+class RandomizeWildPokemon(CasefoldOptionSet):
     """
     Randomizes wild pokemon encounters.
     - **Randomize** - Toggles wild pokemon being randomized. Required for any other modifier below.
@@ -78,7 +100,7 @@ class RandomizeWildPokemon(OptionSet):
     default = []
 
 
-class RandomizeTrainerPokemon(OptionSet):
+class RandomizeTrainerPokemon(CasefoldOptionSet):
     """
     Randomizes trainer pokemon.
     - **Randomize** - Toggles trainer pokemon being randomized. Required for any modifier below.
@@ -104,7 +126,7 @@ class RandomizeTrainerPokemon(OptionSet):
     default = []
 
 
-class RandomizeStarterPokemon(OptionSet):
+class RandomizeStarterPokemon(CasefoldOptionSet):
     """
     Randomizes the starter pokemon you receive at the start of the game.
     - **Randomize** - Toggles starter pokemon being randomized. Required for any other modifier.
@@ -125,7 +147,7 @@ class RandomizeStarterPokemon(OptionSet):
     default = []
 
 
-class RandomizeStaticPokemon(OptionSet):
+class RandomizeStaticPokemon(CasefoldOptionSet):
     """
     Randomizes static encounters you can battle and catch throughout the game, e.g. Volcarona in Relic Castle.
     - **Randomize** - Toggles static pokemon being randomized. Required for any other modifier.
@@ -144,7 +166,7 @@ class RandomizeStaticPokemon(OptionSet):
     default = []
 
 
-class RandomizeGiftPokemon(OptionSet):
+class RandomizeGiftPokemon(CasefoldOptionSet):
     """
     Randomizes gift pokemon that you receive for free, e.g. the Larvesta egg on route 18.
     - **Randomize** - Toggles gift pokemon being randomized. Required for any other modifier.
@@ -161,7 +183,7 @@ class RandomizeGiftPokemon(OptionSet):
     default = []
 
 
-class RandomizeTradePokemon(OptionSet):
+class RandomizeTradePokemon(CasefoldOptionSet):
     """
     Randomizes trade offers from NPCs. Any **Randomize ...** is required for the other modifiers.
     - **Randomize offer** - Toggles offered pokemon being randomized.
@@ -180,7 +202,7 @@ class RandomizeTradePokemon(OptionSet):
     default = []
 
 
-class RandomizeLegendaryPokemon(OptionSet):
+class RandomizeLegendaryPokemon(CasefoldOptionSet):
     """
     Randomizes legendary and mythical encounters.
     - **Randomize** - Toggles legendary pokemon being randomized. Required for any other modifier.
@@ -400,7 +422,7 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
         return len(self.value)
 
 
-class RandomizeBaseStats(OptionSet):
+class RandomizeBaseStats(CasefoldOptionSet):
     """
     Randomizes the base stats of every pokemon species.
     - **Randomize** - Toggles base stats being randomized. Required for any other modifier.
@@ -417,7 +439,7 @@ class RandomizeBaseStats(OptionSet):
     default = []
 
 
-class RandomizeEvolutions(OptionSet):
+class RandomizeEvolutions(CasefoldOptionSet):
     """
     Randomizes the evolutions of every pokemon species.
     - **Randomize** - Toggles evolutions being randomized. Required for any other modifier.
@@ -438,7 +460,7 @@ class RandomizeEvolutions(OptionSet):
     default = []
 
 
-class RandomizeCatchRates(OptionSet):
+class RandomizeCatchRates(CasefoldOptionSet):
     """
     Randomizes the catch rate of every pokemon species.
     - **Shuffle** - Gives every species a commonly used catch rate (e.g. 255, 45, 3, ...).
@@ -455,7 +477,7 @@ class RandomizeCatchRates(OptionSet):
     default = []
 
 
-class RandomizeLevelUpMovesets(OptionSet):
+class RandomizeLevelUpMovesets(CasefoldOptionSet):
     """
     Randomizes the moves a pokemon species learns by leveling up.
     - **Randomize** - Toggles level up movesets being randomized. Required for any other modifier.
@@ -478,7 +500,7 @@ class RandomizeLevelUpMovesets(OptionSet):
     default = []
 
 
-class RandomizeTypes(OptionSet):
+class RandomizeTypes(CasefoldOptionSet):
     """
     Randomizes the type(s) of every pokemon species.
     - **Randomize** - Toggles types being randomized. Required for any other modifier.
@@ -497,7 +519,7 @@ class RandomizeTypes(OptionSet):
     default = []
 
 
-class RandomizeAbilities(OptionSet):
+class RandomizeAbilities(CasefoldOptionSet):
     """
     Randomizes the abilities of every pokemon species.
     - **Randomize** - Toggles abilities being randomized. Required for any other modifier.
@@ -516,7 +538,7 @@ class RandomizeAbilities(OptionSet):
     default = []
 
 
-class RandomizeGenderRatio(OptionSet):
+class RandomizeGenderRatio(CasefoldOptionSet):
     """
     Randomizes the gender ratio of every pokemon species.
     - **Shuffle** - Gives every species a commonly used gender ratio (e.g. 50/50, 1 in 8, ...).
@@ -533,7 +555,7 @@ class RandomizeGenderRatio(OptionSet):
     default = []
 
 
-class RandomizeTMHMCompatibility(OptionSet):
+class RandomizeTMHMCompatibility(CasefoldOptionSet):
     """
     Randomizes the TM and HM compatibility of every pokemon species.
     - **Force all TMs** - Forces all TMs to be compatible with every pokemon species.
@@ -706,7 +728,7 @@ class Seensanity(Range):
     range_end = 649
 
 
-class DoorShuffle(OptionSet):
+class DoorShuffle(CasefoldOptionSet):
     """
     Shuffles or randomizes door warps.
     - **Gates** - Shuffles city gate entrances, leading to the region having a different layout than normally.
@@ -743,7 +765,7 @@ class SeasonControl(Choice):
     default = 0
 
 
-class AdjustLevels(OptionSet):
+class AdjustLevels(CasefoldOptionSet):
     """
     Adjusts the levels of wild and trainer pokemon in areas that are in AP earlier accessible than in vanilla
     to not be significantly higher than in surrounding areas (regardless of randomization).
@@ -796,7 +818,7 @@ class AddFairyType(Choice):
     default = 0
 
 
-class ReplaceEvoMethods(OptionSet):
+class ReplaceEvoMethods(CasefoldOptionSet):
     """
     Replaces certain vanilla evolution methods with other methods that are easier to achieve.
     This also excludes them from randomized evolutions.
@@ -818,7 +840,7 @@ class ReplaceEvoMethods(OptionSet):
     default = []
 
 
-class MasterBallSeller(OptionSet):
+class MasterBallSeller(CasefoldOptionSet):
     """
     Adds the possibility to buy or obtain an unlimited amount of Master Balls.
     You can select multiple sellers.
@@ -832,7 +854,7 @@ class MasterBallSeller(OptionSet):
     - **Cost Free** - Makes Master Balls (potentially) cost nothing.
     - **Cost <x>** - Makes Master Balls (potentially) cost x Pokédollars. x can be any number in range of 0 to 30000.
     """
-    display_name = "Replace Evolution Methods"
+    display_name = "Master Ball Seller"
     valid_keys_casefold = True
     valid_keys = [
         "Ns Castle",
@@ -856,11 +878,11 @@ class MasterBallSeller(OptionSet):
                 compatible.add(val.replace("'", ""))
             else:
                 compatible.add(val)
-        self.value = compatible
+        super().__init__(compatible)
 
     def verify_keys(self) -> None:
         dataset = set(word.casefold() for word in self.value)
-        extra = dataset - self._valid_keys
+        extra = dataset - set(key.casefold() for key in self._valid_keys)
         if extra:
             bad = []
             for key in extra:
@@ -907,7 +929,7 @@ class TrapsProbability(Range):
     range_end = 100
 
 
-class ModifyItemPool(OptionSet):
+class ModifyItemPool(CasefoldOptionSet):
     """
     Modifies what items your world puts into the item pool.
 
@@ -925,7 +947,7 @@ class ModifyItemPool(OptionSet):
     default = []
 
 
-class ModifyLogic(OptionSet):
+class ModifyLogic(CasefoldOptionSet):
     """
     Modifies parts of what's logically required for various locations.
 
