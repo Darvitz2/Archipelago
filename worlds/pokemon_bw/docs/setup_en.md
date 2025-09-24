@@ -4,7 +4,7 @@
 
 As we are using BizHawk, this guide is only applicable to Windows and Linux systems. 
 This APWorld is still in development, so expect bugs! 
-If you find one, please report it to the #future-game-design thread for this game!
+If you find one, please report it in the channel of this game!
 
 ## Required Software
 
@@ -17,7 +17,7 @@ If you find one, please report it to the #future-game-design thread for this gam
 - The built-in BizHawk client within the Archipelago software, which can be found 
   [here](https://github.com/ArchipelagoMW/Archipelago/releases)
 - A .nds file for the english version of Pokémon Black and White
-  - The english versions for USA and Europe are the same
+  - The english versions for the USA and Europe are the same
 
 ## Optional Software
 

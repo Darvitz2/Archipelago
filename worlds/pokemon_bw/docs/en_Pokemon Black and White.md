@@ -34,7 +34,7 @@ while still using the well-known grid-based movement mechanics and battle UI.
   <br>Just open the game and connect to the server again. Important items such as key items, badges, etc. will get 
       automatically re-added if collected but missing in your save file.
 - ***I want to contribute to development, how can I do that?***
-  <br>First of all, propose your ideas/changes/... in the game's thread, so we can talk about things beforehand.
+  <br>First of all, propose your ideas/changes/... in the game's channel, so we can talk about things beforehand.
   <br>The fork of this implementation is found at https://github.com/SparkyDaDoggo/Archipelago/tree/main.
 - ***This game info page looks quite different compared to those of other games...***
   <br>This game has not been merged into main yet, and people tend to get confused by "not working" option
