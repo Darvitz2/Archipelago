@@ -127,24 +127,18 @@ class PokemonBWWorld(World):
             self.seed = self.random.getrandbits(64)
 
         self.random.seed(self.seed)
-        cost_start, cost_end = -1, -1
-        if "Cost: Free" in self.options.master_ball_seller:
-            cost_start = 0
-            cost_end = 0
-        if "Cost: 1000" in self.options.master_ball_seller:
-            cost_start = 1000 if cost_start == -1 else cost_start
-            cost_end = 1000
-        if "Cost: 3000" in self.options.master_ball_seller:
-            cost_start = 3000 if cost_start == -1 else cost_start
-            cost_end = 3000
-        if "Cost: 10000" in self.options.master_ball_seller:
-            cost_start = 10000 if cost_start == -1 else cost_start
-            cost_end = 10000
-        if cost_start == -1 and len(self.options.master_ball_seller.value) > 0:
-            raise OptionError(f"Player {self.player} ({self.player_name}) added "
-                              f"{len(self.options.master_ball_seller.value)} Master Ball seller(s) "
-                              f"without adding any cost modifier")
-        self.master_ball_seller_cost = self.random.randrange(cost_start, cost_end+1, 500) if cost_start != -1 else 0
+
+        cost_start, cost_end = 999999, -1
+        for modifier in self.options.master_ball_seller.value:
+            if modifier.casefold().startswith("cost"):
+                if modifier.casefold().endswith("free"):
+                    cost = 0
+                else:
+                    cost = int(modifier[modifier.index(" ")+1:])
+                cost_start = min(cost_start, cost)
+                cost_end = max(cost_end, cost)
+        self.master_ball_seller_cost = self.random.randrange(cost_start, cost_end+1, 500) if cost_end != -1 else 3000
+
         self.regions = locations.get_regions(self)
         self.rules_dict = locations.create_rule_dict(self)
         locations.connect_regions(self)

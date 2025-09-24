@@ -259,7 +259,7 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
 
     @classmethod
     def from_any(cls, data: typing.Any) -> typing.Self:
-        if not isinstance(data, typing.Iterable):
+        if not isinstance(data, typing.Iterable) or isinstance(data, str):
             raise OptionError(f"Expected iterable for Encounter Plando, got {type(data)}")
         plandos: list[PlandoEncounter] = []
         for plando in data:
@@ -822,31 +822,61 @@ class MasterBallSeller(OptionSet):
     """
     Adds the possibility to buy or obtain an unlimited amount of Master Balls.
     You can select multiple sellers.
-    If multiple cost modifiers are added, a random cost in range between them gets selected.
-    Adding any seller, but no cost modifier, will raise an OptionError.
+    If multiple cost modifiers are added, a random cost in range between them (snapped to 500-steps) gets selected.
+    Adding no cost modifier defaults to 3000.
 
-    - **N's Castle** - Repurposes an NPC in N's Castle, who can be found in the same room as the grunt who gives Ultra Balls to the player, who gives/sells Master Balls to the player.
+    - **Ns Castle** - Repurposes an NPC in N's Castle, who can be found in the same room as the grunt giving Ultra Balls to the player, to give/sell Master Balls to the player.
     - **PC** - Adds an option to every PC in Pokémon Centers to buy/obtain Master Balls.
-    - **Cheren's Mom** - Repurposes Cheren's Mom in Nuvema Town to give/sell Master Balls.
-    - **Undella Mansion seller** - Adds the Master Ball to the pool of items that you can buy for a random price. His offers are not affected by any cost modifier.
-    - **Cost: Free** - Makes Master Balls (potentially) cost nothing.
-    - **Cost: 1000** - Makes Master Balls (potentially) cost 1000 Pokédollars.
-    - **Cost: 3000** - Makes Master Balls (potentially) cost 3000 Pokédollars.
-    - **Cost: 10000** - Makes Master Balls (potentially) cost 10000 Pokédollars.
+    - **Cherens Mom** - Repurposes Cheren's Mom in Nuvema Town to give/sell Master Balls.
+    - **Undella Mansion seller** - Adds the Master Ball to the pool of items that you can buy from the evolution items seller in the Undella Mansion for a random price. His offers are not affected by any cost modifier.
+    - **Cost Free** - Makes Master Balls (potentially) cost nothing.
+    - **Cost <x>** - Makes Master Balls (potentially) cost x Pokédollars. x can be any number in range of 0 to 30000.
     """
     display_name = "Replace Evolution Methods"
     valid_keys_casefold = True
     valid_keys = [
-        "N's Castle",
+        "Ns Castle",
         "PC",
-        "Cheren's Mom",
+        "Cherens Mom",
         "Undella Mansion seller",
-        "Cost: Free",
-        "Cost: 1000",
-        "Cost: 3000",
-        "Cost: 10000",
+        "Cost Free",
+        "Cost 1000",
+        "Cost 3000",
+        "Cost 10000",
     ]
     default = []
+
+    def __init__(self, value: typing.Iterable[str]):
+        super().__init__(value)
+        compatible = set()
+        for val in self.value:
+            if val in ("Cost: Free", "Cost: 1000", "Cost: 3000", "Cost: 10000"):
+                compatible.add(val.replace(":", ""))
+            elif val in ("N's Castle", "Cheren's Mom"):
+                compatible.add(val.replace("'", ""))
+            else:
+                compatible.add(val)
+        self.value = compatible
+
+    def verify_keys(self) -> None:
+        dataset = set(word.casefold() for word in self.value)
+        extra = dataset - self._valid_keys
+        if extra:
+            bad = []
+            for key in extra:
+                split = key.split()
+                if (
+                    len(split) != 2
+                    or split[0] != "cost"
+                    or not split[1].isnumeric()
+                    or int(split[1]) not in range(0, 10001)
+                ):
+                    bad.append(key)
+            if bad:
+                raise OptionError(
+                    f"Found unexpected key {', '.join(bad)} in {getattr(self, 'display_name', self)}. "
+                    f"Allowed keys: {self._valid_keys} and \"Cost x\" for any x in range 0 to 30000."
+                )
 
 
 class WonderTrade(Toggle):

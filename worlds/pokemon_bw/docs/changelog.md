@@ -1,6 +1,29 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.3.4
+
+- Fixed some randomized trainer Pokémon still having the vanilla Pokémon's moves
+- Fixed randomized seasons not being written into save data properly, leading to all seasons being available immediately
+- Fixed enabling multiple Master Ball sellers leading to not all of them being available
+- Made flag and item writing in client more error-proof
+- Fixed `Nacrene City - Item from Lenora after Relic Castle` not showing up in UT
+- Added extended hint information for Dexsanity locations
+- Added location aliases for both Nidorans' Dexsanity locations in UT
+- Fixed Aha prizes having flipped flags
+- Added `Require Flash` to the `modify_logic` option
+- Fixed UT crashing when Encounter Plando was used in generating
+- Some QoL changes for writing the player yaml:
+  - Made all OptionSet options ignore casing
+  - Made Encounter Plando ignore casing for argument names, seasons, and method
+  - Made Encounter Plando accept `season` and `slot` as alternatives to `seasons` and `slots`
+- Tweaked the Master Ball Seller option:
+  - Removed `:` and `'` characters from modifiers
+    - However, old yamls are still compatible
+  - Added the possibility to add any cost modifier in range of 0 to 30000
+  - Removed throwing an option error if any seller, but no cost is added
+    - No cost modifier now instead defaults to 3000
+
 ## 0.3.3
 
 This update only ports over the fixes from the 0.2.2 update, which was released right before this:
@@ -58,6 +81,10 @@ This update only ports over the fixes from the 0.2.2 update, which was released 
 - Fixed rare(?) BizHawk client crashing due to slotdata not being received yet
 - Fixed items getting lost after soft resetting after receiving an item after the last save
 - Fixed TM/HM checking NPC not showing up when `pokemon_master` is chosen as the goal
+
+## 0.2.3
+
+- Fixed certain AP-only NPCs not showing up in save files that were affected by a bug from before 0.2.2
 
 ## 0.2.2
 
