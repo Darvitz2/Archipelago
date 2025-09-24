@@ -23,6 +23,9 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
   - Added the possibility to add any cost modifier in range of 0 to 30000
   - Removed throwing an option error if any seller, but no cost is added
     - No cost modifier now instead defaults to 3000
+- Added error message for patch file being too old
+- Added automatic ROM updates
+- Added details for incorrect ROM header error while patching
 
 ## 0.3.3
 
