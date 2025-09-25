@@ -56,7 +56,7 @@ def patch_species(rom: NintendoDSRom, world_package: str, bw_patch_instance: "Po
                 remove_unique_moves = True
 
         if remove_unique_moves:
-            trainer_file &= 254
+            trainer_file[0] &= 254
             trainer_narc.files[file_num] = bytes(trainer_file)
             new_pokemon_file = b''
             for team_slot in range(len(pokemon_file)//entry_length):
@@ -66,4 +66,5 @@ def patch_species(rom: NintendoDSRom, world_package: str, bw_patch_instance: "Po
         else:
             pokemon_narc.files[file_num] = bytes(pokemon_file)
 
+    rom.setFileByName("a/0/9/2", trainer_narc.save())
     rom.setFileByName("a/0/9/3", pokemon_narc.save())

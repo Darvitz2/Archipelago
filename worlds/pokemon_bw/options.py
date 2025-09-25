@@ -228,7 +228,6 @@ class PokemonRandomizationAdjustments(OptionCounter):
     - **Stats leniency** - The minimum difference between base stat totals of vanilla and randomized species (for options with **Similar base stats** activated). Allowed values are integers in range 0 to 1530.
     """
     display_name = "Pokemon Randomization Adjustments"
-    valid_keys_casefold = True
     valid_keys = [
         "Stats leniency",
     ]
@@ -601,7 +600,6 @@ class StatsRandomizationAdjustments(OptionCounter):
     # - **Gender ratio maximum** - The maximum gender ratio, if randomized.
     #                              A gender ratio of 0 is always female and 255 is always male.
     display_name = "Stats Randomization Adjustments"
-    valid_keys_casefold = True
     valid_keys = [
         # "Stats total minimum",
         # "Stats total maximum",
@@ -869,9 +867,8 @@ class MasterBallSeller(CasefoldOptionSet):
     default = []
 
     def __init__(self, value: typing.Iterable[str]):
-        super().__init__(value)
         compatible = set()
-        for val in self.value:
+        for val in value:
             if val in ("Cost: Free", "Cost: 1000", "Cost: 3000", "Cost: 10000"):
                 compatible.add(val.replace(":", ""))
             elif val in ("N's Castle", "Cheren's Mom"):
@@ -891,7 +888,7 @@ class MasterBallSeller(CasefoldOptionSet):
                     len(split) != 2
                     or split[0] != "cost"
                     or not split[1].isnumeric()
-                    or int(split[1]) not in range(0, 10001)
+                    or int(split[1]) not in range(0, 30001)
                 ):
                     bad.append(key)
             if bad:

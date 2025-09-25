@@ -1,35 +1,24 @@
 # Important stuff
 
 
-# 0.3.4
+# 0.3.5
 
-- Chargestone cave make north to south shortcut open after traversing it for the first time (maybe when battled N)
-- add npc to dragonspiral tower that tells you how to travers 2F
-- snap undella mansion seller prices to 500-steps
-- change dialog of grunts on route 8, people tend to get confused
-- shopping mall nine seller giving ? item when pressing b
-- castelia and driftveil seen pokemon location maybe only checking regional dex
-- route 8 bianca items logic, apparently said to be in logic without light/dark stone, but blocked by grunts wanting the stone
-- juniper seen number locations now checking for caught only
-- musharna encounter not appearing on first visit?
-- after everything else: check docs for up-to-date information, update tests
+- fix seen/caught locations to only count unovan pokémon
+- somehow account for excluded locations in shuffle badges/tms
+- reduce different forms weight in randomization
+- remove arceus types
+- Merge PR adding "Randomize" to trainer/wild if other modifiers present
+- fix evolution logic
+- fix encounter plando overwriting the same slot twice, leading to logic errors
+- add deerling forms to always required species
+  - also fix that location's progress type
 
 # 0.4.0
 
-- fixes and other stuff due to UT:
-  - somehow account for excluded locations in shuffle badges/tms
-  - reduce different forms weight in randomization
-  - remove arceus types
-  - Merge PR adding "Randomize" to trainer/wild if other modifiers present
-  - fix evolution logic
-  - fix encounter plando overwriting the same slot twice, leading to logic errors
-  - add deerling forms to always required species
-    - also fix that location's progress type
 - add now-possible locations
-- more things for encounter plando
-  - "None" species for Encounter Plando, to give a chance to not plando anything
 - fix bianca being spelled "Bianka" on some location names
 - Fix Guidance Chamber items being called "Mistralton Cave 3F..."
+- add missing hidden item in chargestone cave b2f and change the other hidden itm's name
 - More modifiers
   - Randomize Wild Pokémon
     - Prevent overpowered pokémon 
@@ -44,7 +33,7 @@
   - Wild pokémon 
     - This will throw an OptionError if "Ensure all obtainable" is selected and any blacklisted is base stage
   - Trainer pokémon
-- after everything else: check docs for up-to-date information, update tests
+- after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
 
@@ -63,6 +52,7 @@
 - route 18 reappearing and undella bay reappearing items get still detected after pickup
 - make reusable tms option add funny dialog
 - BizHawk 2.11 having issues with modded gen 5 roms
+- Chargestone cave make north to south shortcut open after traversing it for the first time (maybe when battled N)
 
 # Single reports, cannot recreate, need to wait for more reports
 
@@ -74,4 +64,5 @@
 - stone grunts not disappearing?
 - sequence break problem with npcs not moving, see channel
 - incredibly low catch chances? idk how that could be related to the apworld in any way
-- plando items having issues? plandoing basic badge into abyssal ruins sometimes raises fillerrors regarding this item not being placeable
+- plando items having issues? plandoing basic badge into abyssal ruins sometimes raises fillerrors about this item not being placeable
+- route 8 bianca items logic, apparently said to be in logic without light/dark stone, but blocked by grunts wanting the stone

@@ -137,11 +137,11 @@ class PatchMethods:
                 patch.files[file] = opened_zipfile.read(file)
 
         if tuple(manifest["bw_patch_format"]) > version.patch_file():
-            raise Exception(f"File (BW patch version: {'.'.join(manifest['bw_patch_format'])}) too new "
+            raise Exception(f"File (BW patch version: {'.'.join(str(i) for i in manifest['bw_patch_format'])}) too new "
                             f"for this handler (BW patch version: {version.patch_file()}). "
                             f"Please update your apworld.")
         elif tuple(manifest["bw_patch_format"]) < version.patch_file():
-            raise Exception(f"File (BW patch version: {'.'.join(manifest['bw_patch_format'])}) too old "
+            raise Exception(f"File (BW patch version: {'.'.join(str(i) for i in manifest['bw_patch_format'])}) too old "
                             f"for this handler (BW patch version: {version.patch_file()}). "
                             f"Either re-generate your world or downgrade to an older apworld version.")
 
