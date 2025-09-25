@@ -17,8 +17,6 @@ if TYPE_CHECKING:
 
 class PokemonBlackPatch(APAutoPatchInterface):
     game = "Pokemon Black and White"
-    bw_patch_format = (0, 3, 0)
-    rom_patch_version = (0, 3, 4)
     patch_file_ending = ".apblack"
     result_file_ending = ".nds"
 
@@ -46,8 +44,6 @@ class PokemonBlackPatch(APAutoPatchInterface):
 
 class PokemonWhitePatch(APAutoPatchInterface):
     game = "Pokemon Black and White"
-    bw_patch_format = (0, 3, 0)
-    rom_patch_version = (0, 3, 4)
     patch_file_ending = ".apwhite"
     result_file_ending = ".nds"
 
@@ -105,21 +101,25 @@ class PatchMethods:
 
     @staticmethod
     def get_manifest(patch: PokemonBWPatch, manifest: dict[str, Any]) -> Dict[str, Any]:
-        manifest["bw_patch_format"] = patch.bw_patch_format
+        from .data import version
+
+        manifest["bw_patch_format"] = version.patch_file()
         return manifest
 
     @staticmethod
-    def patch(patch: PokemonBWPatch, target: str, version: str) -> None:
+    def patch(patch: PokemonBWPatch, target: str, version_name: str) -> None:
+        from .data import version
+
         patch.read()
 
         if pathlib.Path(target).exists():
             with open(target, "rb") as f:
                 header_part = f.read(0xA0)
                 found_rom_version = tuple(header_part[0x9D:0xA0])
-                if patch.rom_patch_version <= found_rom_version:
+                if version.rom() <= found_rom_version:
                     return
 
-        base_data = get_base_rom_bytes(version)
+        base_data = get_base_rom_bytes(version_name)
         rom = ndspy_rom.NintendoDSRom(base_data)
         procedures: list[str] = str(patch.get_file("procedures.txt"), "utf-8").splitlines()
         for prod in procedures:
@@ -130,18 +130,19 @@ class PatchMethods:
     @staticmethod
     def read_contents(patch: PokemonBWPatch, opened_zipfile: zipfile.ZipFile,
                       manifest: Dict[str, Any]) -> Dict[str, Any]:
+        from .data import version
 
         for file in opened_zipfile.namelist():
             if file not in ["archipelago.json"]:
                 patch.files[file] = opened_zipfile.read(file)
 
-        if tuple(manifest["bw_patch_format"]) > patch.bw_patch_format:
+        if tuple(manifest["bw_patch_format"]) > version.patch_file():
             raise Exception(f"File (BW patch version: {'.'.join(manifest['bw_patch_format'])}) too new "
-                            f"for this handler (BW patch version: {patch.bw_patch_format}). "
+                            f"for this handler (BW patch version: {version.patch_file()}). "
                             f"Please update your apworld.")
-        elif tuple(manifest["bw_patch_format"]) < patch.bw_patch_format:
+        elif tuple(manifest["bw_patch_format"]) < version.patch_file():
             raise Exception(f"File (BW patch version: {'.'.join(manifest['bw_patch_format'])}) too old "
-                            f"for this handler (BW patch version: {patch.bw_patch_format}). "
+                            f"for this handler (BW patch version: {version.patch_file()}). "
                             f"Either re-generate your world or downgrade to an older apworld version.")
 
         return manifest

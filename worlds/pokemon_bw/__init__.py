@@ -1,10 +1,11 @@
 import datetime
+import logging
 import os
 from typing import ClassVar, Mapping, Any, List
 
 import settings
 from BaseClasses import MultiWorld, Tutorial, Item, Location, Region
-from Options import Option, OptionError
+from Options import Option
 from worlds.AutoWorld import World, WebWorld
 from . import items, locations, options, bizhawk_client, rom, groups
 from .generate import EncounterEntry, StaticEncounterEntry, TradeEncounterEntry, TrainerPokemonEntry
@@ -113,6 +114,8 @@ class PokemonBWWorld(World):
         # Load values from UT if this is a regenerated world
         if hasattr(self.multiworld, "re_gen_passthrough"):
             if self.game in self.multiworld.re_gen_passthrough:
+                from .data import version
+
                 self.ut_active = True
                 re_ge_slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
                 re_gen_options: dict[str, Any] = re_ge_slot_data["options"]
@@ -122,6 +125,10 @@ class PokemonBWWorld(World):
                     if opt is not None:
                         setattr(self.options, key, opt.from_any(value))
                 self.seed = re_ge_slot_data["seed"]
+                loaded_ut_version = re_ge_slot_data.get("ut_compatibility", (0, 3, 2))
+                if version.ut() != re_ge_slot_data["ut_compatibility"]:
+                    logging.warning("UT compatibility mismatch detected. You can continue tracking with this "
+                                    "apworld version, but tracking might not be entirely accurate.")
 
         if not self.ut_active:
             self.seed = self.random.getrandbits(64)
@@ -226,6 +233,8 @@ class PokemonBWWorld(World):
             ).write()
 
     def fill_slot_data(self) -> Mapping[str, Any]:
+        from .data import version
+
         # Some options and data are included for UT
         return {
             "options": {
@@ -244,8 +253,11 @@ class PokemonBWWorld(World):
                 "modify_item_pool": self.options.modify_item_pool.value,
                 "modify_logic": self.options.modify_logic.value,
             },
-            "seed": self.seed,  # Needed for UT
-            "master_ball_seller_cost": self.master_ball_seller_cost,  # NOT needed for UT
+            # Needed for UT
+            "seed": self.seed,
+            "ut_compatibility": version.ut(),
+            # NOT needed for UT
+            "master_ball_seller_cost": self.master_ball_seller_cost,
         }
 
     def interpret_slot_data(self, slot_data: dict[str, Any]) -> dict[str, Any]:

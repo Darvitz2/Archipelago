@@ -15,7 +15,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Fixed UT crashing when Encounter Plando was used in generating
 - Some QoL changes for writing the player yaml:
   - Made all OptionSet options ignore casing
-  - Made Encounter Plando ignore casing for argument names, seasons, and method
+  - Made Encounter Plando ignore casing for argument names, seasons, and methods
   - Made Encounter Plando accept `season` and `slot` as alternatives to `seasons` and `slots`
 - Tweaked the Master Ball Seller option:
   - Removed `:` and `'` characters from modifiers
@@ -26,6 +26,12 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added error message for patch file being too old
 - Added automatic ROM updates
 - Added details for incorrect ROM header error while patching
+- Fixed the Musharna static encounter not appearing immediately
+- Made the Undella Town Mansion seller snap his prices to 500-steps
+- Changed the dialog of the grunts on route 8 to better reflect how to make them disappear
+- Fixed the evolution items seller in Shopping Mall Nine giving a `???` item when pressing B
+- Added a warning to UT users when tracking with a not entirely compatible apworld version (e.g. due to RNG changes)
+- Added `None` species to Encounter Plando to make a plando entry not put anything into the specified slot(s)
 
 ## 0.3.3
 
@@ -100,7 +106,7 @@ This update was published after 0.3.2, thereby including a few retroactive bug f
 
 New fixes:
 - Fixed fossils not being revivable after the Plasma grunts stole the Dragon Skull
-- Fixed Professor Juniper ignoring the national dex for hre TM rewards
+- Fixed Professor Juniper ignoring the national dex for her TM rewards
 - Fixed Professor Juniper not always being in the lab
 - Fixed Champion goal triggering after fighting Ghetsis
 

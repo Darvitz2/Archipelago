@@ -1,10 +1,9 @@
-import itertools
-from typing import TYPE_CHECKING, Callable
+
+from typing import TYPE_CHECKING
 from .. import EncounterEntry
 
 if TYPE_CHECKING:
     from ... import PokemonBWWorld
-    from ...data import SpeciesData
 
 
 def generate_wild(world: "PokemonBWWorld",
@@ -47,6 +46,8 @@ def generate_wild(world: "PokemonBWWorld",
             species = plando.species[0]
         else:
             species = world.random.choice(plando.species)
+        if species.casefold() == "none":
+            continue
         species_data = by_name[species]
         species_id = (species_data.dex_number, species_data.form)
         map_abbr = maps[plando.map][0]

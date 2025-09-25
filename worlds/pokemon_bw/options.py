@@ -382,7 +382,7 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
             if len(plando.species) == 0:
                 reasons.append("No species provided")
             for species in plando.species:
-                if species not in by_name:
+                if species.casefold() != "none" and species not in by_name:
                     reasons.append(f"Unknown species {species}")
             if reasons:
                 invalid.append(f"{plando.map}: " + ", ".join(reasons))

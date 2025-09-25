@@ -41,10 +41,11 @@ Every entry consists of 3 to 5 arguments:
   See [this site](data/slot%20values.md) for further information on allowed values.
 - `species` determines which species should be placed into the specified slot(s).
   You can either put in a single species name or a list of species names.
+  `None` can be used (preferably in lists) to make the generator not plando any species into the specified slot(s).
   If multiple species are provided, a random one out of them is chosen.
   Writing the same species multiple times is allowed and can increase its chance of being chosen over 
   the other species in the list.
-  See [this site](data/species.md) for a list of all species names. 
+  See [this site](data/species.md) for a list of all species names.
   Note that different forms have different names, e.g. Unown (A)/(B)/...
 
 Specifying a slot that does not exist in the game (e.g. `Grass` slots in Striaton City) will not have any effect
@@ -82,7 +83,9 @@ Pokemon Black and White:
         - 10
       species:
         - Snorlax
+        - Snorlax
         - Dragonite
-        - Kingdra
         - Bidoof
+        - None
+        - None
 ```
