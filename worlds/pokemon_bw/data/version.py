@@ -29,3 +29,25 @@ def rom() -> tuple[int, int, int]:
 
 def ut() -> tuple[int, int, int]:
     return compatibility[version].ut
+
+
+if __name__ == "__main__":
+    import orjson
+    import os
+    import zipfile
+
+    apworld = "pokemon_bw"
+
+    with zipfile.ZipFile("D:/Games/Archipelago/custom_worlds/"+apworld+".apworld", 'w', zipfile.ZIP_DEFLATED, True, 9) as zipf:
+        metadata = {
+            "game": "Pokemon Black and White",
+            "minimum_ap_version": "0.6.3",
+            "authors": ["BlastSlimey", "SparkyDaDoggo"],
+            "world_version": ".".join(str(i) for i in version)
+        }
+        zipf.writestr(os.path.join(apworld, "archipelago.json"), orjson.dumps(metadata))
+        for root, dirs, files in os.walk("../"):
+            for file in files:
+                zipf.write(os.path.join(root, file),
+                           os.path.relpath(os.path.join(root, file),
+                                           "../../"))
