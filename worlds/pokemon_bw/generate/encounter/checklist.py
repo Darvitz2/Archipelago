@@ -31,14 +31,13 @@ def get_species_checklist(world: "PokemonBWWorld") -> tuple[list[str], set[str]]
             "Deerling (Spring)",
             "Deerling (Summer)",
             "Deerling (Autumn)",
-            "Deerling (Winter)"
+            "Deerling (Winter)",
         ]
         for species in unova_guaranteed:
             if species not in always_required:
                 always_required.append(species)
 
-        return unova[:115] + [
-        ], set()
+        return always_required, set()
 
 
 def check_species(world: "PokemonBWWorld", checklist: tuple[list[str], set[str]], species: str, loop=0) -> None:

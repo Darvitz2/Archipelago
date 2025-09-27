@@ -5,6 +5,12 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 
 - Added evolutions to extended Dexsanity hints
 - Fixed "... for seeing x Pokémon" locations to only account for Unovan Pokémon
+  - Also made sure there are always enough species obtainable for them when randomized
+- Fixed Encounter Plando overwriting the slots multiple times, leading to logic errors
+  - Multiple entries overwriting the same slot(s) now displays a warning in world generation
+- Fixed `Route 6 - Item from scientist for all Deerling forms` sometimes being impossible 
+  due to not all Deerling forms being obtainable
+- Fixed the logic of item-based evolutions
 
 ## 0.3.5
 

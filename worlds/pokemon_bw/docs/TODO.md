@@ -1,19 +1,12 @@
 # Important stuff
 
 
-# 0.3.6
+# 0.4.0
 
 - somehow account for excluded locations in shuffle badges/tms
 - reduce different forms weight in randomization
 - remove arceus types
 - Merge PR adding "Randomize" to trainer/wild if other modifiers present
-- fix evolution logic
-- fix encounter plando overwriting the same slot twice, leading to logic errors
-- add deerling forms to always required species
-  - also fix that location's progress type
-
-# 0.4.0
-
 - add now-possible locations
 - fix bianca being spelled "Bianka" on some location names
 - add "for seeing 25 species" to location in Castelia City
