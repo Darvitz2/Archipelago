@@ -14,17 +14,30 @@ def get_species_checklist(world: "PokemonBWWorld") -> tuple[list[str], set[str]]
     elif "Ensure all obtainable" in world.options.randomize_wild_pokemon:
         return [species for species in by_name], set()
     else:  # Just "Randomize"
-        unova: list[str] = [name for name in unova_species]
-        world.random.shuffle(unova)
-        unova = unova[:115]
-        for species in ("Tornadus", "Thundurus"):
-            if species not in unova:
-                unova.append(species)
-        return unova[:115] + [
+        always_required = [
             "Celebi",
             "Raikou",
             "Entei",
             "Suicune",
+        ]
+
+        unova = [name for name in unova_species]
+        world.random.shuffle(unova)
+        always_required += unova[:115]
+
+        unova_guaranteed = [
+            "Tornadus",
+            "Thundurus",
+            "Deerling (Spring)",
+            "Deerling (Summer)",
+            "Deerling (Autumn)",
+            "Deerling (Winter)"
+        ]
+        for species in unova_guaranteed:
+            if species not in always_required:
+                always_required.append(species)
+
+        return unova[:115] + [
         ], set()
 
 
