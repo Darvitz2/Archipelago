@@ -78,6 +78,7 @@ class Goal(Choice):
 class RandomizeWildPokemon(CasefoldOptionSet):
     """
     Randomizes wild pokemon encounters.
+
     - **Randomize** - Toggles wild pokemon being randomized. Required for any other modifier below.
     - **Ensure all obtainable** - Ensures that every pokemon species is obtainable by either catching or evolving. This is automatically checked if **National pokedex** is chosen as the goal.
     - **Similar base stats** - Tries to keep every randomized pokemon at a similar base stat total as the replaced encounter.
@@ -85,6 +86,9 @@ class RandomizeWildPokemon(CasefoldOptionSet):
     - **Area 1-to-1** - Keeps the amount of different encounters and their encounter rate in every area.
     - **Merge phenomenons** - Makes rustling grass, rippling water spots, dust clouds, and flying shadows in the same area have only one encounter. Takes priority over **Area 1-to-1**.
     - **Prevent rare encounters** - Randomizes the encounter slots with the lowest chance in each area to the same pokemon. Takes priority over **Area 1-to-1**.
+
+    It is **highly recommended** to include **Prevent rare encounters** if you want to randomize wild pokemon,
+    else you might find yourself searching for two 1% encounters on every route.
     """
     display_name = "Randomize Wild Pokemon"
     valid_keys_casefold = True
@@ -850,7 +854,7 @@ class MasterBallSeller(CasefoldOptionSet):
     - **Cherens Mom** - Repurposes Cheren's Mom in Nuvema Town to give/sell Master Balls.
     - **Undella Mansion seller** - Adds the Master Ball to the pool of items that you can buy from the evolution items seller in the Undella Mansion for a random price. His offers are not affected by any cost modifier.
     - **Cost Free** - Makes Master Balls (potentially) cost nothing.
-    - **Cost <x>** - Makes Master Balls (potentially) cost x Pokédollars. x can be any number in range of 0 to 30000.
+    - **Cost x** - Makes Master Balls (potentially) cost x Pokédollars. x can be any number in range of 0 to 30000.
     """
     display_name = "Master Ball Seller"
     valid_keys_casefold = True

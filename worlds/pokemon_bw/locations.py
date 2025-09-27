@@ -138,7 +138,7 @@ def extend_dexsanity_hints(world: "PokemonBWWorld", hint_data: dict[int, dict[in
             places_for_location[location] = set()
         places_for_location[location].add(catching_place)
     for static_slot, entry in world.static_encounter.items():
-        catching_place = static_slot[:static_slot.rindex("Encounter")]
+        catching_place = static_slot[:static_slot.rfind("Encounter")]
         pokemon = by_number[entry.species_id[0]]
         location = "Pokédex - " + pokemon
         if location not in places_for_location:

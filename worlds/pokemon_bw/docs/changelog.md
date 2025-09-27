@@ -1,6 +1,11 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.3.5
+
+- Fixed including any Dexsanity location crashing world generation
+- Made automatic rom updating also downgrade newer roms (due to possible conflicts with used flags etc.)
+
 ## 0.3.4
 
 - Fixed some randomized trainer Pokémon still having the vanilla Pokémon's moves

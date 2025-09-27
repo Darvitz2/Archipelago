@@ -1,7 +1,7 @@
 # Important stuff
 
 
-# 0.3.5
+# 0.3.6
 
 - fix seen/caught locations to only count unovan pokémon
 - somehow account for excluded locations in shuffle badges/tms
@@ -18,7 +18,7 @@
 - add now-possible locations
 - fix bianca being spelled "Bianka" on some location names
 - Fix Guidance Chamber items being called "Mistralton Cave 3F..."
-- add missing hidden item in chargestone cave b2f and change the other hidden itm's name
+- add missing hidden item in chargestone cave b2f and change the other hidden item's name
 - More modifiers
   - Randomize Wild Pokémon
     - Prevent overpowered pokémon 
