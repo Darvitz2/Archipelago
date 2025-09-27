@@ -1,5 +1,5 @@
 from .. import ExtendedRule, InclusionRule
-from ..pokemon import pokedex
+from ..pokemon import species
 from ..items import tm_hm
 
 
@@ -151,22 +151,10 @@ can_find_woman_on_village_bridge: ExtendedRule = lambda state, world: state.can_
 has_forces_of_nature: ExtendedRule = lambda state, world: state.has_all(("Thundurus", "Tornadus"), world.player)
 has_celebi: ExtendedRule = lambda state, world: state.has("Celebi", world.player)
 has_legendary_beasts: ExtendedRule = lambda state, world: state.has_all(("Entei", "Raikou", "Suicune"), world.player)
-has_25_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 25
-    or state.can_reach_region("N's Castle", world.player)
-)
-has_51_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 51
-    or state.can_reach_region("N's Castle", world.player)
-)
-has_60_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 60
-    or state.can_reach_region("N's Castle", world.player)
-)
-has_115_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 115
-    or state.can_reach_region("N's Castle", world.player)
-)
+has_25_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 25
+has_51_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 51
+has_60_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 60
+has_115_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 115
 
 
 # Miscellaneous requirements

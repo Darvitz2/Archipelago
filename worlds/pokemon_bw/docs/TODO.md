@@ -3,7 +3,6 @@
 
 # 0.3.6
 
-- fix seen/caught locations to only count unovan pokémon
 - somehow account for excluded locations in shuffle badges/tms
 - reduce different forms weight in randomization
 - remove arceus types
@@ -17,6 +16,7 @@
 
 - add now-possible locations
 - fix bianca being spelled "Bianka" on some location names
+- add "for seeing 25 species" to location in Castelia City
 - Fix Guidance Chamber items being called "Mistralton Cave 3F..."
 - add missing hidden item in chargestone cave b2f and change the other hidden item's name
 - More modifiers

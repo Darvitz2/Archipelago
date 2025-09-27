@@ -1,10 +1,16 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.3.6
+
+- Added evolutions to extended Dexsanity hints
+- Fixed "... for seeing x Pokémon" locations to only account for Unovan Pokémon
+
 ## 0.3.5
 
 - Fixed including any Dexsanity location crashing world generation
 - Made automatic rom updating also downgrade newer roms (due to possible conflicts with used flags etc.)
+- Added apworld manifest
 
 ## 0.3.4
 

@@ -7,16 +7,20 @@ if TYPE_CHECKING:
 def get_species_checklist(world: "PokemonBWWorld") -> tuple[list[str], set[str]]:
     # Returns ({to be checked species}, {already checked species})
     # Species needed for trade are added in generate_trade_encounters()
-    from ...data.pokemon.species import by_name
+    from ...data.pokemon.species import by_name, unova_species
 
     if "Randomize" not in world.options.randomize_wild_pokemon:
         return [], set()
     elif "Ensure all obtainable" in world.options.randomize_wild_pokemon:
         return [species for species in by_name], set()
     else:  # Just "Randomize"
-        return [
-            "Tornadus",
-            "Thundurus",
+        unova: list[str] = [name for name in unova_species]
+        world.random.shuffle(unova)
+        unova = unova[:115]
+        for species in ("Tornadus", "Thundurus"):
+            if species not in unova:
+                unova.append(species)
+        return unova[:115] + [
             "Celebi",
             "Raikou",
             "Entei",

@@ -33,6 +33,9 @@ while still using the well-known grid-based movement mechanics and battle UI.
 - ***Help, I lost important items (due to PKHeX, game crashes, ...)!***
   <br>Just open the game and connect to the server again. Important items such as key items, badges, etc. will get 
       automatically re-added if collected but missing in your save file.
+- ***How do I get past this roadblock? I did all the story events...***
+  <br>A lot of story-based roadblocks had to be changed to make this game viable for AP. Check the rom changes page
+      (linked down below) for a list of all custom roadblocks.
 - ***I want to contribute to development, how can I do that?***
   <br>First of all, propose your ideas/changes/... in the game's channel, so we can talk about things beforehand.
   <br>The fork of this implementation is found at https://github.com/SparkyDaDoggo/Archipelago/tree/main.
@@ -55,6 +58,9 @@ while still using the well-known grid-based movement mechanics and battle UI.
     ```
   You can optionally omit the parentheses (`"`), but this might not work with modifiers that have special characters
   in their name (e.g. the `'` in `N's Castle`).
+- ***There was a critical bug in the game. Can this be fixed after generating?***
+  <br>Yes! Whenever a new update with changes on the rom side releases, just update your apworld and run the same 
+      patch file again. The rom will then automatically get updated as well.
   
 
 ## Other useful or interesting pages
