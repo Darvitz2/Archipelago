@@ -1,8 +1,10 @@
 
 import logging
 import typing
+from _typeshed import SupportsDunderLT, SupportsDunderGT
 from copy import deepcopy
 from dataclasses import dataclass
+from typing import Callable, Any
 
 import settings
 from BaseClasses import PlandoOptions
@@ -872,14 +874,18 @@ class ModifyLevels(OptionCounter):
         )
 
     @staticmethod
-    def modify(mode: int, value: int, level: int) -> int:
+    def cap(level: int):
+        return max(min(level, 100), 1)
+
+    @classmethod
+    def modify(cls, mode: int, value: int, level: int) -> int:
         match mode:
             case 0:
-                return max((level * value) // 100, 1)
+                return cls.cap((level * value) // 100)
             case 1:
-                return level + value
+                return cls.cap(level + value)
             case 2:
-                return max(int(level ** (value / 100)), 1)
+                return cls.cap(int(level ** (value / 100)))
             case _:
                 raise Exception(f"Bad mode {mode} in Modify Levels option")
 

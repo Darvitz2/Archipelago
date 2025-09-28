@@ -1,6 +1,10 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.3.999
+
+- Fixed `Modify Levels` option not capping levels at 100
+
 ## 0.3.99
 
 - Added `Modify Levels` option
