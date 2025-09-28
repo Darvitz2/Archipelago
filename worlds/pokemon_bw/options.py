@@ -1,10 +1,8 @@
 
 import logging
 import typing
-from _typeshed import SupportsDunderLT, SupportsDunderGT
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Callable, Any
 
 import settings
 from BaseClasses import PlandoOptions
@@ -815,6 +813,12 @@ class ModifyLevels(OptionCounter):
     def from_any(cls, data: typing.Dict[str, typing.Any]) -> OptionDict:
         if type(data) is not dict:
             raise NotImplementedError(f"Cannot Convert from non-dictionary, got {type(data)}")
+        for key in cls.valid_keys:
+            if key not in data:
+                if key in cls.default:
+                    data[key] = cls.default[key]
+                else:
+                    data[key] = 0
         correction = {
             "Multiply": 0,
             "Add": 1,

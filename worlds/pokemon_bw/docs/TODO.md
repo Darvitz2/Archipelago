@@ -1,5 +1,7 @@
 # Important stuff
 
+- fix ut_compatibility key error
+- fix optiondicts not checking whether all keys are defined
 
 # 0.4.0
 

@@ -4,6 +4,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 ## 0.3.999
 
 - Fixed `Modify Levels` option not capping levels at 100
+- Fixed `Modify Levels` crashing when certain keys are not provided in the yaml
 
 ## 0.3.99
 
