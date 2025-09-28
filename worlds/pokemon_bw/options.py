@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import settings
 from BaseClasses import PlandoOptions
 from Options import (Choice, PerGameCommonOptions, OptionSet, Range, Toggle,
-                     PlandoTexts, OptionError, Option, OptionCounter)
+                     PlandoTexts, OptionError, Option, OptionCounter, OptionDict)
 
 if typing.TYPE_CHECKING:
     from worlds.AutoWorld import World
@@ -785,6 +785,105 @@ class AdjustLevels(CasefoldOptionSet):
     default = ["Wild", "Trainer"]
 
 
+class ModifyLevels(OptionCounter):
+    """
+    Modifies the level of all trainer and/or wild pokemon. You can choose a certain mode for each type of encounter.
+    This is applied **after Adjust Levels**.
+    The mode decides how to apply the value to every pokemon. You can write either the name of the mode
+    or the corresponding number:
+    - **Multiply** or **0** - Multiply each level with value being seen as a percentage, i.e. 100 means no modifying. Allowed values are in range 1 to 10000.
+    - **Add** or **1** - Add the value directly to each level (with negative values being allowed), i.e. 0 means no modifying. Allowed values are in range -99 to 99.
+    - **Power** or **2** - Raise each level to the power of the value (which is seen as a percentage), i.e. 100 means no modifying. Allowed values are in range 1 to 700.
+    """
+    display_name = "Modify levels"
+    valid_keys = [
+        "Trainer value",
+        "Wild value",
+        "Trainer mode",
+        "Wild mode",
+    ]
+    default = {
+        "Trainer value": 100,
+        "Wild value": 100,
+        "Trainer mode": 0,
+        "Wild mode": 0,
+    }
+
+    @classmethod
+    def from_any(cls, data: typing.Dict[str, typing.Any]) -> OptionDict:
+        if type(data) is not dict:
+            raise NotImplementedError(f"Cannot Convert from non-dictionary, got {type(data)}")
+        correction = {
+            "Multiply": 0,
+            "Add": 1,
+            "Power": 2,
+        }
+        if data["Trainer mode"] in correction:
+            data["Trainer mode"] = correction[data["Trainer mode"]]
+        if data["Wild mode"] in correction:
+            data["Wild mode"] = correction[data["Wild mode"]]
+        return cls(data)
+
+    def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
+        super().verify(world, player_name, plando_options)
+
+        errors = []
+
+        for encounter in ("Trainer", "Wild"):
+            match self.value[f'{encounter} mode']:
+                case 0:
+                    if not 1 <= self.value[f"{encounter} value"] <= 10000:
+                        errors.append(f"{encounter} value {self.value[f'{encounter} value']} out of range 1 to 10000 for mode 0")
+                case 1:
+                    if not -99 <= self.value[f"{encounter} value"] <= 99:
+                        errors.append(f"{encounter} value {self.value[f'{encounter} value']} out of range -99 to 99 for mode 1")
+                case 2:
+                    if not 1 <= self.value[f"{encounter} value"] <= 700:
+                        errors.append(f"{encounter} value {self.value[f'{encounter} value']} out of range 1 to 700 for mode 2")
+                case _:
+                    errors.append(f"Bad {encounter} mode {self.value[f'{encounter} mode']}")
+
+        if len(errors) != 0:
+            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
+            raise OptionError("\n".join(errors))
+
+    @staticmethod
+    def is_modified(mode: int, value: int) -> bool:
+        match mode:
+            case 0:
+                return value != 100
+            case 1:
+                return value != 0
+            case 2:
+                return value != 100
+            case _:
+                raise Exception(f"Bad mode {mode} in Modify Levels option")
+
+    def is_trainer_modified(self) -> bool:
+        return self.is_modified(self.value["Trainer mode"], self.value["Trainer value"])
+
+    def is_wild_modified(self) -> bool:
+        return self.is_modified(self.value["Wild mode"], self.value["Wild value"])
+
+    def is_any_modified(self) -> bool:
+        return (
+            self.is_modified(self.value["Trainer mode"], self.value["Trainer value"]) or
+            self.is_modified(self.value["Wild mode"], self.value["Wild value"])
+        )
+
+    @staticmethod
+    def modify(mode: int, value: int, level: int) -> int:
+        match mode:
+            case 0:
+                return max((level * value) // 100, 1)
+            case 1:
+                return level + value
+            case 2:
+                return max(int(level ** (value / 100)), 1)
+            case _:
+                raise Exception(f"Bad mode {mode} in Modify Levels option")
+
+
 class ExpModifier(Range):
     """
     Multiplies the experience received from defeating wild and trainer pokemon.
@@ -1075,6 +1174,7 @@ class PokemonBWOptions(PerGameCommonOptions):
 
     # Miscellaneous
     adjust_levels: AdjustLevels
+    modify_levels: ModifyLevels
     # exp_modifier: ExpModifier
     # all_pokemon_seen: AllPokemonSeen
     # add_fairy_type: AddFairyType

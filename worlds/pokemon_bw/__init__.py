@@ -249,6 +249,7 @@ class PokemonBWWorld(World):
                 "dexsanity": self.options.dexsanity.value,
                 "season_control": self.options.season_control.current_key,
                 "adjust_levels": self.options.adjust_levels.value,
+                "modify_levels": self.options.modify_levels.value,
                 "master_ball_seller": self.options.master_ball_seller.value,
                 "modify_item_pool": self.options.modify_item_pool.value,
                 "modify_logic": self.options.modify_logic.value,

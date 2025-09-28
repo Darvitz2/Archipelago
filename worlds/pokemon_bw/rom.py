@@ -96,6 +96,12 @@ class PatchMethods:
             procedures.append("adjust_wild_levels")
         if "Trainer" in patch.world.options.adjust_levels:
             procedures.append("adjust_trainer_levels")
+        if patch.world.options.modify_levels.is_any_modified():
+            level_adjustments.write_modifiers(patch, opened_zipfile)
+            if patch.world.options.modify_levels.is_trainer_modified():
+                procedures.append("modify_trainer_levels")
+            if patch.world.options.modify_levels.is_wild_modified():
+                procedures.append("modify_wild_levels")
 
         opened_zipfile.writestr("procedures.txt", "\n".join(procedures))
 
@@ -161,6 +167,8 @@ patch_procedures: dict[str, Callable[[ndspy_rom.NintendoDSRom, str, PokemonBWPat
     "write_trainer_pokemon": write_trainer_pokemon.patch_species,
     "adjust_wild_levels": level_adjustments.patch_wild,
     "adjust_trainer_levels": level_adjustments.patch_trainer,
+    "modify_wild_levels": level_adjustments.modify_wild,
+    "modify_trainer_levels": level_adjustments.modify_trainers,
 }
 
 

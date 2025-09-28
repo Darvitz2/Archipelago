@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING
+import zipfile
+from typing import TYPE_CHECKING, Any
 
 from ...ndspy.rom import NintendoDSRom
 from ...ndspy.narc import NARC
@@ -54,3 +55,55 @@ def patch_trainer(rom: NintendoDSRom, world_package: str, bw_patch_instance: "Po
         file_pokemon.files[adjustment.trainer_id] = bytes(trainer_pokemon)
 
     rom.setFileByName("a/0/9/3", file_pokemon.save())
+
+
+def write_modifiers(bw_patch_instance: "PokemonBWPatch", opened_zipfile: zipfile.ZipFile) -> None:
+    import orjson
+
+    data: dict[str, Any] = bw_patch_instance.world.options.modify_levels.value
+    opened_zipfile.writestr("modify_levels.json", orjson.dumps(data))
+
+
+def modify_trainers(rom: NintendoDSRom, world_package: str, bw_patch_instance: "PokemonBWPatch") -> None:
+    import orjson
+    from ...options import ModifyLevels
+
+    data: dict[str, Any] = orjson.loads(bw_patch_instance.get_file("modify_levels.json"))
+    file_data = NARC(rom.getFileByName("a/0/9/2"))
+    file_pokemon = NARC(rom.getFileByName("a/0/9/3"))
+
+    for index in range(len(file_data.files)):
+        trainer_data = file_data.files[index]
+        trainer_pokemon = bytearray(file_pokemon.files[index])
+        trainer_format = trainer_data[0]
+        pkmn_count = trainer_data[3]
+        has_held_items = trainer_format >= 2
+        has_unique_moves = trainer_format % 2 == 1
+        pkmn_entry_length = 8 + (8 if has_unique_moves else 0) + (2 if has_held_items else 0)
+        for i in range(pkmn_count):
+            pos = i * pkmn_entry_length + 2
+            trainer_pokemon[pos] = ModifyLevels.modify(data["Trainer mode"], data["Trainer value"], trainer_pokemon[pos])
+        file_pokemon.files[index] = bytes(trainer_pokemon)
+
+    rom.setFileByName("a/0/9/3", file_pokemon.save())
+
+
+def modify_wild(rom: NintendoDSRom, world_package: str, bw_patch_instance: "PokemonBWPatch") -> None:
+    import orjson
+    from ...options import ModifyLevels
+
+    data: dict[str, Any] = orjson.loads(bw_patch_instance.get_file("modify_levels.json"))
+    file_wild = NARC(rom.getFileByName("a/1/2/6"))
+
+    for index in range(len(file_wild.files)):
+        table = bytearray(file_wild.files[index])
+        season_count = len(table) // (56 * 4 + 8)
+        for season in range(season_count):
+            for slot in range(56):
+                slot_pos = 8 + (season * (56 * 4 + 8)) + (4 * slot)
+                if table[slot_pos+2] != 0:
+                    table[slot_pos+2] = ModifyLevels.modify(data["Wild mode"], data["Wild value"], table[slot_pos+2])
+                    table[slot_pos+3] = ModifyLevels.modify(data["Wild mode"], data["Wild value"], table[slot_pos+3])
+        file_wild.files[index] = bytes(table)
+
+    rom.setFileByName("a/1/2/6", file_wild.save())

@@ -1,6 +1,12 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.3.99
+
+- Added `Modify Levels` option
+  - Modes: `Multiply`, `Add`, `Power`
+  - Encounter types: Trainer, Wild
+
 ## 0.3.6
 
 - Added evolutions to extended Dexsanity hints
