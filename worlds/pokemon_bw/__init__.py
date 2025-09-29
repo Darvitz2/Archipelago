@@ -79,7 +79,11 @@ class PokemonBWWorld(World):
     tracker_world = {
         "map_page_folder": "tracker",
         "map_page_maps": "maps/maps.json",
-        "map_page_locations": "locations/locations.json"
+        "map_page_locations": {
+            "locations/locations.json",
+            "locations/submaps_routes.json",
+            "locations/submaps_dungeons.json"
+            }
     }
 
     def __init__(self, multiworld: MultiWorld, player: int):
