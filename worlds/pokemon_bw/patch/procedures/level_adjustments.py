@@ -60,7 +60,7 @@ def patch_trainer(rom: NintendoDSRom, world_package: str, bw_patch_instance: "Po
 def write_modifiers(bw_patch_instance: "PokemonBWPatch", opened_zipfile: zipfile.ZipFile) -> None:
     import orjson
 
-    data: dict[str, Any] = bw_patch_instance.world.options.modify_levels.value
+    data: dict[str, Any] = {"data": bw_patch_instance.world.options.modify_levels.value}
     opened_zipfile.writestr("modify_levels.json", orjson.dumps(data))
 
 
@@ -82,7 +82,7 @@ def modify_trainers(rom: NintendoDSRom, world_package: str, bw_patch_instance: "
         pkmn_entry_length = 8 + (8 if has_unique_moves else 0) + (2 if has_held_items else 0)
         for i in range(pkmn_count):
             pos = i * pkmn_entry_length + 2
-            trainer_pokemon[pos] = ModifyLevels.modify(data["Trainer mode"], data["Trainer value"], trainer_pokemon[pos])
+            trainer_pokemon[pos] = ModifyLevels.modify_trainer(data["data"], trainer_pokemon[pos])
         file_pokemon.files[index] = bytes(trainer_pokemon)
 
     rom.setFileByName("a/0/9/3", file_pokemon.save())
@@ -102,8 +102,8 @@ def modify_wild(rom: NintendoDSRom, world_package: str, bw_patch_instance: "Poke
             for slot in range(56):
                 slot_pos = 8 + (season * (56 * 4 + 8)) + (4 * slot)
                 if table[slot_pos+2] != 0:
-                    table[slot_pos+2] = ModifyLevels.modify(data["Wild mode"], data["Wild value"], table[slot_pos+2])
-                    table[slot_pos+3] = ModifyLevels.modify(data["Wild mode"], data["Wild value"], table[slot_pos+3])
+                    table[slot_pos + 2] = ModifyLevels.modify_wild(data["data"], table[slot_pos + 2])
+                    table[slot_pos + 3] = ModifyLevels.modify_wild(data["data"], table[slot_pos + 3])
         file_wild.files[index] = bytes(table)
 
     rom.setFileByName("a/1/2/6", file_wild.save())

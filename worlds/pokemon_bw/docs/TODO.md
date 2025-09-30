@@ -1,10 +1,10 @@
 # Important stuff
 
-- fix ut_compatibility key error
-- fix optiondicts not checking whether all keys are defined
 
 # 0.4.0
 
+- make dexsanity hints correctly replace grass with cave etc.
+- maybe juniper seen count locations can check for national seen? look at cedric in mistralton city and both other des seen locations
 - somehow fix problem with patch backwards compatibility for patch file altering versions that actually can support older versions (e.g. 0.3.99 not accepting 0.3.0)
 - somehow account for excluded locations in shuffle badges/tms
 - reduce different forms weight in randomization

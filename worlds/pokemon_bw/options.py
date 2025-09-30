@@ -13,6 +13,20 @@ if typing.TYPE_CHECKING:
     from worlds.AutoWorld import World
 
 
+# Order of Option classes being rendered on the WebHost
+# toggle
+# textchoice
+# choice
+# namedrange
+# range
+# freetext
+# optioncounter if valid keys or verify item name or verify location name
+# optionlist if valid keys
+# locationset if verify location names
+# itemset if verify item names
+# optionset if valid keys
+
+
 class CasefoldOptionSet(OptionSet):
     valid_keys_casefold = True
 
@@ -32,6 +46,37 @@ class CasefoldOptionSet(OptionSet):
                     f"Found unexpected key {', '.join(extra)} in {getattr(self, 'display_name', self)}. "
                     f"Allowed keys: {self._valid_keys}."
                 )
+
+
+class ExtendedOptionCounter(OptionCounter):
+    individual_min_max: dict[str, tuple[int, int]] = {}
+
+    @classmethod
+    def from_any(cls, data: typing.Dict[str, typing.Any]) -> OptionDict:
+        if type(data) is not dict:
+            raise NotImplementedError(f"Cannot Convert from non-dictionary, got {type(data)}")
+        for key in cls.valid_keys:
+            if key not in data:
+                if key in cls.default:
+                    data[key] = cls.default[key]
+                else:
+                    data[key] = 0
+        return cls(data)
+
+    def verify(self, world: type[World], player_name: str, plando_options: PlandoOptions) -> None:
+        super().verify(world, player_name, plando_options)
+
+        errors = []
+
+        for key in self.value:
+            if key in self.individual_min_max:
+                _min, _max = self.individual_min_max[key]
+                if not _min <= self.value[key] <= _max:
+                    errors.append(f"{key}: {self.value[key]} not in range {_min} to {_max}")
+
+        if len(errors) != 0:
+            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
+            raise OptionError("\n".join(errors))
 
 
 class GameVersion(Choice):
@@ -225,7 +270,7 @@ class RandomizeLegendaryPokemon(CasefoldOptionSet):
     default = []
 
 
-class PokemonRandomizationAdjustments(OptionCounter):
+class PokemonRandomizationAdjustments(ExtendedOptionCounter):
     """
     Adjust various parameters in various pokemon randomization options (more modifiers are planned).
     Any minimum parameter cannot be higher than its corresponding maximum parameter.
@@ -238,18 +283,9 @@ class PokemonRandomizationAdjustments(OptionCounter):
     default = {
         "Stats leniency": 10,
     }
-
-    def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
-        super().verify(world, player_name, plando_options)
-
-        errors = []
-
-        if not 0 <= self.value["Stats leniency"] <= 1530:
-            errors.append(f"Stats leniency: {self.value['Stats leniency']} not in range 0 to 1530")
-
-        if len(errors) != 0:
-            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
-            raise OptionError("\n".join(errors))
+    individual_min_max = {
+        "Stats leniency": (0, 1530),
+    }
 
 
 class PlandoEncounter(typing.NamedTuple):
@@ -581,7 +617,7 @@ class RandomizeTMHMCompatibility(CasefoldOptionSet):
     default = []
 
 
-class StatsRandomizationAdjustments(OptionCounter):
+class StatsRandomizationAdjustments(ExtendedOptionCounter):
     """
     Adjust various parameters in various randomization options (more modifiers are planned).
     Any minimum parameter cannot be higher than its corresponding maximum parameter.
@@ -620,22 +656,14 @@ class StatsRandomizationAdjustments(OptionCounter):
         # "Gender ratio minimum": 0,
         # "Gender ratio maximum": 255,
     }
-
-    def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
-        super().verify(world, player_name, plando_options)
-
-        errors = []
-
-        if not 6 <= self.value["Stats total minimum"] <= 1530:
-            errors.append(f"Stats total minimum: {self.value['Stats total minimum']} not in range 0 to 1530")
-        if not 6 <= self.value["Stats total maximum"] <= 1530:
-            errors.append(f"Stats total maximum: {self.value['Stats total maximum']} not in range 0 to 1530")
-
-        # Need to add other parameters when implemented
-
-        if len(errors) != 0:
-            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
-            raise OptionError("\n".join(errors))
+    individual_min_max = {
+        # "Stats total minimum": (6, 1530),
+        # "Stats total maximum": (6, 1530),
+        # "Catch rates minimum": (3, 255),
+        # "Catch rates maximum": (3, 255),
+        # "Gender ratio minimum": (0, 255),
+        # "Gender ratio maximum": (0, 255),
+    }
 
 
 class ShuffleBadgeRewards(Choice):
@@ -794,6 +822,16 @@ class ModifyLevels(OptionCounter):
     - **Multiply** or **0** - Multiply each level with value being seen as a percentage, i.e. 100 means no modifying. Allowed values are in range 1 to 10000.
     - **Add** or **1** - Add the value directly to each level (with negative values being allowed), i.e. 0 means no modifying. Allowed values are in range -99 to 99.
     - **Power** or **2** - Raise each level to the power of the value (which is seen as a percentage), i.e. 100 means no modifying. Allowed values are in range 1 to 700.
+
+    An alternative way with more capabilities is to write this as a list with multiple key names (like most plando options).
+    Every entry must include the keys `type`, `mode`, and `value`.
+    All entries are individual calculations that are applied one after another.
+    Here is an example of how an entry can look like:
+    ```
+    - type: Either "Trainer" or "Wild"
+      mode: Any mode described above (can also be either the name or the number)
+      value: The value like described above
+    ```
     """
     display_name = "Modify levels"
     valid_keys = [
@@ -808,46 +846,86 @@ class ModifyLevels(OptionCounter):
         "Trainer mode": 0,
         "Wild mode": 0,
     }
+    value: dict[str, int] | list[dict[str, int | str]]
+
+    def __init__(self, data: typing.Any):
+        if type(data) is dict:
+            super().__init__(data)
+        elif type(data) is list:
+            self.value = deepcopy(data)
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(data)}")
 
     @classmethod
-    def from_any(cls, data: typing.Dict[str, typing.Any]) -> OptionDict:
-        if type(data) is not dict:
-            raise NotImplementedError(f"Cannot Convert from non-dictionary, got {type(data)}")
-        for key in cls.valid_keys:
-            if key not in data:
-                if key in cls.default:
-                    data[key] = cls.default[key]
-                else:
-                    data[key] = 0
-        correction = {
+    def from_any(cls, data: typing.Any) -> OptionDict:
+        aliases = {
             "Multiply": 0,
             "Add": 1,
             "Power": 2,
         }
-        if data["Trainer mode"] in correction:
-            data["Trainer mode"] = correction[data["Trainer mode"]]
-        if data["Wild mode"] in correction:
-            data["Wild mode"] = correction[data["Wild mode"]]
-        return cls(data)
+        if type(data) is dict:
+            data: dict
+            for key in cls.valid_keys:
+                if key not in data:
+                    if key in cls.default:
+                        data[key] = cls.default[key]
+                    else:
+                        data[key] = 0
+            for encounter in ("Trainer", "Wild"):
+                key = encounter + " mode"
+                if data[key] in aliases:
+                    data[key] = aliases[data[key]]
+            return cls(data)
+        elif type(data) is list:
+            data: list
+            list_defaults = {
+                "type": "Trainer",
+                "mode": 0,
+                "value": 100,
+            }
+            for entry in data:
+                if type(entry) is not dict:
+                    raise NotImplementedError(f"Cannot convert list entry from non-dictionary, got {type(entry)}")
+                entry: dict
+                for key in list_defaults:
+                    if key not in entry:
+                        entry[key] = list_defaults[key]
+                if entry["mode"] in aliases:
+                    entry["mode"] = aliases[entry["mode"]]
+            return cls(data)
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(data)}")
 
     def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
-        super().verify(world, player_name, plando_options)
 
         errors = []
+        mode_min_max: dict[int, tuple[int, int]] = {
+            0: (1, 10000),
+            1: (-99, 99),
+            2: (1, 700),
+        }
 
-        for encounter in ("Trainer", "Wild"):
-            match self.value[f'{encounter} mode']:
-                case 0:
-                    if not 1 <= self.value[f"{encounter} value"] <= 10000:
-                        errors.append(f"{encounter} value {self.value[f'{encounter} value']} out of range 1 to 10000 for mode 0")
-                case 1:
-                    if not -99 <= self.value[f"{encounter} value"] <= 99:
-                        errors.append(f"{encounter} value {self.value[f'{encounter} value']} out of range -99 to 99 for mode 1")
-                case 2:
-                    if not 1 <= self.value[f"{encounter} value"] <= 700:
-                        errors.append(f"{encounter} value {self.value[f'{encounter} value']} out of range 1 to 700 for mode 2")
-                case _:
-                    errors.append(f"Bad {encounter} mode {self.value[f'{encounter} mode']}")
+        if type(self.value) is dict:
+            for encounter in ("Trainer", "Wild"):
+                mode = self.value[f'{encounter} mode']
+                if mode not in mode_min_max:
+                    errors.append(f"Bad {encounter} mode {mode}")
+                _min, _max = mode_min_max[mode]
+                if not _min <= self.value[f"{encounter} value"] <= _max:
+                    errors.append(f"{encounter} value {self.value[f'{encounter} value']} "
+                                  f"out of range {_min} to {_max} for mode {mode}")
+        elif type(self.value) is list:
+            for entry in self.value:
+                entry: dict[str, int | str]
+                mode = entry["mode"]
+                if mode not in mode_min_max:
+                    errors.append(f"Bad {entry['type']} mode {mode}")
+                _min, _max = mode_min_max[mode]
+                if not _min <= entry["value"] <= _max:
+                    errors.append(f"{entry['type']} value {entry['value']} "
+                                  f"out of range {_min} to {_max} for mode {mode}")
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
 
         if len(errors) != 0:
             errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
@@ -866,20 +944,59 @@ class ModifyLevels(OptionCounter):
                 raise Exception(f"Bad mode {mode} in Modify Levels option")
 
     def is_trainer_modified(self) -> bool:
-        return self.is_modified(self.value["Trainer mode"], self.value["Trainer value"])
+        if type(self.value) is dict:
+            return self.is_modified(self.value["Trainer mode"], self.value["Trainer value"])
+        elif type(self.value) is list:
+            for entry in self.value:
+                if entry["type"] == "Trainer" and self.is_modified(entry["mode"], entry["value"]):
+                    return True
+            return False
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
 
     def is_wild_modified(self) -> bool:
-        return self.is_modified(self.value["Wild mode"], self.value["Wild value"])
+        if type(self.value) is dict:
+            return self.is_modified(self.value["Wild mode"], self.value["Wild value"])
+        elif type(self.value) is list:
+            for entry in self.value:
+                if entry["type"] == "Wild" and self.is_modified(entry["mode"], entry["value"]):
+                    return True
+            return False
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
 
     def is_any_modified(self) -> bool:
-        return (
-            self.is_modified(self.value["Trainer mode"], self.value["Trainer value"]) or
-            self.is_modified(self.value["Wild mode"], self.value["Wild value"])
-        )
+        return self.is_wild_modified() or self.is_trainer_modified()
 
     @staticmethod
     def cap(level: int):
         return max(min(level, 100), 1)
+
+    @classmethod
+    def modify_trainer(cls, value: dict[str, int] | list[dict[str, int | str]], level) -> int:
+        if type(value) is dict:
+            return cls.modify(value["Trainer mode"], value["Trainer value"], level)
+        elif type(value) is list:
+            calc = level
+            for entry in value:
+                if entry["type"] == "Trainer":
+                    calc = cls.modify(entry["mode"], entry["value"], calc)
+            return calc
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(value)}")
+
+    @classmethod
+    def modify_wild(cls, value: dict[str, int] | list[dict[str, int | str]], level) -> int:
+        if type(value) is dict:
+            return cls.modify(value["Wild mode"], value["Wild value"], level)
+        elif type(value) is list:
+            calc = level
+            for entry in value:
+                if entry["type"] == "Wild":
+                    calc = cls.modify(entry["mode"], entry["value"], calc)
+            return calc
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(value)}")
 
     @classmethod
     def modify(cls, mode: int, value: int, level: int) -> int:

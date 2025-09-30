@@ -1,6 +1,16 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.4.0
+
+- Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
+- Added `Modify Levels` option (expanded from v0.3.99 pre-release)
+  - Mode 1 (how it will be shown on Webhost):
+    - Encounter types: `Trainer`, `Wild`
+    - Modes: `Multiply`, `Add`, `Power`
+  - Mode 2 (cannot be shown on Webhost, but with more capabilities)
+    - Same as mode 1, but accepts multiple chained calculations
+
 ## 0.3.999
 
 - Fixed `Modify Levels` option not capping levels at 100
@@ -11,6 +21,10 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added `Modify Levels` option
   - Modes: `Multiply`, `Add`, `Power`
   - Encounter types: Trainer, Wild
+
+## 0.3.7
+
+- Fixed UT crashing when updating past 0.3.3
 
 ## 0.3.6
 
