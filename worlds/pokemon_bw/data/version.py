@@ -7,6 +7,7 @@ class VersionCompatibility(NamedTuple):
     ut: tuple[int, int, int]
 
 
+# DO NOT put any number higher than 255
 version: tuple[int, int, int] = (0, 4, 0)
 
 compatibility: dict[tuple[int, int, int], VersionCompatibility] = {

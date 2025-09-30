@@ -124,7 +124,7 @@ class RandomizeWildPokemon(CasefoldOptionSet):
     """
     Randomizes wild pokemon encounters.
 
-    - **Randomize** - Toggles wild pokemon being randomized. Required for any other modifier below.
+    - **Randomize** - Toggles wild pokemon being randomized. Automatically added if any other modifier is added.
     - **Ensure all obtainable** - Ensures that every pokemon species is obtainable by either catching or evolving. This is automatically checked if **National pokedex** is chosen as the goal.
     - **Similar base stats** - Tries to keep every randomized pokemon at a similar base stat total as the replaced encounter.
     - **Type themed areas** - Tries to make every pokemon in an area have a certain same type.
@@ -148,14 +148,20 @@ class RandomizeWildPokemon(CasefoldOptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+
 
 class RandomizeTrainerPokemon(CasefoldOptionSet):
     """
     Randomizes trainer pokemon.
-    - **Randomize** - Toggles trainer pokemon being randomized. Required for any modifier below.
+    - **Randomize** - Toggles trainer pokemon being randomized. Automatically added if any other modifier is added.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
     """
-    # - **Type themed areas** - All pokemon of a trainer have to share at least one randomly chosen type.
+    # - **Type themed** - All pokemon of a trainer have to share at least one randomly chosen type.
     #                           Gym leaders will always have themed teams, regardless of this modifier.
     # - **Themed gym trainers** - All pokemon of gym trainers will share the type assigned to the gym leader.
     display_name = "Randomize Trainer Pokemon"
@@ -163,8 +169,10 @@ class RandomizeTrainerPokemon(CasefoldOptionSet):
     valid_keys = [
         "Randomize",
         "Similar base stats",
-        # "Type themed areas",
+        # "Type themed",
         # "Themed gym trainers",
+
+        # Not sure whether I really want to implement these:
         # "Randomize abilities",
         # "Randomize natures",
         # "Randomize held items",
@@ -172,13 +180,24 @@ class RandomizeTrainerPokemon(CasefoldOptionSet):
         # "Allow no held item",
         # "Randomize unique moves",
     ]
+    require_randomize = {
+        "Similar base stats",
+        # "Type themed",
+        # "Themed gym trainers",
+    }
     default = []
+
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value.intersection(cls.require_randomize)) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
 
 
 class RandomizeStarterPokemon(CasefoldOptionSet):
     """
     Randomizes the starter pokemon you receive at the start of the game.
-    - **Randomize** - Toggles starter pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles starter pokemon being randomized. Automatically added if any other modifier is added.
     - **Any base** - Only use unevolved/baby pokemon.
     - **Base with 2 evolutions** - Only use unevolved/baby pokemon that can evolve twice. Overrides **Any base**.
     - **Only official starters** - Only use pokemon that have been a starter in any mainline game. Overrides **Any base** and **Base with 2 evolutions**.
@@ -195,11 +214,17 @@ class RandomizeStarterPokemon(CasefoldOptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+
 
 class RandomizeStaticPokemon(CasefoldOptionSet):
     """
     Randomizes static encounters you can battle and catch throughout the game, e.g. Volcarona in Relic Castle.
-    - **Randomize** - Toggles static pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles static pokemon being randomized. Automatically added if any other modifier is added.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
     - **Only base** - Only use unevolved Pokemon.
     - **No legendaries** - Exclude legendaries from being placed into static encounters.
@@ -214,11 +239,17 @@ class RandomizeStaticPokemon(CasefoldOptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+
 
 class RandomizeGiftPokemon(CasefoldOptionSet):
     """
     Randomizes gift pokemon that you receive for free, e.g. the Larvesta egg on route 18.
-    - **Randomize** - Toggles gift pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles gift pokemon being randomized. Automatically added if any other modifier is added.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
     - **No legendaries** - Exclude legendaries from being placed into gift encounters.
     """
@@ -231,13 +262,21 @@ class RandomizeGiftPokemon(CasefoldOptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+
 
 class RandomizeTradePokemon(CasefoldOptionSet):
     """
-    Randomizes trade offers from NPCs. Any **Randomize ...** is required for the other modifiers.
+    Randomizes trade offers from NPCs. Both **Randomize...** are automatically added if none of them but any other
+    modifier is added.
     - **Randomize offer** - Toggles offered pokemon being randomized.
     - **Randomize request** - Toggles requested pokemon being randomized.
-    - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
+    - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced ones.
+    - **Coupled base stats** - Tries to make offered and requested pokemon have similar base stats
     - **No legendaries** - Exclude legendaries from being placed into trades.
     """
     display_name = "Randomize Trade Pokemon"
@@ -246,28 +285,46 @@ class RandomizeTradePokemon(CasefoldOptionSet):
         "Randomize offer",
         "Randomize request",
         "Similar base stats",
+        "Coupled base stats",
         "No legendaries",
     ]
     default = []
+
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize offer" not in option.value and "Randomize request" not in option.value:
+            option.value.add("randomize offer")
+            option.value.add("randomize request")
 
 
 class RandomizeLegendaryPokemon(CasefoldOptionSet):
     """
     Randomizes legendary and mythical encounters.
-    - **Randomize** - Toggles legendary pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles legendary pokemon being randomized. Automatically added if any other modifier is added.
     - **Keep legendary** - Randomized pokemon will all still be legendaries or mythicals.
+    - **No legendaries** - Exclude legendaries from being placed into these encounters.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one. Overrides **Keep legendary**.
     - **Same type** - Tries to keep at least one type of every encounter.
+
+    Including **Keep legendary** AND **No legendaries** will instead only put pseudo legendaries into these encounters.
     """
     display_name = "Randomize Legendary Pokemon"
     valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep legendary",
+        "No legendaries",
         "Similar base stats",
         "Same type",
     ]
     default = []
+
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
 
 
 class PokemonRandomizationAdjustments(ExtendedOptionCounter):

@@ -10,13 +10,15 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
     - Modes: `Multiply`, `Add`, `Power`
   - Mode 2 (cannot be shown on Webhost, but with more capabilities)
     - Same as mode 1, but accepts multiple chained calculations
+- Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
+- Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
 
-## 0.3.999
+## 0.3.999 (pre-release)
 
 - Fixed `Modify Levels` option not capping levels at 100
 - Fixed `Modify Levels` crashing when certain keys are not provided in the yaml
 
-## 0.3.99
+## 0.3.99 (pre-release)
 
 - Added `Modify Levels` option
   - Modes: `Multiply`, `Add`, `Power`

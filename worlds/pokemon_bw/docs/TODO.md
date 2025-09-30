@@ -25,6 +25,8 @@
       - Base stat total threshold adjustable
     - Force fully evolved 
       - Level threshold adjustable
+    - Type themed
+    - Themed gym trainers
 - Randomization Blacklist
   - Wild pokémon 
     - This will throw an OptionError if "Ensure all obtainable" is selected and any blacklisted is base stage

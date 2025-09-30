@@ -73,16 +73,14 @@ Version 1.0.0 will happen when certain important features are implemented.
 
 - Options
   - Goals: Regional Pokédex, National Pokédex, Custom Pokédex
-  - Seensanity
-    - Only consider wild pokémon
+  - Seensanity (Only consider wild pokémon)
   - All pokémon seen
 
 ### Another update #2: Trainer stuff
 
 - Options
   - Trainersanity
-  - Seensanity
-    - Also consider trainer pokémon
+  - Seensanity (Also consider trainer pokémon)
   - Decrease trainer eyesight
   - Trainer rebattling
 
