@@ -142,8 +142,8 @@ Version 1.0.0 will happen when certain important features are implemented.
 - Door shuffle
 - Optional/Shuffling roadblock requirements
 - Original content
-- Boss fight Plando (gym leaders, elite four (first+second run), Alder, N (N's Castle), Ghetsis, Cheren/Bianca (postgame))
-- Story fight Plando (Cheren, Bianca, N, ...)
+- Trainer randomization
+- Trainer plando
 
 ## Big update #4 (Multiworld update, name WIP)
 

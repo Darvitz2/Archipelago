@@ -1317,6 +1317,19 @@ class ReusableTMs(Choice):
     option_im_not_a_masochist = 3
     default = 0
 
+    @classmethod
+    def from_text(cls, text: str) -> Choice:
+        text = text.lower()
+        if text in ("no", "off"):
+            return cls(99)
+        return super().from_text(text)
+
+    @property
+    def current_key(self) -> str:
+        if self.value == 99:
+            return "no"
+        return super().current_key
+
 
 @dataclass
 class PokemonBWOptions(PerGameCommonOptions):

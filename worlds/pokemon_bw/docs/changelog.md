@@ -3,15 +3,21 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 
 ## 0.4.0
 
-- Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
+### Content and QoL
+
 - Added `Modify Levels` option (expanded from v0.3.99 pre-release)
-  - Mode 1 (how it will be shown on Webhost):
+  - Method 1 (how it will be shown on Webhost):
     - Encounter types: `Trainer`, `Wild`
     - Modes: `Multiply`, `Add`, `Power`
-  - Mode 2 (cannot be shown on Webhost, but with more capabilities)
-    - Same as mode 1, but accepts multiple chained calculations
-- Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
+  - Method 2 (cannot be shown on Webhost, but with more capabilities)
+    - Same as method 1, but accepts multiple chained calculations
 - Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
+- Added many more maps for UT tracking and auto-tabbing
+
+### Bug fixes
+
+- Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
+- Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
 
 ## 0.3.999 (pre-release)
 

@@ -3,13 +3,16 @@
 
 # 0.4.0
 
+- ut auto tabbing
+- fix gym leaders not being present in their gyms
+- fast travel npc in chargestone cave from south to north if battled N at north exit
 - make dexsanity hints correctly replace grass with cave etc.
 - maybe juniper seen count locations can check for national seen? look at cedric in mistralton city and both other des seen locations
 - somehow fix problem with patch backwards compatibility for patch file altering versions that actually can support older versions (e.g. 0.3.99 not accepting 0.3.0)
 - somehow account for excluded locations in shuffle badges/tms
+- make mom stop the player at the door and say funny things for certain reusable tm choices
 - reduce different forms weight in randomization
 - remove arceus types
-- Merge PR adding "Randomize" to trainer/wild if other modifiers present
 - add now-possible locations
 - fix bianca being spelled "Bianka" on some location names
 - add "for seeing 25 species" to location in Castelia City
@@ -48,9 +51,7 @@
 - pitch webhost and template yaml notes, both individual, but template copying from webhost by default
 - Fix locations in pokédex if something written to encounter tables
 - route 18 reappearing and undella bay reappearing items get still detected after pickup
-- make reusable tms option add funny dialog
 - BizHawk 2.11 having issues with modded gen 5 roms
-- Chargestone cave make north to south shortcut open after traversing it for the first time (maybe when battled N)
 
 # Single reports, cannot recreate, need to wait for more reports
 

@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     apworld = "pokemon_bw"
 
-    with zipfile.ZipFile("D:/Games/Archipelago/custom_worlds/"+apworld+".apworld", 'w', zipfile.ZIP_DEFLATED, True, 9) as zipf:
+    with zipfile.ZipFile("D:/Games/Archipelago/custom_worlds/dev/"+apworld+".apworld", 'w', zipfile.ZIP_DEFLATED, True, 9) as zipf:
         metadata = {
             "game": "Pokemon Black and White",
             "minimum_ap_version": "0.6.3",
