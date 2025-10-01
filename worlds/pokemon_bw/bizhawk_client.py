@@ -84,7 +84,7 @@ class PokemonBWClient(BizHawkClient):
             return False
 
         self.player_name = header[0][0xa0:].strip(b'\0').decode()
-        if header[0][8] == b'B':
+        if header[0][8] == b'B'[0]:
             self.game_version = 0
         else:
             self.game_version = 1
