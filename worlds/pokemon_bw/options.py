@@ -52,8 +52,8 @@ class ExtendedOptionCounter(OptionCounter):
     individual_min_max: dict[str, tuple[int, int]] = {}
 
     @classmethod
-    def from_any(cls, data: typing.Dict[str, typing.Any]) -> OptionDict:
-        if type(data) is not dict:
+    def from_any(cls, data: typing.Dict[str, typing.Any]):
+        if not isinstance(data, dict):
             raise NotImplementedError(f"Cannot Convert from non-dictionary, got {type(data)}")
         for key in cls.valid_keys:
             if key not in data:
@@ -63,7 +63,7 @@ class ExtendedOptionCounter(OptionCounter):
                     data[key] = 0
         return cls(data)
 
-    def verify(self, world: type[World], player_name: str, plando_options: PlandoOptions) -> None:
+    def verify(self, world: type["World"], player_name: str, plando_options: PlandoOptions) -> None:
         super().verify(world, player_name, plando_options)
 
         errors = []
@@ -153,6 +153,7 @@ class RandomizeWildPokemon(CasefoldOptionSet):
         option = super().from_any(data)
         if len(option.value) > 0 and "Randomize" not in option.value:
             option.value.add("randomize")
+        return option
 
 
 class RandomizeTrainerPokemon(CasefoldOptionSet):
@@ -192,6 +193,7 @@ class RandomizeTrainerPokemon(CasefoldOptionSet):
         option = super().from_any(data)
         if len(option.value.intersection(cls.require_randomize)) > 0 and "Randomize" not in option.value:
             option.value.add("randomize")
+        return option
 
 
 class RandomizeStarterPokemon(CasefoldOptionSet):
@@ -219,6 +221,7 @@ class RandomizeStarterPokemon(CasefoldOptionSet):
         option = super().from_any(data)
         if len(option.value) > 0 and "Randomize" not in option.value:
             option.value.add("randomize")
+        return option
 
 
 class RandomizeStaticPokemon(CasefoldOptionSet):
@@ -244,6 +247,7 @@ class RandomizeStaticPokemon(CasefoldOptionSet):
         option = super().from_any(data)
         if len(option.value) > 0 and "Randomize" not in option.value:
             option.value.add("randomize")
+        return option
 
 
 class RandomizeGiftPokemon(CasefoldOptionSet):
@@ -267,6 +271,7 @@ class RandomizeGiftPokemon(CasefoldOptionSet):
         option = super().from_any(data)
         if len(option.value) > 0 and "Randomize" not in option.value:
             option.value.add("randomize")
+        return option
 
 
 class RandomizeTradePokemon(CasefoldOptionSet):
@@ -296,6 +301,7 @@ class RandomizeTradePokemon(CasefoldOptionSet):
         if len(option.value) > 0 and "Randomize offer" not in option.value and "Randomize request" not in option.value:
             option.value.add("randomize offer")
             option.value.add("randomize request")
+        return option
 
 
 class RandomizeLegendaryPokemon(CasefoldOptionSet):
@@ -325,6 +331,7 @@ class RandomizeLegendaryPokemon(CasefoldOptionSet):
         option = super().from_any(data)
         if len(option.value) > 0 and "Randomize" not in option.value:
             option.value.add("randomize")
+        return option
 
 
 class PokemonRandomizationAdjustments(ExtendedOptionCounter):
@@ -882,11 +889,11 @@ class ModifyLevels(OptionCounter):
 
     An alternative way with more capabilities is to write this as a list with multiple key names (like most plando options).
     Every entry must include the keys `type`, `mode`, and `value`.
-    All entries are individual calculations that are applied one after another.
+    All entries are individual calculations that are applied one after another. Be aware of rounding errors.
     Here is an example of how an entry can look like:
     ```
     - type: Either "Trainer" or "Wild"
-      mode: Any mode described above (can also be either the name or the number)
+      mode: Any mode described above (can as well be either the name or the number)
       value: The value like described above
     ```
     """
@@ -906,12 +913,18 @@ class ModifyLevels(OptionCounter):
     value: dict[str, int] | list[dict[str, int | str]]
 
     def __init__(self, data: typing.Any):
-        if type(data) is dict:
+        if isinstance(data, dict):
             super().__init__(data)
-        elif type(data) is list:
+        elif isinstance(data, list):
             self.value = deepcopy(data)
         else:
             raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(data)}")
+
+    def get_option_name(self, value):
+        if isinstance(value, dict):
+            return super().get_option_name(value)
+        elif isinstance(value, list):
+            return ", ".join(map(str, value))
 
     @classmethod
     def from_any(cls, data: typing.Any) -> OptionDict:
@@ -920,7 +933,7 @@ class ModifyLevels(OptionCounter):
             "Add": 1,
             "Power": 2,
         }
-        if type(data) is dict:
+        if isinstance(data, dict):
             data: dict
             for key in cls.valid_keys:
                 if key not in data:
@@ -933,7 +946,7 @@ class ModifyLevels(OptionCounter):
                 if data[key] in aliases:
                     data[key] = aliases[data[key]]
             return cls(data)
-        elif type(data) is list:
+        elif isinstance(data, list):
             data: list
             list_defaults = {
                 "type": "Trainer",
@@ -941,7 +954,7 @@ class ModifyLevels(OptionCounter):
                 "value": 100,
             }
             for entry in data:
-                if type(entry) is not dict:
+                if not isinstance(entry, dict):
                     raise NotImplementedError(f"Cannot convert list entry from non-dictionary, got {type(entry)}")
                 entry: dict
                 for key in list_defaults:
@@ -962,7 +975,7 @@ class ModifyLevels(OptionCounter):
             2: (1, 700),
         }
 
-        if type(self.value) is dict:
+        if isinstance(self.value, dict):
             for encounter in ("Trainer", "Wild"):
                 mode = self.value[f'{encounter} mode']
                 if mode not in mode_min_max:
@@ -971,7 +984,7 @@ class ModifyLevels(OptionCounter):
                 if not _min <= self.value[f"{encounter} value"] <= _max:
                     errors.append(f"{encounter} value {self.value[f'{encounter} value']} "
                                   f"out of range {_min} to {_max} for mode {mode}")
-        elif type(self.value) is list:
+        elif isinstance(self.value, list):
             for entry in self.value:
                 entry: dict[str, int | str]
                 mode = entry["mode"]
@@ -1001,9 +1014,9 @@ class ModifyLevels(OptionCounter):
                 raise Exception(f"Bad mode {mode} in Modify Levels option")
 
     def is_trainer_modified(self) -> bool:
-        if type(self.value) is dict:
+        if isinstance(self.value, dict):
             return self.is_modified(self.value["Trainer mode"], self.value["Trainer value"])
-        elif type(self.value) is list:
+        elif isinstance(self.value, list):
             for entry in self.value:
                 if entry["type"] == "Trainer" and self.is_modified(entry["mode"], entry["value"]):
                     return True
@@ -1012,9 +1025,9 @@ class ModifyLevels(OptionCounter):
             raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
 
     def is_wild_modified(self) -> bool:
-        if type(self.value) is dict:
+        if isinstance(self.value, dict):
             return self.is_modified(self.value["Wild mode"], self.value["Wild value"])
-        elif type(self.value) is list:
+        elif isinstance(self.value, list):
             for entry in self.value:
                 if entry["type"] == "Wild" and self.is_modified(entry["mode"], entry["value"]):
                     return True
@@ -1031,9 +1044,9 @@ class ModifyLevels(OptionCounter):
 
     @classmethod
     def modify_trainer(cls, value: dict[str, int] | list[dict[str, int | str]], level) -> int:
-        if type(value) is dict:
+        if isinstance(value, dict):
             return cls.modify(value["Trainer mode"], value["Trainer value"], level)
-        elif type(value) is list:
+        elif isinstance(value, list):
             calc = level
             for entry in value:
                 if entry["type"] == "Trainer":
@@ -1044,9 +1057,9 @@ class ModifyLevels(OptionCounter):
 
     @classmethod
     def modify_wild(cls, value: dict[str, int] | list[dict[str, int | str]], level) -> int:
-        if type(value) is dict:
+        if isinstance(value, dict):
             return cls.modify(value["Wild mode"], value["Wild value"], level)
-        elif type(value) is list:
+        elif isinstance(value, list):
             calc = level
             for entry in value:
                 if entry["type"] == "Wild":
