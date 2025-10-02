@@ -1,6 +1,96 @@
 # Changelog
 Versions are sorted in ascending order, i.e. the most recent changes are at the top.
 
+## 0.4.0
+
+### Content and QoL
+
+- Added `Modify Levels` option (expanded from v0.3.99 pre-release)
+  - Method 1 (how it will be shown on Webhost):
+    - Encounter types: `Trainer`, `Wild`
+    - Modes: `Multiply`, `Add`, `Power`
+  - Method 2 (cannot be shown on Webhost, but with more capabilities)
+    - Same as method 1, but accepts multiple chained calculations
+- Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
+- Added many more maps for UT tracking and auto-tabbing
+
+### Bug fixes
+
+- Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
+- Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
+
+## 0.3.999 (pre-release)
+
+- Fixed `Modify Levels` option not capping levels at 100
+- Fixed `Modify Levels` crashing when certain keys are not provided in the yaml
+
+## 0.3.99 (pre-release)
+
+- Added `Modify Levels` option
+  - Modes: `Multiply`, `Add`, `Power`
+  - Encounter types: Trainer, Wild
+
+## 0.3.7
+
+- Fixed UT crashing when updating past 0.3.3
+
+## 0.3.6
+
+- Added evolutions to extended Dexsanity hints
+- Fixed "... for seeing x Pokémon" locations to only account for Unovan Pokémon
+  - Also made sure there are always enough species obtainable for them when randomized
+- Fixed Encounter Plando overwriting the slots multiple times, leading to logic errors
+  - Multiple entries overwriting the same slot(s) now displays a warning in world generation
+- Fixed `Route 6 - Item from scientist for all Deerling forms` sometimes being impossible 
+  due to not all Deerling forms being obtainable
+- Fixed the logic of item-based evolutions
+
+## 0.3.5
+
+- Fixed including any Dexsanity location crashing world generation
+- Made automatic rom updating also downgrade newer roms (due to possible conflicts with used flags etc.)
+- Added apworld manifest
+
+## 0.3.4
+
+- Fixed some randomized trainer Pokémon still having the vanilla Pokémon's moves
+- Fixed randomized seasons not being written into save data properly, leading to all seasons being available immediately
+- Fixed enabling multiple Master Ball sellers leading to not all of them being available
+- Made flag and item writing in client more error-proof
+- Fixed `Nacrene City - Item from Lenora after Relic Castle` not showing up in UT
+- Added extended hint information for Dexsanity locations
+- Added location aliases for both Nidorans' Dexsanity locations in UT
+- Fixed Aha prizes having flipped flags
+- Added `Require Flash` to the `modify_logic` option
+- Fixed UT crashing when Encounter Plando was used in generating
+- Some QoL changes for writing the player yaml:
+  - Made all OptionSet options ignore casing
+  - Made Encounter Plando ignore casing for argument names, seasons, and methods
+  - Made Encounter Plando accept `season` and `slot` as alternatives to `seasons` and `slots`
+- Tweaked the Master Ball Seller option:
+  - Removed `:` and `'` characters from modifiers
+    - However, old yamls are still compatible
+  - Added the possibility to add any cost modifier in range of 0 to 30000
+  - Removed throwing an option error if any seller, but no cost is added
+    - No cost modifier now instead defaults to 3000
+- Added error message for patch file being too old
+- Added automatic ROM updates
+- Added details for incorrect ROM header error while patching
+- Fixed the Musharna static encounter not appearing immediately
+- Made the Undella Town Mansion seller snap his prices to 500-steps
+- Changed the dialog of the grunts on route 8 to better reflect how to make them disappear
+- Fixed the evolution items seller in Shopping Mall Nine giving a `???` item when pressing B
+- Added a warning to UT users when tracking with a not entirely compatible apworld version (e.g. due to RNG changes)
+- Added `None` species to Encounter Plando to make a plando entry not put anything into the specified slot(s)
+
+## 0.3.3
+
+This update only ports over the fixes from the 0.2.2 update, which was released right before this:
+- Fixed fossils not being revivable after the Plasma grunts stole the Dragon Skull
+- Fixed Professor Juniper ignoring the national dex for her TM rewards
+- Fixed Professor Juniper not always being in the lab
+- Fixed Champion goal triggering after fighting Ghetsis
+
 ## 0.3.2
 
 - Made option descriptions in template yamls look nicer
@@ -50,6 +140,25 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Fixed rare(?) BizHawk client crashing due to slotdata not being received yet
 - Fixed items getting lost after soft resetting after receiving an item after the last save
 - Fixed TM/HM checking NPC not showing up when `pokemon_master` is chosen as the goal
+
+## 0.2.3
+
+- Fixed certain AP-only NPCs not showing up in save files that were affected by a bug from before 0.2.2
+
+## 0.2.2
+
+This update was published after 0.3.2, thereby including a few retroactive bug fixes and QoL things:
+- Fixed rare(?) BizHawk client crashing due to slotdata not being received yet
+- Fixed items getting lost after soft resetting after receiving an item after the last save
+- Made key items and other important items get checked and re-added if not in save file after connecting
+- Fixed TM/HM checking NPC not showing up when pokemon_master is chosen as the goal
+- Changed the item description of a few non-vanilla key items
+
+New fixes:
+- Fixed fossils not being revivable after the Plasma grunts stole the Dragon Skull
+- Fixed Professor Juniper ignoring the national dex for her TM rewards
+- Fixed Professor Juniper not always being in the lab
+- Fixed Champion goal triggering after fighting Ghetsis
 
 ## 0.2.1
 

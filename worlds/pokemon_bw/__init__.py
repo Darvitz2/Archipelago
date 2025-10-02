@@ -1,12 +1,13 @@
 import datetime
+import logging
 import os
 from typing import ClassVar, Mapping, Any, List
 
 import settings
 from BaseClasses import MultiWorld, Tutorial, Item, Location, Region
-from Options import Option, OptionError
+from Options import Option
 from worlds.AutoWorld import World, WebWorld
-from . import items, locations, options, bizhawk_client, rom, groups
+from . import items, locations, options, bizhawk_client, rom, groups, tracker
 from .generate import EncounterEntry, StaticEncounterEntry, TradeEncounterEntry, TrainerPokemonEntry
 from .data import RulesDict
 
@@ -75,166 +76,18 @@ class PokemonBWWorld(World):
     item_name_groups = groups.get_item_groups()
     location_name_groups = groups.get_location_groups()
 
-
-    # UT tracker Section
-    def map_page_index(data: Any) -> int:
-        mapping: dict[str, int] = {
-            "route1": 1,
-            "route2": 2,
-            "route3": 3,
-            "route4": 4,
-            "route5": 5,
-            "route6": 6,
-            "route7": 7,
-            "route8": 8,
-            "route9": 9,
-            "route10": 10,
-            "route11": 11,
-            "route12": 12,
-            "route13": 13,
-            "route14": 14,
-            "route15": 15,
-            "route16": 16,
-            "route17": 17,
-            "route18": 18,
-            "accumulatown": 19,
-            "anvilletown": 20,
-            "blackcity": 21,
-            "casteliacity": 22,
-            "driftveilcity": 23,
-            "icirruscity": 24,
-            "lacunosatown": 25,
-            "mistraltoncity_b": 26,
-            "mistraltoncity_w": 27,
-            "nacrenecity": 28,
-            "nimbasacity": 29,
-            "nimbasacityeast": 30,
-            "nuvematown": 31,
-            "opelucidcity_b": 32,
-            "opelucidcity_w": 33,
-            "striatoncity": 34,
-            "undellatown": 35,
-            "whiteforest": 36,
-            "abundantshrine": 37,
-            "abyssalruins1f": 38,
-            "abyssalruins2f": 39,
-            "abyssalruins3f": 40,
-            "abyssalruins4f": 41,
-            "celestialtower1f": 42,
-            "celestialtower2f": 43,
-            "celestialtower3f": 44,
-            "celestialtower4f": 45,
-            "celestialtower5f": 46,
-            "challengerscave1f": 47,
-            "challengerscaveb1f": 48,
-            "challengerscaveb2f": 49,
-            "chargestonecave1f": 50,
-            "chargestonecaveb1f": 51,
-            "chargestonecaveb2f": 52,
-            "chargestonecaveoutside": 53,
-            "coldstorage": 54,
-            "coldstoragecontainer": 55,
-            "coldstorageoutside": 56,
-            "desertresort": 57,
-            "desertresortentrance": 58,
-            "dragonspiraltower1f": 59,
-            "dragonspiraltower2f": 60,
-            "dragonspiraltower3f": 61,
-            "dragonspiraltower4f": 62,
-            "dragonspiraltower5f": 63,
-            "dragonspiraltower6f": 64,
-            "dragonspiraltower7f": 65,
-            "dragonspiraltowerentrance": 66,
-            "dragonspiraltoweroutside": 67,
-            "dreamyard": 68,
-            "dreamyardbasement": 69,
-            "giantchasmcave": 70,
-            "giantchasmcrater": 71,
-            "giantchasmdepths": 72,
-            "giantchasmentrance": 73,
-            "guidancechamber": 74,
-            "libertygarden": 75,
-            "libertygardenlighthouse": 76,
-            "libertygardenlighthousebasement": 77,
-            "lostlornforest": 78,
-            "marvelousbridge": 79,
-            "mistraltoncave1f": 80,
-            "mistraltoncave2f": 81,
-            "mooroficirrus": 82,
-            "nscastle1f": 83,
-            "nscastle2f": 84,
-            "nscastle2frightroom": 85,
-            "nscastle3f": 86,
-            "nscastle3fcenterroom": 87,
-            "nscatle3fleftroom": 88,
-            "nscastle4f": 89,
-            "nscastle4fcenterroom": 90,
-            "nscastle5f": 91,
-            "nscastlensroom": 92,
-            "nscastlethroneroom": 93,
-            "p2laboratory": 94,
-            "pinwheelforest": 95,
-            "pinwheelforestoutside": 96,
-            "reliccastle1f": 97,
-            "reliccastleb1f": 98,
-            "reliccastleb2f": 99,
-            "reliccastleb3f": 100,
-            "reliccastleb4f": 101,
-            "reliccastleb5f": 102,
-            "reliccastleb7f": 103,
-            "reliccastlemaze": 104,
-            "reliccastletower1f": 105,
-            "reliccastletowerb1f": 106,
-            "reliccastletowerb2f": 107,
-            "reliccastletowerb3f": 108,
-            "reliccastletowerb4f": 109,
-            "reliccastletowerb5f": 110,
-            "reliccastletowerb6f": 111,
-            "reliccastletowerb7f": 112,
-            "reliccastlevolcaronasroom": 113,
-            "ruminationfield": 114,
-            "skyarrowbridge": 115,
-            "tubelinebridge": 116,
-            "twistmountain": 117,
-            "twistmountainicerockcave": 118,
-            "twistmountainlowerlevel": 119,
-            "twistmountainmiddlelevel": 120,
-            "twistmountainoutside": 121,
-            "twistmountainupperlevel": 122,
-            "undellabay": 123,
-            "victoryroad1fleftmostroom": 124,
-            "victoryroad1fmiddleroom": 125,
-            "victoryroad1frightmostroom": 126,
-            "victoryroad2fleftroom": 127,
-            "victoryroad2frightroom": 128,
-            "victoryroad3fleftmostroom": 129,
-            "victoryroad3fmiddleroom": 130,
-            "victoryroad3frightmostroom": 131,
-            "victoryroad4fleftmostroom": 132,
-            "victoryroad4fmiddleroom": 133,
-            "victoryroad4frightmostroom": 134,
-            "victoryroad5f": 135,
-            "victoryroad6f": 136,
-            "victoryroad7f": 137,
-            "victoryroadoutside": 138,
-            "victoryroadtrialchamber": 139,
-            "villagebridge": 140,
-            "wellspringcave1f": 141,
-            "wellspringcaveb1f": 142
-        }
-        return mapping.get(data, 0)
-    
     ut_can_gen_without_yaml = True
     tracker_world = {
         "map_page_folder": "tracker",
         "map_page_maps": "maps/maps.json",
         "map_page_locations": {
             "locations/locations.json",
+            "locations/submaps_cities.json",
+            "locations/submaps_dungeons.json",
             "locations/submaps_routes.json",
-            "locations/submaps_dungeons.json"
-            },
-        "map_page_index": map_page_index,
-        "map_page_setting_key": "{player}_{team}_pokemonbw_map"
+        },
+        "map_page_index": tracker.map_page_index,
+        "map_page_setting_key": "pokemon_bw_map_{team}_{player}",
     }
 
     def __init__(self, multiworld: MultiWorld, player: int):
@@ -259,6 +112,7 @@ class PokemonBWWorld(World):
         self.master_ball_seller_cost: int = 0
 
         self.ut_active: bool = False
+        self.location_id_to_alias: dict[int, str] = {}
 
     def generate_early(self) -> None:
         from .generate.encounter import wild, checklist, static, plando
@@ -267,6 +121,8 @@ class PokemonBWWorld(World):
         # Load values from UT if this is a regenerated world
         if hasattr(self.multiworld, "re_gen_passthrough"):
             if self.game in self.multiworld.re_gen_passthrough:
+                from .data import version
+
                 self.ut_active = True
                 re_ge_slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
                 re_gen_options: dict[str, Any] = re_ge_slot_data["options"]
@@ -276,29 +132,27 @@ class PokemonBWWorld(World):
                     if opt is not None:
                         setattr(self.options, key, opt.from_any(value))
                 self.seed = re_ge_slot_data["seed"]
+                loaded_ut_version = re_ge_slot_data.get("ut_compatibility", (0, 3, 2))
+                if version.ut() != loaded_ut_version:
+                    logging.warning("UT compatibility mismatch detected. You can continue tracking with this "
+                                    "apworld version, but tracking might not be entirely accurate.")
 
         if not self.ut_active:
             self.seed = self.random.getrandbits(64)
 
         self.random.seed(self.seed)
-        cost_start, cost_end = -1, -1
-        if "Cost: Free" in self.options.master_ball_seller:
-            cost_start = 0
-            cost_end = 0
-        if "Cost: 1000" in self.options.master_ball_seller:
-            cost_start = 1000 if cost_start == -1 else cost_start
-            cost_end = 1000
-        if "Cost: 3000" in self.options.master_ball_seller:
-            cost_start = 3000 if cost_start == -1 else cost_start
-            cost_end = 3000
-        if "Cost: 10000" in self.options.master_ball_seller:
-            cost_start = 10000 if cost_start == -1 else cost_start
-            cost_end = 10000
-        if cost_start == -1 and len(self.options.master_ball_seller.value) > 0:
-            raise OptionError(f"Player {self.player} ({self.player_name}) added "
-                              f"{len(self.options.master_ball_seller.value)} Master Ball seller(s) "
-                              f"without adding any cost modifier")
-        self.master_ball_seller_cost = self.random.randrange(cost_start, cost_end+1, 500) if cost_start != -1 else 0
+
+        cost_start, cost_end = 999999, -1
+        for modifier in self.options.master_ball_seller.value:
+            if modifier.casefold().startswith("cost"):
+                if modifier.casefold().endswith("free"):
+                    cost = 0
+                else:
+                    cost = int(modifier[modifier.index(" ")+1:])
+                cost_start = min(cost_start, cost)
+                cost_end = max(cost_end, cost)
+        self.master_ball_seller_cost = self.random.randrange(cost_start, cost_end+1, 500) if cost_end != -1 else 3000
+
         self.regions = locations.get_regions(self)
         self.rules_dict = locations.create_rule_dict(self)
         locations.connect_regions(self)
@@ -365,6 +219,10 @@ class PokemonBWWorld(World):
         place_badges_fill(self, progitempool, fill_locations)
         place_tm_hm_fill(self, progitempool, usefulitempool, filleritempool, fill_locations)
 
+    def extend_hint_information(self, hint_data: dict[int, dict[int, str]]):
+        hint_data[self.player] = {}
+        locations.extend_dexsanity_hints(self, hint_data)
+
     def generate_output(self, output_directory: str) -> None:
         if self.options.version == "black":
             rom.PokemonBlackPatch(
@@ -382,6 +240,8 @@ class PokemonBWWorld(World):
             ).write()
 
     def fill_slot_data(self) -> Mapping[str, Any]:
+        from .data import version
+
         # Some options and data are included for UT
         return {
             "options": {
@@ -390,18 +250,23 @@ class PokemonBWWorld(World):
                 "randomize_wild_pokemon": self.options.randomize_wild_pokemon.value,
                 "randomize_trainer_pokemon": self.options.randomize_trainer_pokemon.value,
                 "pokemon_randomization_adjustments": self.options.pokemon_randomization_adjustments.value,
-                "encounter_plando": self.options.encounter_plando.value,
+                "encounter_plando": self.options.encounter_plando.to_slot_data(),
                 "shuffle_badges": self.options.shuffle_badges.current_key,
                 "shuffle_tm_hm": self.options.shuffle_tm_hm.current_key,
                 "dexsanity": self.options.dexsanity.value,
                 "season_control": self.options.season_control.current_key,
                 "adjust_levels": self.options.adjust_levels.value,
+                "modify_levels": self.options.modify_levels.value,
                 "master_ball_seller": self.options.master_ball_seller.value,
                 "modify_item_pool": self.options.modify_item_pool.value,
                 "modify_logic": self.options.modify_logic.value,
+                "reusable_tms": self.options.reusable_tms.current_key,
             },
-            "seed": self.seed,  # Needed for UT
-            "master_ball_seller_cost": self.master_ball_seller_cost,  # NOT needed for UT
+            # Needed for UT
+            "seed": self.seed,
+            "ut_compatibility": version.ut(),
+            # NOT needed for UT
+            "master_ball_seller_cost": self.master_ball_seller_cost,
         }
 
     def interpret_slot_data(self, slot_data: dict[str, Any]) -> dict[str, Any]:

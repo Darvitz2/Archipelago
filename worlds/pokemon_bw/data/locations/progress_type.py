@@ -9,7 +9,9 @@ always_default: ProgressTypeMethod = lambda world: LocationProgressType.DEFAULT
 always_excluded: ProgressTypeMethod = lambda world: LocationProgressType.EXCLUDED
 
 season_dependant: ProgressTypeMethod = lambda world: (
-    LocationProgressType.EXCLUDED if world.options.season_control == "vanilla" else LocationProgressType.DEFAULT
+    LocationProgressType.DEFAULT
+    if "Randomize" in world.options.randomize_wild_pokemon or world.options.season_control != "vanilla"
+    else LocationProgressType.EXCLUDED
 )
 
 key_item_location: ProgressTypeMethod = lambda world: (

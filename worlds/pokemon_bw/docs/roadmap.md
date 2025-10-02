@@ -4,6 +4,7 @@ The "barely working" version will still be playable to goal, so it will start wi
 
 Every feature will increase the version by +0.1.
 However, do not confuse that with semantic version naming: `major.minor.build`
+Versions before 1.0.0 though can have small feature additions in +0.0.1 updates.
 
 Version 1.0.0 will happen when certain important features are implemented.
 
@@ -44,6 +45,7 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Wild pokémon randomization
     - Also enables full dexsanity
   - Trainer pokémon randomization
+  - Adjust levels
   - Encounter Plando
   - Master Ball seller (OptionSet), random cost in range if multiple
     - N's Castle
@@ -54,23 +56,33 @@ Version 1.0.0 will happen when certain important features are implemented.
     - Cost: 1000
     - Cost: 3000
     - Cost: 10000
-  - Adjust levels
+
+### 0.4.0
+
+- More modifiers
+  - Randomize Wild Pokémon
+    - Prevent overpowered pokémon
+  - Randomize Trainer Pokémon 
+    - Prevent overpowered pokémon
+    - Force fully evolved
+- Randomization Blacklist
+  - Wild pokémon
+  - Trainer pokémon
 
 ### Another update #1: Pokédex stuff
 
 - Options
   - Goals: Regional Pokédex, National Pokédex, Custom Pokédex
-  - Seensanity
-    - Only consider wild pokémon
+  - Seensanity (Only consider wild pokémon)
   - All pokémon seen
 
 ### Another update #2: Trainer stuff
 
 - Options
   - Trainersanity
-  - Seensanity
-    - Also consider trainer pokémon
+  - Seensanity (Also consider trainer pokémon)
   - Decrease trainer eyesight
+  - Trainer rebattling
 
 ### Another update #3: Text stuff
 
@@ -95,6 +107,7 @@ Version 1.0.0 will happen when certain important features are implemented.
 - Running shoes as an item, making mom cutscene on route 2 a check
 - Relic castle room filling with sand unlockable via an item
 - Dowsing Machine as a hard requirement for hidden items
+- Free fly destination
 
 ## Big update #1 (Stats update, name WIP, required for core)
 
@@ -129,8 +142,8 @@ Version 1.0.0 will happen when certain important features are implemented.
 - Door shuffle
 - Optional/Shuffling roadblock requirements
 - Original content
-- Boss fight Plando (gym leaders, elite four (first+second run), Alder, N (N's Castle), Ghetsis, Cheren/Bianca (postgame))
-- Story fight Plando (Cheren, Bianca, N, ...)
+- Trainer randomization
+- Trainer plando
 
 ## Big update #4 (Multiworld update, name WIP)
 
