@@ -20,8 +20,6 @@ mapping_single: dict[int, int] = {
     374: 14,  # => "route14"
     378: 15,  # => "route15"
     383: 16,  # => "route16"
-    423: 17,  # => "route17"
-    387: 18,  # => "route18"
     397: 19,  # => "accumulatown"
     418: 20,  # => "anvilletown"
     0: 21,  # => "blackcity"
@@ -98,7 +96,6 @@ mapping_single: dict[int, int] = {
     277: 91,  # => "nscastle5f"
     274: 92,  # => "nscastlensroom"
     278: 93,  # => "nscastlethroneroom"
-    238: 94,  # => "p2laboratory"
     155: 95,  # => "pinwheelforest"
     154: 96,  # => "pinwheelforestoutside"
     160: 97,  # => "reliccastle1f"
@@ -147,6 +144,7 @@ mapping_single: dict[int, int] = {
     255: 140,  # => "villagebridge"
     324: 141,  # => "wellspringcave1f"
     325: 142,  # => "wellspringcaveb1f"
+    423 + 387 + 238: 143, # => "route17", "route18", "p2laboratory"
 }
 
 mapping_range: dict[range, int] = {

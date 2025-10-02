@@ -86,7 +86,7 @@
 {"sections": [{"name": "Chargestone Cave - B1F center item"}], "map_locations": [{"map": "chargestonecaveb1f", "x": 428, "y": 564}]},
 {"sections": [{"name": "Chargestone Cave - B1F east hidden item"}], "map_locations": [{"map": "chargestonecaveb1f", "x": 650, "y": 678}]},
 {"sections": [{"name": "Chargestone Cave - B1F north item"}], "map_locations": [{"map": "chargestonecaveb1f", "x": 330, "y": 344}]},
-{"sections": [{"name": "Chargestone Cave - B1F west hidden item"}], "map_locations": [{"map": "chargestonecaveb1f", "x": 252, "y": 406}]},
+{"sections": [{"name": "Chargestone Cave - B1F west hidden item"}], "map_locations": [{"map": "chargestonecaveb1f", "x": 252, "y": 706}]},
 {"sections": [{"name": "Chargestone Cave - B2F hidden item"}], "map_locations": [{"map": "chargestonecaveb2f", "x": 406, "y": 492}]},
 {"sections": [{"name": "Chargestone Cave - B2F north east item"}], "map_locations": [{"map": "chargestonecaveb2f", "x": 392, "y": 84}]},
 {"sections": [{"name": "Chargestone Cave - B2F south east item"}], "map_locations": [{"map": "chargestonecaveb2f", "x": 328, "y": 558}]},

@@ -5,7 +5,7 @@
         "location_size": 32,
         "location_border_thickness": 2
     },
-{"name": "route1", "img": "images/routes/route1.png", "location_size": 32, "location_border_thickness": 2},
+{"name": "route1", "img": "images/routes/route1.png", "location_size": 14, "location_border_thickness": 2},
 {"name": "route2", "img": "images/routes/route2.png", "location_size": 32, "location_border_thickness": 2},
 {"name": "route3", "img": "images/routes/route3.png", "location_size": 32, "location_border_thickness": 2},
 {"name": "route4", "img": "images/routes/route4.png", "location_size": 32, "location_border_thickness": 2},
@@ -146,5 +146,6 @@
 {"name": "victoryroadtrialchamber", "img": "images/dungeons/victoryroadtrialchamber.png", "location_size": 32, "location_border_thickness": 2},
 {"name": "villagebridge", "img": "images/dungeons/villagebridge.png", "location_size": 32, "location_border_thickness": 2},
 {"name": "wellspringcave1f", "img": "images/dungeons/wellspringcave1f.png", "location_size": 32, "location_border_thickness": 2},
-{"name": "wellspringcaveb1f", "img": "images/dungeons/wellspringcaveb1f.png", "location_size": 32, "location_border_thickness": 2}
+{"name": "wellspringcaveb1f", "img": "images/dungeons/wellspringcaveb1f.png", "location_size": 32, "location_border_thickness": 2},
+{"name": "routes_17_18_p2lab", "img": "images/routes/routes_17_18_p2lab.png", "location_size": 32, "location_border_thickness": 2}
 ]
