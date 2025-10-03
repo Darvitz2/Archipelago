@@ -102,7 +102,6 @@ class PokemonBWWorld(World):
         self.fighting_type_species: set[str] = set()  # Needed for challenge rock outside of pinwheel forest
         self.to_be_filled_locations: int = 0
         self.seed: int = 0
-        self.to_be_locked_items: dict[str, Any] = {}
         self.wild_encounter: dict[str, EncounterEntry] = {}
         self.static_encounter: dict[str, StaticEncounterEntry] | None = None
         self.trade_encounter: dict[str, TradeEncounterEntry] | None = None
@@ -189,14 +188,8 @@ class PokemonBWWorld(World):
                             f"Please report this to the devs and provide the yaml used for generating.")
         for _ in range(self.to_be_filled_locations-len(item_pool)):
             item_pool.append(self.create_item(self.get_filler_item_name()))
-        items.reserve_locked_items(self, item_pool)
+        items.place_locked_items(self, item_pool)
         self.multiworld.itempool.extend(item_pool)
-
-    def pre_fill(self) -> None:
-        from .generate.locked_placement import place_badges_pre_fill, place_tm_hm_pre_fill
-
-        place_badges_pre_fill(self)
-        place_tm_hm_pre_fill(self)
 
     def fill_hook(self,
                   progitempool: List[Item],

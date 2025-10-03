@@ -6,13 +6,23 @@ if TYPE_CHECKING:
     from .. import PokemonBWWorld
 
 
-def place_badges_pre_fill(world: "PokemonBWWorld") -> None:
+def is_excluded(world: "PokemonBWWorld", location: Location) -> bool:
+    return location.progress_type == LocProgType.EXCLUDED or location.name in world.options.exclude_locations
+
+
+def place_badges_locked(world: "PokemonBWWorld", items: list[Item]) -> None:
     from ..data.locations.ingame_items import special
+    from ..data.items import badges
 
     match world.options.shuffle_badges.current_key:
         case "vanilla":
+            # Priority locations are ignored here because of no badges being filler
             # Shuffling items and locations not needed since this option is about specific placement
-            badge_items: dict[str, Item] = world.to_be_locked_items["badges"]
+            badge_items: dict[str, Item] = {
+                item.name: item
+                for item in items
+                if item.name in badges.table
+            }
             badge_locations: dict[str, Location] = {
                 loc.name: loc
                 for loc in world.get_locations()
@@ -29,33 +39,26 @@ def place_badges_pre_fill(world: "PokemonBWWorld") -> None:
                 "Opelucid Gym - Badge reward": "Legend Badge",
             }
             for loc, it in placements.items():
-                if badge_locations[loc].item is not None:
-                    continue
-                if badge_locations[loc].progress_type == LocProgType.EXCLUDED:
-                    continue
-                if badge_items[it] not in world.multiworld.itempool:
+                if is_excluded(world, badge_locations[loc]):
                     continue
                 badge_locations[loc].place_locked_item(badge_items[it])
-                world.multiworld.itempool.remove(badge_items[it])
+                items.remove(badge_items[it])
         case "shuffle":
-            # Items not shuffled
-            badge_items: dict[str, Item] = world.to_be_locked_items["badges"]
-            badge_items = {name: item for name, item in badge_items.items() if item in world.multiworld.itempool}
-            # Locations initially not shuffled
+            # Priority locations are ignored here because of no badges being filler
+            # Shuffle items because of some locations potentially being skipped
+            badge_items: list[Item] = [item for item in items if item.name in badges.table]
+            world.random.shuffle(badge_items)
+            # Locations not shuffled since items are shuffled
             badge_locations: list[Location] = [
                 loc
                 for loc in world.get_locations()
                 if loc.name in special.gym_badges
-                if loc.item is None
-                if loc.progress_type != LocProgType.EXCLUDED
+                if not is_excluded(world, loc)
             ]
-            # Shuffle locations, this should ensure randomness because of having no filling rules
-            world.random.shuffle(badge_locations)
-            for location, item in zip(badge_locations, badge_items.values()):
-                location: Location
-                item: Item
+            for location in badge_locations:
+                item = badge_items.pop()
                 location.place_locked_item(item)
-                world.multiworld.itempool.remove(item)
+                items.remove(item)
         case "any_badge":
             pass
         case "anything":
@@ -151,89 +154,84 @@ def place_badges_fill(world: "PokemonBWWorld",
             raise Exception(f"Bad shuffle_badges option value for player {world.player_name}")
 
 
-def place_tm_hm_pre_fill(world: "PokemonBWWorld") -> None:
+def place_tm_hm_locked(world: "PokemonBWWorld", items: list[Item]) -> None:
     from ..data.locations.ingame_items.special import tm_hm_ncps, gym_tms
     from ..data.locations import all_tm_locations
-    from ..data.items import tm_hm
+    from ..data.items import tm_hm, all_tm_hm
 
     match world.options.shuffle_tm_hm.current_key:
         case "shuffle":
-            # Priority locations are ignored here because of already complex algorithm and no TMs/HMs being filler
-            # Items already shuffled
-            # Do not iterate over multiworld itempool, else shuffling is lost
-            tm_hm_items: list[Item] = world.to_be_locked_items["tm_hm"]
-            tm_hm_items = [item for item in tm_hm_items if item in world.multiworld.itempool]
-            # Sort HMs to front to prevent problems with HM rules
+            # Priority locations are ignored here because of no TMs/HMs being filler
+            # Get TMs and HMs shuffled
+            tm_hm_items: list[Item] = [item for item in items if item.name in all_tm_hm]
+            world.random.shuffle(tm_hm_items)
+            # Shuffle locations to prevent always having all HMs in the same few spots
+            tm_hm_locs: list[Location] = [
+                loc
+                for loc in world.get_locations()
+                if loc.name in all_tm_locations
+                if not is_excluded(world, loc)
+            ]
+            world.random.shuffle(tm_hm_locs)
+            # Take only a slice of items and sort included HMs to front to prevent problems with HM rules
+            tm_hm_items = tm_hm_items[:len(tm_hm_locs)]
             to_place = 0
             for to_check in range(1, len(tm_hm_items)):
                 if tm_hm_items[to_check].name in tm_hm.hm:
                     tm_hm_items[to_check], tm_hm_items[to_place] = tm_hm_items[to_place], tm_hm_items[to_check]
                     to_place += 1
-            # Locations initially not shuffled
-            tm_hm_locs: list[Location] = [
-                loc
-                for loc in world.get_locations()
-                if loc.name in all_tm_locations
-                if loc.item is None
-                if loc.progress_type != LocProgType.EXCLUDED
-            ]
-            # Shuffle locations to prevent always having all HMs in the same few spots
-            world.random.shuffle(tm_hm_locs)
-            for i in range(min(len(tm_hm_items), len(tm_hm_locs))):
-                item = tm_hm_items[i]
-                for loc_index in reversed(range(len(tm_hm_locs))):
-                    location = tm_hm_locs[loc_index]
+            for item in tm_hm_items:
+                for location in tm_hm_locs:
                     hm_rule = all_tm_locations[location.name].hm_rule
                     if hm_rule is None or hm_rule(item.name):
-                        tm_hm_locs.pop(loc_index)
+                        tm_hm_locs.remove(location)
                         location.place_locked_item(item)
-                        world.multiworld.itempool.remove(item)
+                        items.remove(item)
                         break
         case "hm_with_badge":
-            # Priority locations are ignored here because of already complex algorithm and no TMs/HMs being filler
-            # Items already shuffled
-            # Do not iterate over multiworld itempool, else shuffling is lost
-            tms: list[Item] = world.to_be_locked_items["tms"]
-            hms: list[Item] = world.to_be_locked_items["hms"]
-            tms = [item for item in tms if item in world.multiworld.itempool]
-            hms = [item for item in hms if item in world.multiworld.itempool]
-            # Locations initially not shuffled
+            tm_items = [item for item in items if item.name in tm_hm.tm and "TM70" not in item.name]
+            hm_items = [item for item in items if item.name in tm_hm.hm or "TM70" in item.name]
             other_tm_locations: list[Location] = [
                 loc
                 for loc in world.get_locations()
                 if loc.name in tm_hm_ncps
-                if loc.item is None
-                if loc.progress_type != LocProgType.EXCLUDED
+                if not is_excluded(world, loc)
             ]
             gym_tm_locations: list[Location] = [
                 loc
                 for loc in world.get_locations()
                 if loc.name in gym_tms
-                if loc.item is None
-                if loc.progress_type != LocProgType.EXCLUDED
+                if not is_excluded(world, loc)
             ]
-            # First only shuffle gym locations, since some might get put on top of other list if there are leftovers
-            world.random.shuffle(gym_tm_locations)
-            hm_place_count = min(len(hms), len(gym_tm_locations))
-            for i in range(hm_place_count):
-                # No gym TM location has an HM rule
-                gym_tm_locations[i].place_locked_item(hms[i])
-                world.multiworld.itempool.remove(hms[i])
-            # Either fill remaining locations with TMs or potentially put remaining HMs in other locations
-            # Put HMs at the front to prevent problems with HM rules
-            tms = hms[hm_place_count:] + tms
-            other_tm_locations.extend(gym_tm_locations[hm_place_count:])
-            # Shuffle other locations to prevent always having leftover HMs in the same few spots
+            # Shuffle everything
+            # If no gym location is excluded, add one random TM to HMs
+            if len(gym_tm_locations) == 8:
+                hm_items.append(world.random.choice(tm_items))
+            world.random.shuffle(hm_items)
             world.random.shuffle(other_tm_locations)
-            for i in range(min(len(tms), len(other_tm_locations))):
-                item = tms[i]
-                for loc_index in reversed(range(len(other_tm_locations))):
-                    location = other_tm_locations[loc_index]
+            world.random.shuffle(gym_tm_locations)
+            # Place HMs into gym locations first
+            for loc in gym_tm_locations:
+                item = hm_items.pop()
+                loc.place_locked_item(item)
+                items.remove(item)
+            # If more than one gym location was excluded, add remaining HMs to TM list and shuffle that
+            tm_items.extend(hm_items)
+            world.random.shuffle(tm_items)
+            # Take only a slice of items and sort included HMs to front to prevent problems with HM rules
+            tm_items = tm_items[:len(other_tm_locations)]
+            to_place = 0
+            for to_check in range(1, len(tm_items)):
+                if tm_items[to_check].name in tm_hm.hm:
+                    tm_items[to_check], tm_items[to_place] = tm_items[to_place], tm_items[to_check]
+                    to_place += 1
+            for item in tm_items:
+                for location in other_tm_locations:
                     hm_rule = all_tm_locations[location.name].hm_rule
                     if hm_rule is None or hm_rule(item.name):
-                        other_tm_locations.pop(loc_index)
+                        other_tm_locations.remove(location)
                         location.place_locked_item(item)
-                        world.multiworld.itempool.remove(item)
+                        items.remove(item)
                         break
         case "any_tm_hm":
             pass
@@ -263,7 +261,7 @@ def place_tm_hm_fill(world: "PokemonBWWorld",
                 (item, pool)
                 for pool in (progitempool, usefulitempool, filleritempool)
                 for item in pool
-                if (item.name.lower().startswith("tm") or item.name.lower().startswith("hm")) and item.name[2].isdigit()
+                if len(item.name) > 2 and item.name[:2].lower() in ("tm", "hm") and item.name[2].isdigit()
             ]
             tm_hm_locs: list[Location] = [
                 loc

@@ -5,7 +5,7 @@ from ..progress_type import *
 from ... import FlagLocationData, TMLocationData
 
 # What if Rood gets Cut and Fennel gets Surf? That would be a guaranteed "unreachable locations
-no_hm: Callable[[str], bool] = lambda name: not name.lower().startswith("hm")
+no_hm: Callable[[str], bool] = lambda name: not (len(name) > 2 and name[:2].lower() == "hm" and name[2].isdigit())
 
 gym_badges: dict[str, FlagLocationData] = {
     "Striaton Gym - Badge reward": FlagLocationData(0x172, key_item_location, "Striaton City", None, None),

@@ -102,26 +102,8 @@ def populate_starting_inventory(world: "PokemonBWWorld", items: list[PokemonBWIt
         items.remove(start)
 
 
-def reserve_locked_items(world: "PokemonBWWorld", items: list[PokemonBWItem]) -> None:
-    from .data.items import badges, all_tm_hm, tm_hm
-    from .data.locations.ingame_items.special import tm_hm_ncps, gym_tms
+def place_locked_items(world: "PokemonBWWorld", items: list[PokemonBWItem]) -> None:
+    from .generate import locked_placement
 
-    if world.options.shuffle_badges in ("vanilla", "shuffle"):
-        badge_items = [item for item in items if item.name in badges.table]
-        to_be_locked: dict[str, PokemonBWItem] = {}
-        for item in badge_items:
-            to_be_locked[item.name] = item
-        world.to_be_locked_items["badges"] = to_be_locked
-
-    if world.options.shuffle_tm_hm == "shuffle":
-        tm_hm_items = [item for item in items if item.name in all_tm_hm]
-        world.random.shuffle(tm_hm_items)
-        world.to_be_locked_items["tm_hm"] = tm_hm_items
-    elif world.options.shuffle_tm_hm == "hm_with_badge":
-        tm_items = [item for item in items if item.name in tm_hm.tm and "TM70" not in item.name]
-        hm_items = [item for item in items if item.name in tm_hm.hm or "TM70" in item.name]
-        world.random.shuffle(tm_items)
-        world.random.shuffle(hm_items)
-        world.to_be_locked_items["tms"] = tm_items
-        world.to_be_locked_items["hms"] = hm_items
-
+    locked_placement.place_badges_locked(world, items)
+    locked_placement.place_tm_hm_locked(world, items)
