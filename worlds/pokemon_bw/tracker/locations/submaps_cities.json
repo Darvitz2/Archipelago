@@ -52,7 +52,7 @@
 {"sections": [{"name": "Nacrene City - Hidden item on railway"}], "map_locations": [{"map": "nacrenecity", "x": 26, "y": 402}]},
 {"sections": [{"name": "Nacrene City - Item from Cheren #1"},{"name": "Nacrene City - Item from Cheren #2"},{"name": "Nacrene City - Item from Cheren #3"}], "map_locations": [{"map": "nacrenecity", "x": 920, "y": 408}]},
 {"sections": [{"name": "Nacrene City - Item from girl in west building"}], "map_locations": [{"map": "nacrenecity", "x": 218, "y": 340}]},
-{"sections": [{"name": "Nacrene City - Item from Bianca"},{"name": "Nacrene City - Item from Lenora"}], "map_locations": [{"map": "nacrenecity", "x": 584, "y": 163}]},
+{"sections": [{"name": "Nacrene City - Item from Bianca"},{"name": "Nacrene City - Item from Lenora after Relic Castle"}], "map_locations": [{"map": "nacrenecity", "x": 584, "y": 163}]},
 {"sections": [{"name": "Nacrene City - Item from waitress in Café Warehouse"}], "map_locations": [{"map": "nacrenecity", "x": 264, "y": 136}]},
 {"sections": [{"name": "Nacrene Gym - Badge reward"},{"name": "Nacrene Gym - Gym guide item"},{"name": "Nacrene Gym - TM reward"}], "map_locations": [{"map": "nacrenecity", "x": 584, "y": 90}]},
 {"sections": [{"name": "Nimbasa City - Hidden item near ferris wheel"}], "map_locations": [{"map": "nimbasacityeast", "x": 852, "y": 382}]},

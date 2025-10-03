@@ -204,7 +204,7 @@
 {"sections": [{"name": "P2 Laboratory - Item outside"}], "map_locations": [{"map": "p2laboratory", "x": 2376, "y": 119}]},
 {"sections": [{"name": "Pinwheel Forest - East hidden item"}], "map_locations": [{"map": "pinwheelforest", "x": 1320, "y": 564}]},
 {"sections": [{"name": "Pinwheel Forest - East item inside tree stump"}], "map_locations": [{"map": "pinwheelforest", "x": 1624, "y": 338}]},
-{"sections": [{"name": "Pinwheel Forest - Item from Lenora"}], "map_locations": [{"map": "pinwheelforest", "x": 602, "y": 166}]},
+{"sections": [{"name": "Pinwheel Forest - Item from Lenora"},{"name": "Pinwheel Forest - Stolen item from Plasma grunt"}], "map_locations": [{"map": "pinwheelforest", "x": 602, "y": 166}]},
 {"sections": [{"name": "Pinwheel Forest - Item from ranger Audra"}], "map_locations": [{"map": "pinwheelforest", "x": 248, "y": 698}]},
 {"sections": [{"name": "Pinwheel Forest - Item from ranger Forrest"}], "map_locations": [{"map": "pinwheelforest", "x": 584, "y": 776}]},
 {"sections": [{"name": "Pinwheel Forest - Item from ranger Irene"}], "map_locations": [{"map": "pinwheelforest", "x": 104, "y": 442}]},
