@@ -18,6 +18,8 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 
 - Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
 - Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
+- Fixed unit test failures due to `Shuffle Badge Rewards` and `Shuffle TM Rewards` shenanigans
+- Fixed badge and TM/HM locations not being excludable or prioritizable
 
 ## 0.3.999 (pre-release)
 

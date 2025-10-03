@@ -3,37 +3,51 @@
 
 # 0.4.0
 
-- ut auto tabbing
-- fix gym leaders not being present in their gyms
-- fast travel npc in chargestone cave from south to north if battled N at north exit
+## APWorld
+
 - make dexsanity hints correctly replace grass with cave etc.
-- maybe juniper seen count locations can check for national seen? look at cedric in mistralton city and both other des seen locations
 - somehow fix problem with patch backwards compatibility for patch file altering versions that actually can support older versions (e.g. 0.3.99 not accepting 0.3.0)
-- somehow account for excluded locations in shuffle badges/tms
-- make mom stop the player at the door and say funny things for certain reusable tm choices
 - reduce different forms weight in randomization
 - remove arceus types
-- add now-possible locations
+- master ball sellers falsely unset?
 - fix bianca being spelled "Bianka" on some location names
-- add "for seeing 25 species" to location in Castelia City
+- update UT fixes
+- add "for seeing 25 species" to location name in Castelia City
 - Fix Guidance Chamber items being called "Mistralton Cave 3F..."
 - add missing hidden item in chargestone cave b2f and change the other hidden item's name
+- Fill levelup movesets
 - More modifiers
   - Randomize Wild Pokémon
     - Prevent overpowered pokémon 
-      - Gets overwritten by "Ensure all obtainable"
+      - Other modifiers take priority, some op species are even required all the time
       - Base stat total threshold adjustable
+    - Prevent early Wonder Guard and fixed HP attacks
   - Randomize Trainer Pokémon 
     - Prevent overpowered pokémon
       - Base stat total threshold adjustable
     - Force fully evolved 
       - Level threshold adjustable
     - Type themed
-    - Themed gym trainers
+    - Themed gym trainers (also make gym leaders and elite 4 always have themed teams)
+    - Prevent early Wonder Guard and fixed HP attacks
 - Randomization Blacklist
   - Wild pokémon 
-    - This will throw an OptionError if "Ensure all obtainable" is selected and any blacklisted is base stage
+    - This will throw an OptionError if any blacklisted is base stage but required
+    - Ignores Encounter Plando
   - Trainer pokémon
+
+## Rom
+
+- fix gym leaders not being present in their gyms
+- fast travel npc in chargestone cave from south to north if battled N at north exit
+- maybe juniper seen count locations can check for national seen? look at cedric in mistralton city and both other dex seen locations
+- make mom stop the player at the door and say funny things for certain reusable tm choices
+- skip musical tutorial, because some players have problems
+- disable dig outside of battle when season patch included, as a temporary bandaid fix
+
+## both
+
+- add now-possible locations
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
