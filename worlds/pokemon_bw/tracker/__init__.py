@@ -144,8 +144,9 @@ mapping_single: dict[int, int] = {
     255: 140,  # => "villagebridge"
     324: 141,  # => "wellspringcave1f"
     325: 142,  # => "wellspringcaveb1f"
-    423 + 387: 143, # => "route17", "route18", "p2laboratory"
-    238: 143 # => "route17", "route18", "p2laboratory"
+    423 : 143, # => "route17" these all are merged to one map
+    387: 143, # => "route18" these all are merged to one map
+    238: 143, # => "p2 lab" these all are merged to one map
 }
 
 mapping_range: dict[range, int] = {
