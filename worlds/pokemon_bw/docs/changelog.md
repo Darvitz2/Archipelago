@@ -14,12 +14,14 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
 - Added many more maps for UT tracking and auto-tabbing
 
-### Bug fixes
+### Bug fixes and technical stuff
 
 - Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
 - Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
 - Fixed unit test failures due to `Shuffle Badge Rewards` and `Shuffle TM Rewards` shenanigans
 - Fixed badge and TM/HM locations not being excludable or prioritizable
+- Changed some locations' names
+- Added a missing hidden item location in Chargestone Cave B2F
 
 ## 0.3.999 (pre-release)
 

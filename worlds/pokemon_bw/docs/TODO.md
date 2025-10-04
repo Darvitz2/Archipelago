@@ -9,10 +9,6 @@
 - somehow fix problem with patch backwards compatibility for patch file altering versions that actually can support older versions (e.g. 0.3.99 not accepting 0.3.0)
 - reduce different forms weight in randomization
 - master ball sellers falsely unset?
-- fix bianca being spelled "Bianka" on some location names
-- add "for seeing 25 species" to location name in Castelia City
-- Fix Guidance Chamber items being called "Mistralton Cave 3F..."
-- add missing hidden item in chargestone cave b2f and change the other hidden item's name
 - Fill levelup movesets
 - More modifiers
   - Randomize Wild Pokémon
@@ -42,8 +38,9 @@
 - make mom stop the player at the door and say funny things for certain reusable tm choices
 - skip musical tutorial, because some players have problems
 - disable dig outside of battle when season patch included, as a temporary bandaid fix
+- cold storage sage not appearing?
 
-## both
+## Both
 
 - add now-possible locations
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
