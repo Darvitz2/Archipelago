@@ -155,9 +155,9 @@ class SpeciesData(NamedTuple):
 
 
 class MovesetData(NamedTuple):
-    # tuple(level, move name)
-    level_up_moves: list[tuple[int, str]]
-    # TM number (internal order is TM1-95 HM1-6)
+    # tuple(level, move number)
+    level_up_moves: list[tuple[int, int]]
+    # TM number (internal order is TM01-95 HM01-06)
     tm_hm_moves: set[str]
 
 

@@ -5,8 +5,6 @@
 
 ## APWorld
 
-- make dexsanity hints correctly replace grass with cave etc.
-- Fill levelup movesets
 - More modifiers
   - Randomize Wild Pokémon
     - Prevent overpowered pokémon 
@@ -16,13 +14,15 @@
   - Randomize Trainer Pokémon 
     - Prevent overpowered pokémon
       - Base stat total threshold adjustable
+      - Takes priority over similar base stats
     - Evolve when possible
     - Force fully evolved 
       - Level threshold adjustable
     - Type themed
     - Themed gym trainers (also make gym leaders and elite 4 always have themed teams)
     - Prevent early Wonder Guard and fixed HP attacks
-    - Rivals keep starter
+    - Rivals keep first pokemon
+    - Rivals take from box
   - Adjust Levels
     - Trainer team (weaker pokémon used in postgame area battles for similar base stats)
 - Randomization Blacklist
@@ -35,6 +35,8 @@
   - Efficient mode, making a lot of text shorter
 - Text Plando
   - Text extractor in client
+- Make the asking for a rom file first check the header and then correctly name the copy in the AP folder, so that the patching process will detect an incorrect rom version and notify the user about it
+- more location groups for unpopular spots like abyssal ruins
 
 ## Rom
 
@@ -45,7 +47,9 @@
 - skip musical tutorial, because some players have problems
 - disable dig outside of battle when season patch included, as a temporary bandaid fix
 - cold storage sage first sequence after ghetsis makes second sequence not possible since spawn flag is permanently set
-- wingull giving TM without grams
+- fix wingull giving TM without grams
+- desert resort south hidden item not checkable?
+- make item names in custom roadblock dialogues a distinguishable color
 
 ## Both
 
@@ -53,6 +57,7 @@
 - a way to check whether map or fly menu is opened
 - Running shoes as an item, making mom cutscene on route 2 a check
 - Bianca route 8 trigger right before door, how should I fix it?
+  - Idea: make trigger depend on new variable, which is set after grunts flee (however, look for variables and flags being set in bianca script)
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
@@ -71,6 +76,7 @@
 - Fix locations in pokédex if something written to encounter tables
 - route 18 reappearing and undella bay reappearing items get still detected after pickup
 - BizHawk 2.11 having issues with modded gen 5 roms
+- rename slot methods to cave/dust cloud/etc everywhere
 
 # Single reports, cannot recreate, need to wait for more reports
 
