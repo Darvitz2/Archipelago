@@ -24,6 +24,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added a missing hidden item location in Chargestone Cave B2F
 - Fixed "Striaton City - TM from Fennel" not being able to contain an HM with certain potions
 - Reduced frequency of different forms of the same pokémon in randomization
+- Fixed season-dependant locations not being excluded when wild pokémon are randomized
 
 ## 0.3.999 (pre-release)
 

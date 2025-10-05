@@ -40,7 +40,7 @@
 - make mom stop the player at the door and say funny things for certain reusable tm choices
 - skip musical tutorial, because some players have problems
 - disable dig outside of battle when season patch included, as a temporary bandaid fix
-- cold storage sage not appearing?
+- cold storage sage first sequence after ghetsis makes second sequence not possible since spawn flag is permanently set
 
 ## Both
 
