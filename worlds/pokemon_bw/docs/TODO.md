@@ -7,8 +7,6 @@
 
 - make dexsanity hints correctly replace grass with cave etc.
 - somehow fix problem with patch backwards compatibility for patch file altering versions that actually can support older versions (e.g. 0.3.99 not accepting 0.3.0)
-- reduce different forms weight in randomization
-- master ball sellers falsely unset?
 - Fill levelup movesets
 - More modifiers
   - Randomize Wild Pokémon
@@ -19,14 +17,18 @@
   - Randomize Trainer Pokémon 
     - Prevent overpowered pokémon
       - Base stat total threshold adjustable
+    - Evolve when possible
     - Force fully evolved 
       - Level threshold adjustable
     - Type themed
     - Themed gym trainers (also make gym leaders and elite 4 always have themed teams)
     - Prevent early Wonder Guard and fixed HP attacks
+    - Rivals keep starter
+  - Adjust Levels
+    - Trainer team (weaker pokémon used in postgame area battles for similar base stats)
 - Randomization Blacklist
-  - Wild pokémon 
-    - This will throw an OptionError if any blacklisted is base stage but required
+  - Wild pokémon
+    - Will still put every species that is required to be randomized and base stage into at least one slot
     - Ignores Encounter Plando
   - Trainer pokémon
 

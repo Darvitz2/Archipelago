@@ -1,3 +1,5 @@
+from random import Random
+
 from .. import SpeciesData
 
 by_name: dict[str, SpeciesData] = {
@@ -772,3 +774,16 @@ by_id: dict[tuple[int, int], str] = {
 unova_species: dict[str, SpeciesData] = {
     name: data for name, data in by_name.items() if 494 <= data.dex_number <= 649
 }
+
+forms_by_dex: dict[int, list[tuple[str, SpeciesData]]] = {i: [] for i in range(1, 650)}
+for spe, data in by_name.items():
+    forms_by_dex[data.dex_number].append((spe, data))
+
+
+def get_weighted_random_species(random: Random,
+                                fbd: dict[int, list[tuple[str, SpeciesData]]]) -> tuple[str, SpeciesData]:
+    forms = fbd[random.choice([i for i in fbd])]
+    if len(forms) == 1:
+        return forms[0]
+    else:
+        return random.choice(forms)

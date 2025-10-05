@@ -34,7 +34,7 @@ tm_hm_ncps: dict[str, TMLocationData] = {
     "Nuvema Town - TM from Professor Juniper for seeing 60 species": TMLocationData(175, always_default, "Nuvema Town", None, None, has_60_species),
     "Nuvema Town - TM from Professor Juniper for seeing 115 species": TMLocationData(176, always_default, "Nuvema Town", None, None, has_115_species),
     "Route 18 - TM from sage Rood": TMLocationData(0x186, always_default, "Route 18", None, no_hm, can_beat_ghetsis),
-    "Striaton City - TM from Fennel": TMLocationData(0x18D, always_default, "Striaton City", None, no_hm, None),
+    "Striaton City - TM from Fennel": TMLocationData(0x18D, always_default, "Striaton City", None, None, None),
     "Dreamyard - TM from sage Gorm": TMLocationData(0x19A, always_default, "Dreamyard South", None, None, None),
     "Pinwheel Forest Outside - TM from woman near Nacrene City": TMLocationData(271, always_default, "Pinwheel Forest Outside", None, None, None),
     "Castelia City - TM from hiker in building in Castelia Street": TMLocationData(265, always_default, "Castelia City", None, None, None),
