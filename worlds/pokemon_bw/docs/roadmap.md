@@ -72,6 +72,12 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Simple method, shown on Webhost
   - Advanced method, more capabilities
 - UT auto-tabbing
+- Running shoes as an item, making mom cutscene on route 2 a check
+- Funny dialogue
+  - Funny mode, including actually funny things
+  - Efficient mode, making a lot of text shorter
+- Text Plando
+  - Text extractor in client
 
 ### Another update #1: Pokédex stuff
 
@@ -88,15 +94,7 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Decrease trainer eyesight
   - Trainer rebattling
 
-### Another update #3: Text stuff
-
-- Options
-  - Funny dialogue
-  - Text Plando
-    - Text extractor in client
-- An NPC in Accumula Town telling you some information about the world
-
-### Another update #4: Script editing stuff
+### Another update #3: Script editing stuff
 
 - Options
   - Additional roadblocks
@@ -108,10 +106,10 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Seen count checks modifier
 - Xtransceiver being required to see certain story sequences (with some of them giving items)
   - Also, dynamic Xtransceiver item that automatically adds the correctly gendered version to the game
-- Running shoes as an item, making mom cutscene on route 2 a check
 - Relic castle room filling with sand unlockable via an item
 - Dowsing Machine as a hard requirement for hidden items
 - Free fly destination
+- An NPC in Accumula Town telling you some information about the world
 
 ## Big update #1 (Stats update, name WIP, required for core)
 

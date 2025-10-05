@@ -6,7 +6,6 @@
 ## APWorld
 
 - make dexsanity hints correctly replace grass with cave etc.
-- somehow fix problem with patch backwards compatibility for patch file altering versions that actually can support older versions (e.g. 0.3.99 not accepting 0.3.0)
 - Fill levelup movesets
 - More modifiers
   - Randomize Wild Pokémon
@@ -31,6 +30,11 @@
     - Will still put every species that is required to be randomized and base stage into at least one slot
     - Ignores Encounter Plando
   - Trainer pokémon
+- Funny dialogue
+  - Funny mode, including actually funny things
+  - Efficient mode, making a lot of text shorter
+- Text Plando
+  - Text extractor in client
 
 ## Rom
 
@@ -41,10 +45,14 @@
 - skip musical tutorial, because some players have problems
 - disable dig outside of battle when season patch included, as a temporary bandaid fix
 - cold storage sage first sequence after ghetsis makes second sequence not possible since spawn flag is permanently set
+- wingull giving TM without grams
 
 ## Both
 
 - add now-possible locations
+- a way to check whether map or fly menu is opened
+- Running shoes as an item, making mom cutscene on route 2 a check
+- Bianca route 8 trigger right before door, how should I fix it?
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
@@ -75,4 +83,3 @@
 - sequence break problem with npcs not moving, see channel
 - incredibly low catch chances? idk how that could be related to the apworld in any way
 - plando items having issues? plandoing basic badge into abyssal ruins sometimes raises fillerrors about this item not being placeable
-- route 8 bianca items logic, apparently said to be in logic without light/dark stone, but blocked by grunts wanting the stone
