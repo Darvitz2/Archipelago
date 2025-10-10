@@ -252,7 +252,7 @@ class PokemonBWWorld(World):
             "master_ball_seller_cost": self.master_ball_seller_cost,
         }
 
-    def interpret_slot_data(self, slot_data: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
         """Helper function for Universal Tracker"""
-        _ = self  # Damn PyCharm screaming "meThoD mAy bE stAtiC"
         return slot_data
