@@ -5,8 +5,10 @@ def get_item_groups() -> dict[str, set[str]]:
     return {
         "TMs": set(tm_hm.tm),
         "HMs": set(tm_hm.hm),
+        "TMs and HMs": {*tm_hm.tm, *tm_hm.hm},
         "Main items": {*main_items.filler, *main_items.fossils, *main_items.min_once,
                        *main_items.mail, *main_items.unused},
+        "Fossils": set(main_items.fossils),
         "Key items": {*key_items.progression, *key_items.vanilla, *key_items.useless, *key_items.special},
         "Medicine": {*medicine.table, *medicine.important},
         "Berries": {*berries.standard, *berries.niche},
@@ -21,10 +23,11 @@ def get_location_groups() -> dict[str, set[str]]:
 
     return {
         "Dexsanity": set(dexsanity.location_table),
-        "Overworld items": set(overworld_items.table),
+        "Overworld items": {*overworld_items.table, *overworld_items.abyssal_ruins, *overworld_items.seasonal},
         "Abyssal Ruins items": set(overworld_items.abyssal_ruins),
-        "Hidden items": set(hidden_items.table),
-        "NPC items": {*other.table, *special.gym_badges, *special.gym_tms, *special.tm_hm_ncps},
+        "Hidden items": {*hidden_items.table, *hidden_items.seasonal},
+        "NPC items": {*other.table, *other.seasonal, *special.gym_badges, *special.gym_tms, *special.tm_hm_ncps},
+        "Season-dependant items": {*overworld_items.seasonal, *hidden_items.seasonal, *other.seasonal},
         "Badge rewards": set(special.gym_badges),
         "Gym TM rewards": set(special.gym_tms),
         "TM/HM locations": {*special.gym_tms, *special.tm_hm_ncps},

@@ -1,3 +1,5 @@
+import collections
+import itertools
 from typing import TYPE_CHECKING
 
 from ...locations import PokemonBWLocation
@@ -8,19 +10,17 @@ if TYPE_CHECKING:
 
 
 def lookup(domain: int) -> dict[str, int]:
-    from ...data.locations.ingame_items.overworld_items import table, abyssal_ruins
+    from ...data.locations.ingame_items.overworld_items import table, abyssal_ruins, seasonal
 
     return {
-        name: data.flag_id + domain for name, data in table.items()
-    } | {
-        name: data.flag_id + domain for name, data in abyssal_ruins.items()
+        name: data.flag_id + domain for tab in (table, abyssal_ruins, seasonal) for name, data in tab
     }
 
 
 def create(world: "PokemonBWWorld") -> None:
-    from ...data.locations.ingame_items.overworld_items import table, abyssal_ruins
+    from ...data.locations.ingame_items.overworld_items import table, abyssal_ruins, seasonal
 
-    for tab in (table, abyssal_ruins):
+    for tab in (table, abyssal_ruins, seasonal):
         for name, data in tab.items():
             if data.inclusion_rule is None or data.inclusion_rule(world):
                 r: "Region" = world.regions[data.region]

@@ -142,12 +142,7 @@ table: dict[str, FlagLocationData] = {
     "Twist Mountain - Upper floor north east cave item": FlagLocationData(1179, always_default, "Twist Mountain", None, None),
     "Twist Mountain - Middle floor west cave item #1": FlagLocationData(1236, always_default, "Twist Mountain", None, None),
     "Twist Mountain - Middle floor west cave item #2": FlagLocationData(1180, always_default, "Twist Mountain", None, None),
-    "Twist Mountain - Middle floor north cave item (Winter)": FlagLocationData(1266, season_dependant, "Twist Mountain", None, can_set_winter),
-    "Twist Mountain - Lower floor little east cave item (Winter)": FlagLocationData(1182, season_dependant, "Twist Mountain", None, can_set_winter),
-    "Twist Mountain - Lower floor north west cave item (Spring/Summer/Autumn)": FlagLocationData(1267, season_dependant, "Twist Mountain", None, can_set_other_than_winter),
     "Twist Mountain - Item near ice rock": FlagLocationData(1183, always_default, "Twist Mountain", None, None),
-    "Icirrus City - Item west of pokémon center (Winter)": FlagLocationData(1326, season_dependant, "Icirrus City", None, can_set_winter),
-    "Dragonspiral Tower - Item near entrance (Winter)": FlagLocationData(1410, season_dependant, "Dragonspiral Tower", None, can_set_winter),
     "Dragonspiral Tower - Outside item": FlagLocationData(1184, always_default, "Dragonspiral Tower", None, can_use_surf),
     "Dragonspiral Tower - 2F north east item": FlagLocationData(1237, always_default, "Dragonspiral Tower", None, None),
     "Dragonspiral Tower - 2F item on pillar": FlagLocationData(1270, always_default, "Dragonspiral Tower", None, None),
@@ -161,7 +156,6 @@ table: dict[str, FlagLocationData] = {
     "Route 8 - Center item": FlagLocationData(1186, always_default, "Route 8", None, None),
     "Route 8 - North west item": FlagLocationData(1185, always_default, "Route 8", None, None),
     "Route 8 - Item near northern lake": FlagLocationData(1268, always_default, "Route 8", None, None),
-    "Moor of Icirrus - South east item (Spring/Summer/Autumn)": FlagLocationData(1303, season_dependant, "Moor of Icirrus", None, can_set_other_than_winter),
     "Moor of Icirrus - Item near northern lake": FlagLocationData(1311, always_default, "Moor of Icirrus", None, can_use_surf),
     "Moor of Icirrus - North east item": FlagLocationData(1314, always_default, "Moor of Icirrus", None, None),
     "Moor of Icirrus - Item behind boulder #1": FlagLocationData(1315, always_default, "Moor of Icirrus", None, can_use_strength),
@@ -285,4 +279,13 @@ abyssal_ruins: dict[str, FlagLocationData] = {
     "Abyssal Ruins 3F - North east item": FlagLocationData(1365, always_default, "Abyssal Ruins 3F", None, None),
     "Abyssal Ruins 3F - Kinda north east item": FlagLocationData(1368, always_default, "Abyssal Ruins 3F", None, None),
     "Abyssal Ruins 4F - Item": FlagLocationData(1372, always_default, "Abyssal Ruins 4F", None, None),
+}
+
+seasonal: dict[str, FlagLocationData] = {
+    "Twist Mountain - Middle floor north cave item (Winter)": FlagLocationData(1266, season_dependant, "Twist Mountain", None, can_set_winter),
+    "Twist Mountain - Lower floor little east cave item (Winter)": FlagLocationData(1182, season_dependant, "Twist Mountain", None, can_set_winter),
+    "Twist Mountain - Lower floor north west cave item (Spring/Summer/Autumn)": FlagLocationData(1267, season_dependant, "Twist Mountain", None, can_set_other_than_winter),
+    "Icirrus City - Item west of pokémon center (Winter)": FlagLocationData(1326, season_dependant, "Icirrus City", None, can_set_winter),
+    "Dragonspiral Tower - Item near entrance (Winter)": FlagLocationData(1410, season_dependant, "Dragonspiral Tower", None, can_set_winter),
+    "Moor of Icirrus - South east item (Spring/Summer/Autumn)": FlagLocationData(1303, season_dependant, "Moor of Icirrus", None, can_set_other_than_winter),
 }

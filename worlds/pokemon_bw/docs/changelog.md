@@ -12,6 +12,8 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
   - Advanced method (cannot be shown on Webhost, but with more capabilities)
     - Same as simple, but accepts multiple chained calculations
 - Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
+- Added a location group for season-dependant item locations
+- Added an item group for fossils and another one for TMs and HMs combined
 
 ### Bug fixes and technical stuff
 
@@ -23,6 +25,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Fixed "Striaton City - TM from Fennel" not being able to contain an HM with certain options
 - Reduced frequency of different forms of the same pokémon in randomization
 - Wrote down levelup moveset data
+- Fixed the overworld items location group not containing abyssal ruins locations
 
 ## 0.3.999 (pre-release)
 

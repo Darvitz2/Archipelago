@@ -15,8 +15,11 @@ all_tm_locations: ChainMap[str, "TMLocationData"] = ChainMap[str, "TMLocationDat
 all_item_locations: ChainMap[str, "AnyLocationData"] = ChainMap[str, "AnyLocationData"](
     overworld_items.table,
     overworld_items.abyssal_ruins,
+    overworld_items.seasonal,
     hidden_items.table,
+    hidden_items.seasonal,
     other.table,
+    other.seasonal,
     special.gym_badges,
     special.gym_tms,
     special.tm_hm_ncps,

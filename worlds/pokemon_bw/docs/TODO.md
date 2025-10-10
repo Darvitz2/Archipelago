@@ -38,8 +38,8 @@
   - Efficient mode, making a lot of text shorter
 - Text Plando
   - Text extractor in client
-- Make the asking for a rom file first check the header and then correctly name the copy in the AP folder, so that the patching process will detect an incorrect rom version and notify the user about it
-- location group for season-dependant locations
+- Make the asking for a rom file first check the header and then correctly name the copy in the AP folder, 
+  so that the patching process will detect an incorrect rom version and notify the user about it
 
 ## Rom
 
