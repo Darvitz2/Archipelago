@@ -185,7 +185,7 @@
 {"sections": [{"name": "Guidance Chamber - North west hidden item"}], "map_locations": [{"map": "guidancechamber", "x": 128, "y": 160}]},
 {"sections": [{"name": "Guidance Chamber - North west item"}], "map_locations": [{"map": "guidancechamber", "x": 146, "y": 160}]},
 {"sections": [{"name": "Guidance Chamber - South west item"}], "map_locations": [{"map": "guidancechamber", "x": 112, "y": 448}]},
-{"sections": [{"name": "Moor of Icirrus - Hidden item behind boulder"}], "map_locations": [{"map": "mooroficirrus", "x": 218, "y": 690}]},
+{"sections": [{"name": "Moor of Icirrus - Hidden item behind boulder (Spring/Summer/Autumn)"}], "map_locations": [{"map": "mooroficirrus", "x": 218, "y": 690}]},
 {"sections": [{"name": "Moor of Icirrus - Hidden item near ledge"}], "map_locations": [{"map": "mooroficirrus", "x": 552, "y": 322}]},
 {"sections": [{"name": "Moor of Icirrus - Item behind boulder #1"}], "map_locations": [{"map": "mooroficirrus", "x": 40, "y": 578}]},
 {"sections": [{"name": "Moor of Icirrus - Item behind boulder #2"}], "map_locations": [{"map": "mooroficirrus", "x": 184, "y": 722}]},

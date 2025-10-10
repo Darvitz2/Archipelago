@@ -105,6 +105,10 @@ can_set_other_than_winter: ExtendedRule = lambda state, world: (
     )
 )
 
+can_use_strength_and_set_other_than_winter: ExtendedRule = lambda state, world: (
+    can_use_strength(state, world) and can_set_other_than_winter(state, world)
+)
+
 can_catch_all_deerlings: ExtendedRule = lambda state, world: (
     "Randomize" in world.options.randomize_wild_pokemon
     or world.options.season_control == "vanilla"
@@ -191,7 +195,7 @@ extended_rules_list: tuple = (
     has_trio_badge, has_basic_badge, has_insect_badge, has_bolt_badge,
     has_quake_badge, has_jet_badge, has_freeze_badge, has_legend_badge,
 
-    can_set_winter, can_set_other_than_winter, can_catch_all_deerlings,
+    can_set_winter, can_set_other_than_winter, can_catch_all_deerlings, can_use_strength_and_set_other_than_winter,
     encounter_can_set_spring, encounter_can_set_summer, encounter_can_set_autumn, encounter_can_set_winter,
 
     can_beat_ghetsis, can_encounter_swords_of_justice, can_cut_dreamyard_tree, can_go_deeper_into_relic_castle,

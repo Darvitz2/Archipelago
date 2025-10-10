@@ -3,10 +3,6 @@
 - New document just for roadblocks and other important stuff because rom changes doc does not list all roadblocks
 - reformat options guides to be one document explaining all complex options and unify encounter plando docs
 - make docs easier to read
-- Added a location group for items in Abyssal Ruins
-- Added the `Start Inventory From Pool` option
-- commit rom changes immediately
-- fix "Moor of Icirrus - Hidden item behind boulder" name and logic
 
 # 0.4.0
 
@@ -43,7 +39,7 @@
 - Text Plando
   - Text extractor in client
 - Make the asking for a rom file first check the header and then correctly name the copy in the AP folder, so that the patching process will detect an incorrect rom version and notify the user about it
-- more location groups for unpopular spots like abyssal ruins
+- location group for season-dependant locations
 
 ## Rom
 

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import settings
 from BaseClasses import PlandoOptions
 from Options import (Choice, PerGameCommonOptions, OptionSet, Range, Toggle,
-                     PlandoTexts, OptionError, Option, OptionCounter, OptionDict)
+                     PlandoTexts, OptionError, Option, OptionCounter, OptionDict, StartInventoryPool)
 
 if typing.TYPE_CHECKING:
     from worlds.AutoWorld import World
@@ -1397,6 +1397,7 @@ class PokemonBWOptions(PerGameCommonOptions):
     # wonder_trade: WonderTrade
     # multiworld_gift_pokemon: MultiworldGiftPokemon
     # traps_percentage: TrapsPercentage
+    start_inventory_from_pool: StartInventoryPool
     modify_item_pool: ModifyItemPool
     modify_logic: ModifyLogic
     # funny_dialogue: FunnyDialog
