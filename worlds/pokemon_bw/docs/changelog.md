@@ -12,19 +12,16 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
   - Advanced method (cannot be shown on Webhost, but with more capabilities)
     - Same as simple, but accepts multiple chained calculations
 - Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
-- Added many more maps for UT tracking and auto-tabbing
 
 ### Bug fixes and technical stuff
 
 - Fixed `Pokémon Randomization Adjustments` crashing when given an empty dictionary
-- Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
 - Fixed unit test failures due to `Shuffle Badge Rewards` and `Shuffle TM Rewards` shenanigans
 - Fixed badge and TM/HM locations not being excludable or prioritizable
 - Changed some locations' names
 - Added a missing hidden item location in Chargestone Cave B2F
 - Fixed "Striaton City - TM from Fennel" not being able to contain an HM with certain options
 - Reduced frequency of different forms of the same pokémon in randomization
-- Fixed season-dependant locations not being excluded when wild pokémon are randomized
 - Wrote down levelup moveset data
 
 ## 0.3.999 (pre-release)
@@ -37,6 +34,21 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added `Modify Levels` option
   - Modes: `Multiply`, `Add`, `Power`
   - Encounter types: Trainer, Wild
+
+## 0.3.10
+
+- Added many more maps and auto-tabbing (@palex00, @Radis7Noir, @Darvitz2, darkfire006)
+
+## 0.3.9
+
+- Added a location group for items in Abyssal Ruins
+- Added the `Start Inventory From Pool` option
+- Fixed season-dependant locations not being excluded when wild pokémon are randomized
+- Fixed Wellspring Cave B1F not being considered in `Require Flash` logic modifier (@Seatori)
+- Fixed some gym leaders not being present in their gyms in some situations
+- Fixed sage Zinzolin not appearing in Cold Storage again if first scene was played after Ghetsis
+- Fixed Bianca on route 8 only triggering when standing in front of the bridge gate
+- Fixed the Wingull on route 13 giving the item even without having all grams
 
 ## 0.3.8
 

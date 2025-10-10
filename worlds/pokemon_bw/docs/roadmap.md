@@ -56,6 +56,7 @@ Version 1.0.0 will happen when certain important features are implemented.
     - Cost: 1000
     - Cost: 3000
     - Cost: 10000
+- UT auto-tabbing (added in later patch)
 
 ### 0.4.0
 
@@ -71,7 +72,6 @@ Version 1.0.0 will happen when certain important features are implemented.
 - Modify Levels option
   - Simple method, shown on Webhost
   - Advanced method, more capabilities
-- UT auto-tabbing
 - Running shoes as an item, making mom cutscene on route 2 a check
 - Funny dialogue
   - Funny mode, including actually funny things

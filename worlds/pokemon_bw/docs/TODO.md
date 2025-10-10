@@ -1,5 +1,12 @@
 # Important stuff
 
+- New document just for roadblocks and other important stuff because rom changes doc does not list all roadblocks
+- reformat options guides to be one document explaining all complex options and unify encounter plando docs
+- make docs easier to read
+- Added a location group for items in Abyssal Ruins
+- Added the `Start Inventory From Pool` option
+- commit rom changes immediately
+- fix "Moor of Icirrus - Hidden item behind boulder" name and logic
 
 # 0.4.0
 
@@ -50,6 +57,7 @@
 - fix wingull giving TM without grams
 - desert resort south hidden item not checkable?
 - make item names in custom roadblock dialogues a distinguishable color
+- fix nacrene city sequence break
 
 ## Both
 
@@ -58,6 +66,7 @@
 - Running shoes as an item, making mom cutscene on route 2 a check
 - Bianca route 8 trigger right before door, how should I fix it?
   - Idea: make trigger depend on new variable, which is set after grunts flee (however, look for variables and flags being set in bianca script)
+- maybe [redacted] is actually possible? but definitely with restrictions
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
