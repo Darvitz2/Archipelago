@@ -176,7 +176,7 @@ has_any_tm_hm: ExtendedRule = lambda state, world: (
 
 striaton_hidden_item: ExtendedRule = lambda state, world: state.can_reach_region("Route 3", world.player) or can_use_surf(state, world)
 
-dark_cave: ExtendedRule = lambda state, world: "Require Flash" not in world.options.modify_logic or can_use_flash(state, world)
+dark_cave: ExtendedRule = lambda state, world: "Require Flash" not in world.options.modify_logic or state.has("Out of logic", world.player) or can_use_flash(state, world)
 
 challengers_cave: ExtendedRule = lambda state, world: has_red_chain(state, world) and dark_cave(state, world)
 

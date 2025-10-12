@@ -38,7 +38,6 @@
   - Efficient mode, making a lot of text shorter
 - Text Plando
   - Text extractor in client
-- glitched logic in UT, will show yellow checks, used for dark caves without flash and hidden items without dowsing machine
 
 ## Rom
 

@@ -77,6 +77,7 @@ class PokemonBWWorld(World):
     location_name_groups = groups.get_location_groups()
 
     ut_can_gen_without_yaml = True
+    glitches_item_name = "Out of logic"
     tracker_world = {
         "map_page_folder": "tracker",
         "map_page_maps": "maps/maps.json",

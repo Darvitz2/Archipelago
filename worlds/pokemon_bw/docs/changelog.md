@@ -15,6 +15,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added a location group for season-dependant item locations
 - Added an item group for fossils and another one for TMs and HMs combined
 - Reworked how wild encounters are listed in the spoiler log
+- Added glitched logic in UT for `Require Dowsing Machine` and `Require Flash` logic modifiers
 
 ### Bug fixes and technical stuff
 

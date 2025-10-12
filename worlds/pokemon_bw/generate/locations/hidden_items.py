@@ -17,7 +17,7 @@ def lookup(domain: int) -> dict[str, int]:
 def create(world: "PokemonBWWorld") -> None:
     from ...data.locations.ingame_items.hidden_items import table, seasonal
 
-    dowsing_machine_rule: "AccessRule" = lambda state: state.has("Dowsing Machine", world.player)
+    dowsing_machine_rule: "AccessRule" = lambda state: state.has_any(("Dowsing Machine", "Out of logic"), world.player)
     req_dwsn_mchn = "Require Dowsing Machine" in world.options.modify_logic
 
     def f(loc_data: "FlagLocationData") -> "AccessRule":
