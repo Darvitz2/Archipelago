@@ -1,4 +1,4 @@
-# All (player relevant) base modifications to the roms (as of 0.2.0)
+# All (player relevant) base modifications to the roms (as of 0.3.11)
 
 - New and changed roadblocks
   - Man hindering the player from entering route 3 now requires the parcel
@@ -48,6 +48,7 @@
   - Also made some events trigger every time instead of once a day
 - Prevented gym events from being disabled when beating the gym leader
 - The grunt at Pokémon League teleporting you to N's castle now stays even after defeating Ghetsis
-- Professor Juniper is now always in her laboratory, regardless of current story events
-- Fossils can now always be revived in the Nacrene City museum, regardless of current story events
+- Certain NPCs are now always at their standard locations regardless of story events
+- Fossils can now be revived regardless of story events
+- Changed some key items' descriptions to reflect their purpose in AP
 - Added a debug menu to the PC help menu

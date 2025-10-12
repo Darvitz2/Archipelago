@@ -2,7 +2,17 @@
 
 - New document just for roadblocks and other important stuff because rom changes doc does not list all roadblocks
 - reformat options guides to be one document explaining all complex options and unify encounter plando docs
-- make docs easier to read
+- make docs easier to readmaster ball seller not showing up again
+
+# 0.3.11 maybe? if enough bugs arise, else in 0.4.0
+
+- deprecated in 0.4.0:
+  - mistralton cave 3f in ut overworld map uppercase letters
+
+- already in 0.4.0:
+  - Fixed the overworld items location group not containing abyssal ruins locations
+  - pinwheel forest east already after nimbasa city old man scene reachable, but virizion still only after cobalion
+  - bianca on route 8 triggers without going to relic castle, change logic
 
 # 0.4.0
 
@@ -38,31 +48,31 @@
   - Efficient mode, making a lot of text shorter
 - Text Plando
   - Text extractor in client
-- Make the asking for a rom file first check the header and then correctly name the copy in the AP folder, 
-  so that the patching process will detect an incorrect rom version and notify the user about it
+- glitched logic in UT, will show yellow checks, used for dark caves without flash and hidden items without dowsing machine
+- sort encounter slots in spoiler if randomized
+- UT-less version packer
 
 ## Rom
 
-- fix gym leaders not being present in their gyms
 - fast travel npc in chargestone cave from south to north if battled N at north exit
 - maybe juniper seen count locations can check for national seen? look at cedric in mistralton city and both other dex seen locations
 - make mom stop the player at the door and say funny things for certain reusable tm choices
 - skip musical tutorial, because some players have problems
 - disable dig outside of battle when season patch included, as a temporary bandaid fix
-- cold storage sage first sequence after ghetsis makes second sequence not possible since spawn flag is permanently set
-- fix wingull giving TM without grams
 - desert resort south hidden item not checkable?
 - make item names in custom roadblock dialogues a distinguishable color
 - fix nacrene city sequence break
+- fix reappearing hidden items still getting detected by dowsing machine because of original flags not being checked
+- opelucid city fly flag only set after ghetsis scene?
 
 ## Both
 
 - add now-possible locations
-- a way to check whether map or fly menu is opened
+- a way to check whether map or fly menu is opened, used for switching to ow map in UT
 - Running shoes as an item, making mom cutscene on route 2 a check
-- Bianca route 8 trigger right before door, how should I fix it?
-  - Idea: make trigger depend on new variable, which is set after grunts flee (however, look for variables and flags being set in bianca script)
 - maybe [redacted] is actually possible? but definitely with restrictions
+- Dowsing Machine as a hard requirement for hidden items
+- one case of goal not triggering reported in sync
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
@@ -79,7 +89,6 @@
 - organize imports for type hints behind TYPE_CHECKING
 - pitch webhost and template yaml notes, both individual, but template copying from webhost by default
 - Fix locations in pokédex if something written to encounter tables
-- route 18 reappearing and undella bay reappearing items get still detected after pickup
 - BizHawk 2.11 having issues with modded gen 5 roms
 - rename slot methods to cave/dust cloud/etc everywhere
 

@@ -78,6 +78,7 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Efficient mode, making a lot of text shorter
 - Text Plando
   - Text extractor in client
+- Dowsing Machine as a hard requirement for hidden items
 
 ### Another update #1: Pokédex stuff
 
@@ -107,7 +108,6 @@ Version 1.0.0 will happen when certain important features are implemented.
 - Xtransceiver being required to see certain story sequences (with some of them giving items)
   - Also, dynamic Xtransceiver item that automatically adds the correctly gendered version to the game
 - Relic castle room filling with sand unlockable via an item
-- Dowsing Machine as a hard requirement for hidden items
 - Free fly destination
 - An NPC in Accumula Town telling you some information about the world
 

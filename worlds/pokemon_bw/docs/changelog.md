@@ -26,6 +26,8 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Reduced frequency of different forms of the same pokémon in randomization
 - Wrote down levelup moveset data
 - Fixed the overworld items location group not containing abyssal ruins locations
+- Fixed logic of Pinwheel Forest's east side
+- Fixed logic of `Route 8 - Item from Bianca` (this got incorrect logic as a side effect of the previous fix)
 
 ## 0.3.999 (pre-release)
 
