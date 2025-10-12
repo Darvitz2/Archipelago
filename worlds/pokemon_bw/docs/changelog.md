@@ -14,6 +14,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Made `Randomize` automatically being included in wild and trainer pokémon randomization if other modifiers are included (@Darvitz2)
 - Added a location group for season-dependant item locations
 - Added an item group for fossils and another one for TMs and HMs combined
+- Reworked how wild encounters are listed in the spoiler log
 
 ### Bug fixes and technical stuff
 
@@ -25,9 +26,6 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Fixed "Striaton City - TM from Fennel" not being able to contain an HM with certain options
 - Reduced frequency of different forms of the same pokémon in randomization
 - Wrote down levelup moveset data
-- Fixed the overworld items location group not containing abyssal ruins locations
-- Fixed logic of Pinwheel Forest's east side
-- Fixed logic of `Route 8 - Item from Bianca` (this got incorrect logic as a side effect of the previous fix)
 
 ## 0.3.999 (pre-release)
 
@@ -39,6 +37,13 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added `Modify Levels` option
   - Modes: `Multiply`, `Add`, `Power`
   - Encounter types: Trainer, Wild
+
+## 0.3.11
+
+- Added version without UT submaps to release
+- Fixed `Mistralton Cave 3F` locations not appearing on the overworld map in UT
+- Fixed logic of Pinwheel Forest's east side
+- Fixed logic of `Route 8 - Item from Bianca` (this got incorrect logic as a side effect of the previous fix)
 
 ## 0.3.10
 

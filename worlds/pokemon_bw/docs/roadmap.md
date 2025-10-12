@@ -94,6 +94,7 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Seensanity (Also consider trainer pokémon)
   - Decrease trainer eyesight
   - Trainer rebattling
+  - Trainer teams in spoiler
 
 ### Another update #3: Script editing stuff
 

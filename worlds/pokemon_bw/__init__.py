@@ -1,7 +1,7 @@
 import datetime
 import logging
 import os
-from typing import ClassVar, Mapping, Any, List
+from typing import ClassVar, Mapping, Any, List, TextIO
 
 import settings
 from BaseClasses import MultiWorld, Tutorial, Item, Location, Region
@@ -205,6 +205,11 @@ class PokemonBWWorld(World):
     def extend_hint_information(self, hint_data: dict[int, dict[int, str]]):
         hint_data[self.player] = {}
         locations.extend_dexsanity_hints(self, hint_data)
+
+    def write_spoiler(self, spoiler_handle: TextIO) -> None:
+        from .generate.spoiler import write_spoiler_encounter, write_spoiler_trainer
+        write_spoiler_encounter(self, spoiler_handle)
+        write_spoiler_trainer(self, spoiler_handle)
 
     def generate_output(self, output_directory: str) -> None:
         if self.options.version == "black":

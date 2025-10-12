@@ -4,16 +4,6 @@
 - reformat options guides to be one document explaining all complex options and unify encounter plando docs
 - make docs easier to readmaster ball seller not showing up again
 
-# 0.3.11 maybe? if enough bugs arise, else in 0.4.0
-
-- deprecated in 0.4.0:
-  - mistralton cave 3f in ut overworld map uppercase letters
-
-- already in 0.4.0:
-  - Fixed the overworld items location group not containing abyssal ruins locations
-  - pinwheel forest east already after nimbasa city old man scene reachable, but virizion still only after cobalion
-  - bianca on route 8 triggers without going to relic castle, change logic
-
 # 0.4.0
 
 ## APWorld
@@ -49,8 +39,6 @@
 - Text Plando
   - Text extractor in client
 - glitched logic in UT, will show yellow checks, used for dark caves without flash and hidden items without dowsing machine
-- sort encounter slots in spoiler if randomized
-- UT-less version packer
 
 ## Rom
 
