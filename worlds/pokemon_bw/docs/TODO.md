@@ -38,6 +38,7 @@
   - Efficient mode, making a lot of text shorter
 - Text Plando
   - Text extractor in client
+- reword error messages in rom.py
 
 ## Rom
 
@@ -48,9 +49,10 @@
 - disable dig outside of battle when season patch included, as a temporary bandaid fix
 - desert resort south hidden item not checkable?
 - make item names in custom roadblock dialogues a distinguishable color
-- fix nacrene city sequence break
+- fix nacrene city sequence break (though is it actually broken?)
 - fix reappearing hidden items still getting detected by dowsing machine because of original flags not being checked
 - opelucid city fly flag only set after ghetsis scene?
+- make massage lady in castelia repeatable
 
 ## Both
 
