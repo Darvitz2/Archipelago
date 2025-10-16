@@ -210,3 +210,52 @@ class TestModifyItemPoolAll(PokemonBWTestBase):
 
 class TestModifyLogicNone(PokemonBWTestBase):
     options = {"modify_logic": []}
+
+
+###################################################
+# Funny Dialog                                    #
+###################################################
+
+
+class TestFunnyDialogFunny(PokemonBWTestBase):
+    options = {"funny_dialog": "funny"}
+
+
+class TestFunnyDialogEfficient(PokemonBWTestBase):
+    options = {"funny_dialog": "efficient"}
+
+
+###################################################
+# Text Plando                                     #
+###################################################
+
+
+class TestTextPlandoSimple(PokemonBWTestBase):
+    options = {"text_plando": [
+        {"at": "system 12 0 1", "text": "Test 123[Terminate]", "percentage": 12},
+        {"at": "story 0 0 1", "text": "Test[c_100_#1_0][NextLine]123[Terminate]", "percentage": 100},
+        {"at": "system 12 0 1", "text": "Test[End][NextLine]123[NextLine]123[Scroll][NextLine]lol[Terminate]"},
+    ]}
+
+
+class TestTextPlandoWithFunny(PokemonBWTestBase):
+    options = {
+        "text_plando": [
+            {"at": "system 12 0 1", "text": "Test 123[Terminate]", "percentage": 12},
+            {"at": "story 0 0 1", "text": "Test[c_100_#1_0][NextLine]123[Terminate]", "percentage": 100},
+            {"at": "system 12 0 1", "text": "Test[End][NextLine]123[NextLine]123[Scroll][NextLine]lol[Terminate]"},
+        ],
+        "funny_dialog": "funny",
+    }
+
+
+class TestTextPlandoWithEfficient(PokemonBWTestBase):
+    options = {
+        "text_plando": [
+            {"at": "system 12 0 1", "text": "Test 123[Terminate]", "percentage": 12},
+            {"at": "story 0 0 1", "text": "Test[c_100_#1_0][NextLine]123[Terminate]", "percentage": 100},
+            {"at": "system 12 0 1", "text": "Test[End][NextLine]123[NextLine]123[Scroll][NextLine]lol[Terminate]"},
+        ],
+        "funny_dialog": "efficient",
+    }
+

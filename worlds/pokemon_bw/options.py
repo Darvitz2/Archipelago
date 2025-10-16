@@ -1279,7 +1279,7 @@ class FunnyDialog(Choice):
     option_efficient = 2
     default = 0
 
-    def verify(self, world: typing.Type[World], player_name: str, plando_options: "PlandoOptions") -> None:
+    def verify(self, world: typing.Type["World"], player_name: str, plando_options: "PlandoOptions") -> None:
         from BaseClasses import PlandoOptions
         if self.current_key != "none" and not (PlandoOptions.texts & plando_options):
             # plando is disabled but plando options were given so overwrite the options
