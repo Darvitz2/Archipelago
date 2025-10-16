@@ -17,6 +17,7 @@ region_list: set[str] = {
     "Striaton City",
     "Dreamyard Entrance",
     "Dreamyard North",  # behind cuttable tree
+    "Dreamyard Grass North",  # reachable from either cuttable tree or basement key
     "Dreamyard Basement",
     "Dreamyard South",  # only accessible from basement
     "Route 3",
