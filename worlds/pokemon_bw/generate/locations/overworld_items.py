@@ -13,7 +13,7 @@ def lookup(domain: int) -> dict[str, int]:
     from ...data.locations.ingame_items.overworld_items import table, abyssal_ruins, seasonal
 
     return {
-        name: data.flag_id + domain for tab in (table, abyssal_ruins, seasonal) for name, data in tab
+        name: data.flag_id + domain for tab in (table, abyssal_ruins, seasonal) for name, data in tab.items()
     }
 
 
