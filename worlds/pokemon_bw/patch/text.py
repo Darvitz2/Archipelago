@@ -1,8 +1,16 @@
+import string
+
 
 class Entry:
-    line: str = ""
-    key: int = 0
+    line: str = "[Terminate]"
+    key: int = 1
     flags: int = 0
+
+    def __init__(self, line="[Terminate]", key=1, flags=0):
+        super().__init__()
+        self.line = line
+        self.key = key
+        self.flags = flags
 
 
 def decode(data: bytes) -> list[list[Entry]]:
@@ -52,16 +60,16 @@ def decode(data: bytes) -> list[list[Entry]]:
                 if char == 0xFFFF:
                     st.line += "[Terminate]"
                 elif char == 0xFFFE:
-                    st.line += "[NextLine]"
+                    st.line += "[NextLine]"  # \n in CTRMap
                 elif char == 0xF000:
                     k += 1
                     command = decchars[k]
                     k += 1
                     total = decchars[k]
                     if command == 0xBE01 and total == 0:
-                        st.line += f"[End]"
+                        st.line += f"[End]"  # \c in CTRMap
                     elif command == 0xBE00 and total == 0:
-                        st.line += f"[Scroll]"
+                        st.line += f"[Scroll]"  # \r in CTRMap
                     else:
                         st.line += f"[c_{command:x}_#{total}"
                         for _ in range(total):
@@ -115,6 +123,8 @@ def encode(texts: list[list[Entry]]) -> bytes:
             while k < len(entry.line):
                 char = entry.line[k]
                 if char != "[":
+                    if char == "]":
+                        raise Exception(f"Extra closing bracket: "+entry.line[:k+1])
                     unicode = ord(char)
                     if unicode > 0xffff:
                         raise Exception(f"Unicode character cannot be written to text file: {char} ({hex(unicode)})")
@@ -175,3 +185,54 @@ def encode(texts: list[list[Entry]]) -> bytes:
     data[4:8] = blocksizesum.to_bytes(4, "little")
 
     return data
+
+
+def is_bad_text(line: str) -> str:
+    k = 0
+    while k < len(line):
+        char = line[k]
+        if char == "]":
+            return "Extra closing bracket"
+        if char == "[":
+            if k + 10 < len(line) and line[k:k+11] == "[Terminate]":
+                k += 11
+                if k == len(line):
+                    return ""
+                return "[Terminate] before end of line"
+            elif k + 9 < len(line) and line[k:k + 10] == "[NextLine]":
+                k += 10
+            elif k + 4 < len(line) and line[k:k+5] == "[End]":
+                k += 5
+            elif k + 7 < len(line) and line[k:k+8] == "[Scroll]":
+                k += 8
+            elif k + 4 < len(line) and line[k:k+3] == "[0x":
+                end = line.find("]", k)
+                if end == -1:
+                    return "Missing closing bracket"
+                if not line[k+3:end].isnumeric():
+                    return "Non-numeric raw value"
+                if int(line[k+1:end]) > 0xffff:
+                    return "Raw value too big"
+                k = end + 1
+            elif k + 2 < len(line) and line[k:k+3] == "[c_":
+                end = line.find("]", k)
+                if end == -1:
+                    return "Missing closing bracket"
+                parts = line[k+1:end].split("_")
+                if len(parts) < 3:
+                    return "Incomplete command"
+                if parts[2][0] != "#":
+                    return "Missing # at command param count"
+                if not parts[2][1:].isnumeric():
+                    return "Non-numeric command param count"
+                if int(parts[2][1:]) != len(parts) - 3:
+                    return "Incorrect command param count"
+                if not all(c in string.hexdigits for c in parts[1]):
+                    return "Command is not a hexadecimal number"
+                for part in parts[3:]:
+                    if not part.isnumeric():
+                        return "Non-numeric command param"
+                k = end + 1
+        else:
+            k += 1
+    return "Line ended without [Terminate]"

@@ -255,6 +255,8 @@ class PokemonBWWorld(World):
                 "master_ball_seller": self.options.master_ball_seller.value,
                 "modify_item_pool": self.options.modify_item_pool.value,
                 "modify_logic": self.options.modify_logic.value,
+                "funny_dialog": self.options.funny_dialog.current_key,
+                "text_plando": self.options.text_plando.to_slot_data(),
                 "reusable_tms": self.options.reusable_tms.current_key,
             },
             # Needed for UT

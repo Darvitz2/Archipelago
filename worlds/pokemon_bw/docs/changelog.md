@@ -16,6 +16,9 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added an item group for fossils and another one for TMs and HMs combined
 - Reworked how wild encounters are listed in the spoiler log
 - Added glitched logic in UT for `Require Dowsing Machine` and `Require Flash` logic modifiers
+- Added `Funny Dialog` and `Text Plando` options
+  - `funny` and `efficient` modes for `Funny Dialog`
+  - Both options require the text plando setting in the host yaml to be enabled
 
 ### Bug fixes and technical stuff
 
@@ -38,6 +41,11 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added `Modify Levels` option
   - Modes: `Multiply`, `Add`, `Power`
   - Encounter types: Trainer, Wild
+
+## 0.3.12
+
+- Fixed the Wingull grams reward location not working
+- Added an error message for too old AP versions
 
 ## 0.3.11
 

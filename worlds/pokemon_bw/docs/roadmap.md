@@ -147,6 +147,7 @@ Version 1.0.0 will happen when certain important features are implemented.
 - Original content
 - Trainer randomization
 - Trainer plando
+- Trashsanity
 
 ## Big update #4 (Multiworld update, name WIP)
 

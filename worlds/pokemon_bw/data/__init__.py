@@ -199,6 +199,15 @@ class TrainerAdjustmentData(NamedTuple):
     trainer_id: int
 
 
+class TextData(NamedTuple):
+    credit: str
+    section: Literal["story", "system"]
+    file: int
+    block: int
+    entry: int
+    text: str
+
+
 AnyItemData: type = Union[ItemData, BadgeItemData, SeasonItemData]
 AnyLocationData: type = Union[FlagLocationData, DexLocationData, TMLocationData]
 AnyEncounterData: type = Union[EncounterData, TradeEncounterData, StaticEncounterData]

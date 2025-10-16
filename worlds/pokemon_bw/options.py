@@ -1267,13 +1267,27 @@ class ModifyLogic(CasefoldOptionSet):
     default = ["Require Dowsing Machine", "Prioritize key item locations", "Require Flash"]
 
 
-class FunnyDialog(Toggle):
+class FunnyDialog(Choice):
     """
-    Adds humorous dialogue submitted by the folks in the Pokemon Black and White thread of the
-    Archipelago Discord server. This option requires Text Plando being enabled in the host settings.
+    Adds humorous dialogue submitted by the folks in the Pokemon Black and White thread/channel of the
+    Archipelago Discord server. Alternatively, the efficient mode shortens many story lines for quicker playthroughs.
+    This option requires Text Plando being enabled in the host settings.
     """
     display_name = "Funny Dialogue"
+    option_none = 0
+    option_funny = 1
+    option_efficient = 2
     default = 0
+
+    def verify(self, world: typing.Type[World], player_name: str, plando_options: "PlandoOptions") -> None:
+        from BaseClasses import PlandoOptions
+        if self.current_key != "none" and not (PlandoOptions.texts & plando_options):
+            # plando is disabled but plando options were given so overwrite the options
+            self.value = []
+            logging.warning(f"The plando texts module is turned off, "
+                            f"so funny/efficient dialog for {player_name} will be ignored.")
+        else:
+            super().verify(world, player_name, plando_options)
 
 
 class PokemonBWTextPlando(PlandoTexts):
@@ -1286,30 +1300,38 @@ class PokemonBWTextPlando(PlandoTexts):
     ```
     Refer to the Text Plando guide of this game for further information.
     """
-    # TODO definitely not done
     display_name = "Text Plando"
     default = [
-        # ("story 160 0 7", "[vMisc_0] received [vPkmn_1]![NextLine] Congratulations![Terminate]", 100),
+        # ("story 160 0 7", "[c_100_#1_0] received [c_101_#1_1]![NextLine] Congratulations![Terminate]", 100),
         # ("system 172 0 1", "Huh? Why did you press the[NextLine]B button?[Terminate]", 100),
     ]
 
     def verify_keys(self) -> None:
+        from .patch.text import is_bad_text
         invalid = []
         for word in self:
             parts = word.at.casefold().split()
             reasons = []
             if len(parts) < 4:
-                reasons.append("Not enough arguments")
+                reasons.append("Not enough arguments: "+word.at)
             if len(parts) > 4:
-                reasons.append("Too many arguments")
+                reasons.append("Too many arguments: "+word.at)
             if parts[0] not in ("system", "story"):
-                reasons.append("Unknown module")
+                reasons.append("Unknown module: "+parts[0])
             if not parts[1].isnumeric():
-                reasons.append("File index is not a number")
+                reasons.append("File index is not a number: "+parts[1])
+            if parts[0] == "system" and int(parts[1]) > 287:
+                reasons.append(f"System file {parts[1]} does not exist")
+            if parts[0] == "story" and int(parts[1]) > 471:
+                reasons.append(f"Story file {parts[1]} does not exist")
             if not parts[2].isnumeric():
-                reasons.append("Part index is not a number")
+                reasons.append("Block index is not a number: "+parts[2])
             if not parts[3].isnumeric():
-                reasons.append("Line index is not a number")
+                reasons.append("Line index is not a number: "+parts[3])
+            if word.text:
+                bad = is_bad_text(word.text[0])
+                if bad:
+                    reasons.append("Bad text line: "+bad)
             if reasons:
                 invalid.append((" ".join(parts), reasons))
         if invalid:
@@ -1319,6 +1341,16 @@ class PokemonBWTextPlando(PlandoTexts):
                 "\n".join((f"{entry[0]}: {', '.join(entry[1])}" for entry in invalid)) +
                 "\nRefer to the Text Plando guide of this game for further information."
             )
+
+    def to_slot_data(self) -> list[dict[str, str | list[str] | int]]:
+        return [
+            {
+                "text": plando.text,
+                "at": plando.at,
+                "percentage": plando.percentage,
+            }
+            for plando in self
+        ]
 
 
 class ReusableTMs(Choice):
@@ -1400,6 +1432,6 @@ class PokemonBWOptions(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
     modify_item_pool: ModifyItemPool
     modify_logic: ModifyLogic
-    # funny_dialogue: FunnyDialog
-    # text_plando: TextPlando
+    funny_dialog: FunnyDialog
+    text_plando: PokemonBWTextPlando
     reusable_tms: ReusableTMs

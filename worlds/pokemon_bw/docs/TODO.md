@@ -33,12 +33,11 @@
     - Will still put every species that is required to be randomized and base stage into at least one slot
     - Ignores Encounter Plando
   - Trainer pokémon
-- Funny dialogue
-  - Funny mode, including actually funny things
-  - Efficient mode, making a lot of text shorter
-- Text Plando
-  - Text extractor in client
+- Text extractor in client
 - reword error messages in rom.py
+- make sure there is at least one fighting type in randomized wild encounters
+- extended location hint for deerlings location and challenge rock
+- dexsanity plando
 
 ## Rom
 

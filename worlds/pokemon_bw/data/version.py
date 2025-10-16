@@ -17,6 +17,7 @@ compatibility: dict[tuple[int, int, int], VersionCompatibility] = {
     (0, 4, 0): VersionCompatibility((0, 4, 0), (0, 4, 0), (0, 4, 0), (0, 4, 0), (0, 6, 3)),
     (0, 3, 999): VersionCompatibility((0, 3, 99), (0, 3, 0), (0, 3, 200), (0, 3, 6), (0, 6, 3)),
     (0, 3, 99): VersionCompatibility((0, 3, 99), (0, 3, 0), (0, 3, 99), (0, 3, 6), (0, 6, 3)),
+    (0, 3, 12): VersionCompatibility((0, 3, 0), (0, 3, 0), (0, 3, 12), (0, 3, 9), (0, 6, 3)),
     (0, 3, 11): VersionCompatibility((0, 3, 0), (0, 3, 0), (0, 3, 9), (0, 3, 9), (0, 6, 3)),
     (0, 3, 10): VersionCompatibility((0, 3, 0), (0, 3, 0), (0, 3, 9), (0, 3, 9), (0, 6, 3)),
     (0, 3, 9): VersionCompatibility((0, 3, 0), (0, 3, 0), (0, 3, 9), (0, 3, 9), (0, 6, 3)),
@@ -69,7 +70,7 @@ if __name__ == "__main__":
               zipfile.ZipFile(dev_dir+apworld+".apworld", 'w', zipfile.ZIP_DEFLATED, True, 9) as zipf2):
             metadata = {
                 "game": "Pokemon Black and White",
-                "minimum_ap_version": "0.6.3",
+                "minimum_ap_version": ".".join(str(i) for i in ap_minimum()),
                 "authors": ["BlastSlimey", "SparkyDaDoggo"],
                 "world_version": ".".join(str(i) for i in version)
             }
