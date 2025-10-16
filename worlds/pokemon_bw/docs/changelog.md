@@ -19,6 +19,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added `Funny Dialog` and `Text Plando` options
   - `funny` and `efficient` modes for `Funny Dialog`
   - Both options require the text plando setting in the host yaml to be enabled
+  - Added setting to enable text extraction upon running a patch file
 
 ### Bug fixes and technical stuff
 

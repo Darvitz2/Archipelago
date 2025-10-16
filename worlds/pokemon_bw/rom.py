@@ -132,6 +132,9 @@ class PatchMethods:
         procedures: list[str] = str(patch.get_file("procedures.txt"), "utf-8").splitlines()
         for prod in procedures:
             patch_procedures[prod](rom, __name__, patch)
+        if get_settings()["pokemon_bw_settings"]["extract_text"]:
+            from .patch import text_extractor
+            text_extractor.extract(rom, target)
         with open(target, 'wb') as f:
             f.write(rom.save(updateDeviceCapacity=True))
 

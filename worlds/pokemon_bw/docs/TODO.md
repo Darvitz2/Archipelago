@@ -33,7 +33,6 @@
     - Will still put every species that is required to be randomized and base stage into at least one slot
     - Ignores Encounter Plando
   - Trainer pokémon
-- Text extractor in client
 - reword error messages in rom.py
 - make sure there is at least one fighting type in randomized wild encounters
 - extended location hint for deerlings location and challenge rock

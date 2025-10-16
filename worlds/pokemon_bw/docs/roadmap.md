@@ -77,7 +77,7 @@ Version 1.0.0 will happen when certain important features are implemented.
   - Funny mode, including actually funny things
   - Efficient mode, making a lot of text shorter
 - Text Plando
-  - Text extractor in client
+  - Text extractor setting in patching process
 - Dowsing Machine as a hard requirement for hidden items
 
 ### Another update #1: Pokédex stuff

@@ -34,10 +34,15 @@ class PokemonBWSettings(settings.Group):
         """Toggles whether Encounter Plando is enabled for players in generation.
         If disabled, yamls that use Encounter Plando do not raise OptionErrors, but display a warning."""
 
+    class ExtractText(settings.Bool):
+        """If enabled, running a patch file for this game will also produce a text file
+        containing all ingame text alongside the rom."""
+
     black_rom: PokemonBlackRomFile = PokemonBlackRomFile(PokemonBlackRomFile.copy_to)
     white_rom: PokemonWhiteRomFile = PokemonWhiteRomFile(PokemonWhiteRomFile.copy_to)
     # remove_collected_field_items: RemoveCollectedFieldItems | bool = False
     enable_encounter_plando: EnableEncounterPlando | bool = True
+    extract_text: ExtractText | bool = False
 
 
 class PokemonBWWeb(WebWorld):
