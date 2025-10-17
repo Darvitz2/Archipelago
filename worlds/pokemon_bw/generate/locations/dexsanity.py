@@ -28,7 +28,10 @@ def create(world: "PokemonBWWorld", catchable_species_data: dict[str, "SpeciesDa
         return lambda state: location_table[x].special_rule(state, world)
 
     r: "Region" = world.regions["Pokédex"]
-    catchable_dex: list[str] = [data.dex_name for data in catchable_species_data.values()]
+    catchable_dex: list[str] = []
+    for data in catchable_species_data.values():
+        if data.dex_name not in catchable_dex:
+            catchable_dex.append(data.dex_name)
 
     def create_location(loc_name: str) -> None:
         data = location_table[loc_name]

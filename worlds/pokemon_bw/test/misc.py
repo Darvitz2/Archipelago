@@ -1,3 +1,5 @@
+import random
+
 from test.bases import WorldTestBase
 
 
@@ -181,6 +183,26 @@ class TestDexsanityFull(PokemonBWTestBase):
     }
 
 
+class TestDexsanityPlandoVanilla(PokemonBWTestBase):
+    options = {
+        "dexsanity": [random.randint(1, 649) for _ in range(100)],
+    }
+
+
+class TestDexsanityPlandoRandomized(PokemonBWTestBase):
+    options = {
+        "dexsanity": [random.randint(1, 649) for _ in range(100)],
+        "randomize_wild_pokemon": ["Randomize"],
+    }
+
+
+class TestDexsanityPlandoAllObtainable(PokemonBWTestBase):
+    options = {
+        "dexsanity": [random.randint(1, 649) for _ in range(100)],
+        "randomize_wild_pokemon": ["Randomize", "Ensure all obtainable"],
+    }
+
+
 ###################################################
 # Season Control                                  #
 ###################################################
@@ -192,6 +214,68 @@ class TestSeasonControlChangeable(PokemonBWTestBase):
 
 class TestSeasonControlRandomized(PokemonBWTestBase):
     options = {"season_control": "randomized"}
+
+
+###################################################
+# Adjust Levels                                   #
+###################################################
+
+
+class TestAdjustLevelsNone(PokemonBWTestBase):
+    options = {"adjust_levels": []}
+
+
+###################################################
+# Modify Levels                                   #
+###################################################
+
+
+def get_random_modify_levels() -> dict[str, int]:
+    opt_type = random.choice(("Trainer", "Wild"))
+    opt_mode = random.choice(("Multiply", "Add", "Power"))
+    if opt_mode == "Multiply":
+        opt_value = random.randint(1, 10000)
+    elif opt_mode == "Add":
+        opt_value = random.randint(-99, 99)
+    else:
+        opt_value = random.randint(1, 700)
+    return {"type": opt_type, "mode": opt_mode, "value": opt_value}
+
+
+class TestModifyLevelsAdvancedEmpty(PokemonBWTestBase):
+    options = {"modify_levels": []}
+
+
+class TestModifyLevelsAdvancedRandom(PokemonBWTestBase):
+    options = {"modify_levels": [
+        get_random_modify_levels()
+        for _ in range(5)
+    ]}
+
+
+###################################################
+# Master Ball Seller                              #
+###################################################
+
+
+class TestMasterBallSellerOneCost(PokemonBWTestBase):
+    options = {"master_ball_seller": ["Ns Castle", "Cost 1000"]}
+
+
+class TestMasterBallSellerTwoCosts(PokemonBWTestBase):
+    options = {"master_ball_seller": ["PC", "Cherens Mom", "Cost Free", "Cost 10000"]}
+
+
+class TestMasterBallSellerNoCost(PokemonBWTestBase):
+    options = {"master_ball_seller": ["Undella Mansion seller"]}
+
+
+class TestMasterBallSellerCustomCosts(PokemonBWTestBase):
+    options = {"master_ball_seller": [
+        "Ns Castle",
+        f"Cost {random.randint(0, 30000)}",
+        f"Cost {random.randint(0, 30000)}"
+    ]}
 
 
 ###################################################
