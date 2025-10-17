@@ -792,11 +792,38 @@ class Dexsanity(Range):
 
     If you want to have all 649 possible checks, then you need to randomize wild
     encounters and add the **Ensure all obtainable** modifier.
+
+    Alternatively, you can input a list of dex numbers in order to plando what Pokemon you want to have locations for.
+    However, without wild Pokemon randomization being enabled, Pokemon that are not obtainable in the vanilla game
+    will be ignored.
     """
     display_name = "Dexsanity"
+    value: int | list[int]
     default = 0
     range_start = 0
     range_end = 649
+
+    def __init__(self, value: typing.Any):
+        if isinstance(value, typing.Iterable):
+            for val in value:
+                if not type(val) is int:
+                    raise Exception(f"Option {self.__class__.__name__} as a list expects integers, found {type(val)}")
+                if val < 1:
+                    raise Exception(f"Option {self.__class__.__name__} contains dex number {val}, "
+                                    f"which is lower than minimum 1")
+                elif val > self.range_end:
+                    raise Exception(f"Option {self.__class__.__name__} contains dex number {val}, "
+                                    f"which is higher than maximum {self.range_end}")
+            self.value = list(set(value))  # Get rid of duplicates
+            self.value.sort()  # Very important to not make it non-deterministic
+        else:
+            super().__init__(value)
+
+    @classmethod
+    def from_any(cls, data: typing.Any) -> Range:
+        if type(data) is int or isinstance(data, typing.Iterable):
+            return cls(data)
+        return cls.from_text(str(data))
 
 
 class Trainersanity(Range):
@@ -1347,7 +1374,8 @@ class PokemonBWTextPlando(PlandoTexts):
             {
                 "text": plando.text,
                 "at": plando.at,
-                "percentage": plando.percentage,
+                "percentage": 100,  # Probabilities of all entries in self.value have already been rolled,
+                                    # so passing the original percentage might discard even more
             }
             for plando in self
         ]
@@ -1367,7 +1395,7 @@ class ReusableTMs(Choice):
     @classmethod
     def from_text(cls, text: str) -> Choice:
         text = text.lower()
-        if text in ("no", "off"):
+        if text in ("no", "off", "im_serious_no", "im_a_masochist"):
             return cls(99)
         return super().from_text(text)
 

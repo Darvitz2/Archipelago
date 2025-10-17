@@ -2,15 +2,10 @@ import os
 import pathlib
 import zipfile
 
-from .ndspy import rom as ndspy_rom
-
 import Utils
 from settings import get_settings
 from worlds.Files import APAutoPatchInterface
 from typing import TYPE_CHECKING, Any, Dict, Callable
-
-from .patch.procedures import base_patch, season_patch, write_wild_pokemon, level_adjustments, write_trainer_pokemon, \
-    write_text
 
 if TYPE_CHECKING:
     from . import PokemonBWWorld
@@ -77,6 +72,7 @@ class PatchMethods:
 
     @staticmethod
     def write_contents(patch: PokemonBWPatch, opened_zipfile: zipfile.ZipFile) -> None:
+        from patch.procedures import write_text, write_wild_pokemon, write_trainer_pokemon, level_adjustments
 
         write_wild = False
         for encounter in patch.world.wild_encounter.values():
@@ -127,8 +123,24 @@ class PatchMethods:
                 if version.rom() != found_rom_version:
                     return
 
+        from .ndspy.rom import NintendoDSRom
+        from .patch.procedures import (base_patch, season_patch, write_wild_pokemon, write_trainer_pokemon,
+                                       level_adjustments, write_text)
+
+        patch_procedures: dict[str, Callable[[NintendoDSRom, str, PokemonBWPatch], None]] = {
+            "base_patch": base_patch.patch,
+            "season_patch": season_patch.patch,
+            "write_wild_pokemon": write_wild_pokemon.patch,
+            "write_trainer_pokemon": write_trainer_pokemon.patch_species,
+            "adjust_wild_levels": level_adjustments.patch_wild,
+            "adjust_trainer_levels": level_adjustments.patch_trainer,
+            "modify_wild_levels": level_adjustments.modify_wild,
+            "modify_trainer_levels": level_adjustments.modify_trainers,
+            "write_text": write_text.patch,
+        }
+
         base_data = get_base_rom_bytes(version_name)
-        rom = ndspy_rom.NintendoDSRom(base_data)
+        rom = NintendoDSRom(base_data)
         procedures: list[str] = str(patch.get_file("procedures.txt"), "utf-8").splitlines()
         for prod in procedures:
             patch_procedures[prod](rom, __name__, patch)
@@ -166,19 +178,6 @@ class PatchMethods:
         if file not in patch.files:
             patch.read()
         return patch.files[file]
-
-
-patch_procedures: dict[str, Callable[[ndspy_rom.NintendoDSRom, str, PokemonBWPatch], None]] = {
-    "base_patch": base_patch.patch,
-    "season_patch": season_patch.patch,
-    "write_wild_pokemon": write_wild_pokemon.patch,
-    "write_trainer_pokemon": write_trainer_pokemon.patch_species,
-    "adjust_wild_levels": level_adjustments.patch_wild,
-    "adjust_trainer_levels": level_adjustments.patch_trainer,
-    "modify_wild_levels": level_adjustments.modify_wild,
-    "modify_trainer_levels": level_adjustments.modify_trainers,
-    "write_text": write_text.patch,
-}
 
 
 def get_base_rom_bytes(version: str, file_name: str = "") -> bytes:
