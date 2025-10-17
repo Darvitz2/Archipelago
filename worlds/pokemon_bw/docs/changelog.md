@@ -19,7 +19,8 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Added `Funny Dialog` and `Text Plando` options
   - `funny` and `efficient` modes for `Funny Dialog`
   - Both options require the text plando setting in the host yaml to be enabled
-  - Added setting to enable text extraction upon running a patch file
+  - Added a setting to enable text extraction upon running a patch file
+- Added plando mode to `Dexsanity` option
 
 ### Bug fixes and technical stuff
 
@@ -31,6 +32,7 @@ Versions are sorted in ascending order, i.e. the most recent changes are at the 
 - Fixed "Striaton City - TM from Fennel" not being able to contain an HM with certain options
 - Reduced frequency of different forms of the same pokémon in randomization
 - Wrote down levelup moveset data
+- Made sure there is always at least one fighting type pokémon obtainable (for the challenge rock)
 
 ## 0.3.999 (pre-release)
 

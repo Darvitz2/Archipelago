@@ -4,10 +4,25 @@
 
 Pokémon Black and White are the introduction to the fifth generation of the Pokémon franchise. 
 Travel through the Unova region, catch a variety of brand-new Pokémon you have never seen before, 
-collect the eight gym badges, fight Team Plasma, who claim to be the saviors of all the Pokémon, 
+collect the eight gym badges, fight Team Plasma who claim to be the saviors of all the Pokémon, 
 and become the champion of the region.
 These games present themselves in 2.5D graphics, 
 while still using the well-known grid-based movement mechanics and battle UI. 
+
+## Useful and interesting pages
+
+- [Setup guide](setup_en.md)
+- [Roadblocks](roadblocks.md)
+- [Rom changes](rom%20changes.md)
+- [Changelog](changelog.md)
+- [Credits](credits.md)
+- [Features roadmap](roadmap.md)
+- [Various options guides](options%20guides.md)
+  - Currently including `Encounter Plando` and other upcoming features in 0.4.0
+
+## Known bugs (might be outdated)
+
+- Using dig while having season control enabled crashes the game
 
 ## FAQ (kinda)
 
@@ -61,16 +76,3 @@ while still using the well-known grid-based movement mechanics and battle UI.
 - ***There was a critical bug in the game. Can this be fixed after generating?***
   <br>Yes! Whenever a new update with changes on the rom side releases, just update your apworld and run the same 
       patch file again. The rom will then automatically get updated as well.
-  
-
-## Other useful or interesting pages
-
-- [Rom changes](rom%20changes.md)
-- [Changelog](changelog.md)
-- [Credits](credits.md)
-- [Features roadmap](roadmap.md)
-- [Encounter Plando guide](encounter%20plando.md)
-
-## Known bugs (might be outdated)
-
-- Using dig while having season control enabled crashes the game

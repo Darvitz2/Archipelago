@@ -1,4 +1,174 @@
-# A list of all species names for Encounter Plando
+# Various lists for Encounter Plando
+
+## All map names
+
+These names are ordered by internal file number (0-111).
+
+- Striaton City
+- Driftveil City
+- Icirrus City
+- Dreamyard (Ruins)
+- Dreamyard (Basement)
+- Pinwheel Forest (Outer)
+- Pinwheel Forest (Inner)
+- Desert Resort (Outer)
+- Desert Resort (Inner)
+- Relic Castle (1F Castleside)
+- Relic Castle (B1F Castleside)
+- Relic Castle (B2F Castleside)
+- Relic Castle (B3F Castleside)
+- Relic Castle (B4F Castleside)
+- Relic Castle (Castleside Sand Filled)
+- Relic Castle (Castleside Back Room)
+- Relic Castle (B7F Top Right)
+- Relic Castle (B7F Top Left)
+- Relic Castle (B7F Left of Center)
+- Relic Castle (B7F Right of Center)
+- Relic Castle (B7F Right of Top Center)
+- Relic Castle (B7F Top Center)
+- Relic Castle (B7F Left of Top Center)
+- Relic Castle (B7F Center)
+- Relic Castle (B7F Left of Volcarona Entrance)
+- Relic Castle (B7F Right of Volcarona Entrance)
+- Relic Castle (B7F Under Top Right)
+- Relic Castle (B7F Bottom Right)
+- Relic Castle (B7F Under Top Left)
+- Relic Castle (B7F Bottom Left)
+- Relic Castle (B7F Volcarona Entrance)
+- Relic Castle (Volcarona Room)
+- Relic Castle (Towerside Front Room)
+- Relic Castle (B6F Towerside)
+- Relic Castle (B5F Towerside)
+- Relic Castle (B4F Towerside)
+- Relic Castle (B3F Towerside)
+- Relic Castle (B2F Towerside)
+- Relic Castle (B1F Towerside)
+- Relic Castle (1F Towerside)
+- Cold Storage
+- Chargestone Cave (1F)
+- Chargestone Cave (B1F)
+- Chargestone Cave (B2F)
+- Twist Mountain (Upper Level)
+- Twist Mountain (Middle Level)
+- Twist Mountain (Lower Level)
+- Twist Mountain (Ice Rock Cave)
+- Dragonspiral Tower (Icirrus City)
+- Dragonspiral Tower (Tower Exterior)
+- Dragonspiral Tower (1F)
+- Dragonspiral Tower (2F)
+- Victory Road (Outside)
+- Victory Road (1F Middle Cave)
+- Victory Road (2F Left Cave)
+- Victory Road (3F Middle Cave)
+- Victory Road (4F Middle Cave)
+- Victory Road (2F Right Cave)
+- Victory Road (1F Right Cave)
+- Victory Road (3F Right Cave)
+- Victory Road (1F Left Cave)
+- Victory Road (3F Left Cave)
+- Victory Road (4F Left Cave)
+- Victory Road (5F Cave)
+- Victory Road (6F Cave)
+- Victory Road (4F Right Cave)
+- Victory Road (7F Cave)
+- Trial Chamber
+- Giant Chasm (Outside Entrance)
+- Giant Chasm (Entrance Cave)
+- Giant Chasm (Crater)
+- Giant Chasm (Kyurem's Cave)
+- P2 Laboratory
+- Undella Bay
+- Driftveil Drawbridge
+- Village Bridge
+- Marvelous Bridge
+- Route 1
+- Route 2
+- Route 3
+- Wellspring Cave (1F)
+- Wellspring Cave (B1F)
+- Route 4
+- Route 5
+- Route 6
+- Mistralton Cave (1F)
+- Mistralton Cave (2F)
+- Guidance Chamber
+- Route 7
+- Celestial Tower (2F)
+- Celestial Tower (3F)
+- Celestial Tower (4F)
+- Celestial Tower (Top)
+- Route 8
+- Moor of Icirrus
+- Route 9
+- Challenger's Cave (Entrance)
+- Challenger's Cave (B1F)
+- Challenger's Cave (B2F)
+- Route 10
+- Insect Badge Gate
+- Route 11
+- Route 12
+- Route 13
+- Route 14
+- Abundant Shrine
+- Route 15
+- Route 16
+- Lostlorn Forest
+- Route 18
+- Undella Town
+- Route 17
+
+## Maps that support having different seasons
+
+- Icirrus City
+- Twist Mountain (Upper Level)
+- Twist Mountain (Middle Level)
+- Twist Mountain (Lower Level)
+- Twist Mountain (Ice Rock Cave)
+- Dragonspiral Tower (Icirrus City)
+- Dragonspiral Tower (Tower Exterior)
+- Undella Bay
+- Route 6
+- Route 7
+- Route 8
+- Moor of Icirrus
+
+## Slot values
+
+Like already said on the main guide, the slot argument can either be omitted (equal to inputting all slots),
+be a single number, or a list of numbers.
+
+The range of allowed numbers depends on the chosen method.
+The `Grass`, `Dark grass`, and `Rustling grass` methods have 12 slots (numbered 0-11) each, 
+while all other methods have only 5 slots (numbered 0-4) each.
+
+The encounter rate of each slot differs between each method and slot number.
+- The rates of `Grass`, `Dark grass`, and `Rustling grass` slots are (ordered by slot number)
+  - 20
+  - 20
+  - 10
+  - 10
+  - 10
+  - 10
+  - 5
+  - 5
+  - 4
+  - 4
+  - 1
+  - 1
+- The rates of `Surfing` and `Surfing rippling` slots are (ordered by slot number)
+  - 60
+  - 30
+  - 5
+  - 4
+  - 1
+- The rates of `Fishing` and `Fishing rippling` slots are (ordered by slot number)
+  - 40
+  - 40
+  - 15
+  - 4
+  - 1
+
+# All species names
 
 These names are mostly sorted by dex number and form number.
 The exceptions at the end of this list originate from these forms having their own data in the games' files

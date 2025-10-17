@@ -1,8 +1,6 @@
 # Important stuff
 
-- New document just for roadblocks and other important stuff because rom changes doc does not list all roadblocks
-- reformat options guides to be one document explaining all complex options and unify encounter plando docs
-- make docs easier to readmaster ball seller not showing up again
+- make docs easier to read
 
 # 0.4.0
 
@@ -31,12 +29,10 @@
 - Randomization Blacklist
   - Wild pokémon
     - Will still put every species that is required to be randomized and base stage into at least one slot
-    - Ignores Encounter Plando
+    - Ignored by Encounter Plando
   - Trainer pokémon
 - reword error messages in rom.py
-- make sure there is at least one fighting type in randomized wild encounters
 - extended location hint for deerlings location and challenge rock
-- dexsanity plando
 
 ## Rom
 
@@ -51,6 +47,7 @@
 - fix reappearing hidden items still getting detected by dowsing machine because of original flags not being checked
 - opelucid city fly flag only set after ghetsis scene?
 - make massage lady in castelia repeatable
+- baker on village bridge not repeatable
 
 ## Both
 
@@ -60,6 +57,7 @@
 - maybe [redacted] is actually possible? but definitely with restrictions
 - Dowsing Machine as a hard requirement for hidden items
 - one case of goal not triggering reported in sync
+- master ball seller not showing up again?
 - after everything else: check docs for up-to-date information, update tests, update location names in ut                             
 
 # Not urgent
