@@ -66,9 +66,9 @@ Pokemon Black and White:
       method: Grass
       species: Blastoise
     - map: Route 8
-      seasons: Summer
+      season: Summer
       method: Surfing
-      slots: 4
+      slot: 4
       species: Liligant
     - map: Twist Mountain (Upper Level)
       seasons:
@@ -104,8 +104,21 @@ or a custom list.
 
 Instead of just writing a single option name like `vanilla` or `try_normalized`, you need to provide key-value pairs.
 To change (Dark/Rustling) Grass rates, use the `Grass` key. Surfing/Fishing (Rippling) rates need the `Surfing`/`Fishing` key respectively.
+Though you are not required to always use all keys; you can leave any of them as vanilla if you want.
 The value has to be a list of positive integers. The `Grass` key needs exactly 12 numbers, while the others need exactly 5 numbers.
 All numbers in a list need to add up to exactly 100 and need to be greater than 0.
+
+## An example on how using this option could look like
+
+```
+...
+Pokemon Black and White:
+  ...
+  modify_encounter_rates:
+    Grass: [30, 10, 4, 2, 2, 2, 25, 10, 5, 4, 4, 2]
+    Surfing: [25, 25, 30, 10, 10]
+    Fishing: [96, 1, 1, 1, 1]
+```
 
 # Text Plando guide for Pokémon Black and White (coming in 0.4.0)
 
