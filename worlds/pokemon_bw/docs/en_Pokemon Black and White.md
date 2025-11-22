@@ -50,7 +50,7 @@ while still using the well-known grid-based movement mechanics and battle UI.
       automatically re-added if collected but missing in your save file.
 - ***How do I get past this roadblock? I did all the story events...***
   <br>A lot of story-based roadblocks had to be changed to make this game viable for AP. Check the rom changes page
-      (linked down below) for a list of all custom roadblocks.
+      (see list of links above) for a list of all custom roadblocks.
 - ***I want to contribute to development, how can I do that?***
   <br>First of all, propose your ideas/changes/... in the game's channel, so we can talk about things beforehand.
   <br>The fork of this implementation is found at https://github.com/SparkyDaDoggo/Archipelago/tree/main.
