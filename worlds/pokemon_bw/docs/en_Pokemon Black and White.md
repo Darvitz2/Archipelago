@@ -22,7 +22,11 @@ while still using the well-known grid-based movement mechanics and battle UI.
 
 ## Known bugs (might be outdated)
 
-- Using dig while having season control enabled crashes the game
+- Game breaking bugs:
+  - Using dig while having season control enabled crashes the game
+- Harmless/visual bugs:
+  - The dowsing machine keeps detecting hidden items that are normally reappearing even after pickup
+  - Certain overworld item balls on route 13 don't disappear after pickup
 
 ## FAQ (kinda)
 
