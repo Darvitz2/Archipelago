@@ -9,6 +9,7 @@ from worlds._bizhawk.client import BizHawkClient
 from .client.locations import check_flag_locations, check_dex_locations
 from .client.items import receive_items
 from .client.setup import early_setup, late_setup
+from .client.tracker import set_map
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
@@ -48,6 +49,7 @@ class PokemonBWClient(BizHawkClient):
     medicine_bag_offset = 0x19494  # 0x2347A4 in vanilla W
     berry_bag_offset = 0x19554  # 0x234864 in vanilla W
     badges_offset = 0x21ac0  # 0x23CDD0 in vanilla W
+    map_id_offset = 0x3461c  # 0x24f92c in vanilla W
 
     def __init__(self):
         super().__init__()
@@ -58,6 +60,8 @@ class PokemonBWClient(BizHawkClient):
         self.missing_flag_loc_ids: list[list[int]] = [[] for _ in range(self.flags_amount)]
         self.missing_dex_flag_loc_ids: list[list[int]] = [[] for _ in range(self.dex_amount)]
         self.save_data_address = 0
+        self.current_map = -1
+        self.game_version = -1  # 0 for black, 1 for white
         self.goal_checking_method: Callable[["PokemonBWClient", "BizHawkClientContext"],
                                             Coroutine[Any, Any, bool]] | None = None
         self.logger = logging.getLogger("Client")
@@ -80,6 +84,10 @@ class PokemonBWClient(BizHawkClient):
             return False
 
         self.player_name = header[0][0xa0:].strip(b'\0').decode()
+        if header[0][8] == b'B'[0]:
+            self.game_version = 0
+        else:
+            self.game_version = 1
         ctx.game = self.game
         ctx.items_handling = 0b111
         ctx.want_slot_data = True
@@ -135,6 +143,8 @@ class PokemonBWClient(BizHawkClient):
                 await early_setup(self, ctx)
                 setup_needed = True
 
+            await set_map(self, ctx)
+
             locations_to_check: list[int] = (
                 await check_flag_locations(self, ctx) +
                 await check_dex_locations(self, ctx)
@@ -160,3 +170,59 @@ class PokemonBWClient(BizHawkClient):
         except bizhawk.ConnectorError:
             pass
 
+    def get_flag(self, flag: int) -> bool:
+        return (self.flags_cache[flag//8] & (2 ** (flag % 8))) != 0
+
+    async def write_set_flag(self, ctx: "BizHawkClientContext", flag: int) -> None:
+        while not await bizhawk.guarded_write(
+            ctx.bizhawk_ctx, ((
+                self.save_data_address + self.flags_offset + (flag//8),
+                [self.flags_cache[flag//8] | (2 ** (flag % 8))],
+                self.ram_read_write_domain
+            ),), ((
+                self.save_data_address + self.flags_offset + (flag//8),
+                [self.flags_cache[flag//8]],
+                self.ram_read_write_domain
+            ),)
+        ):
+            self.flags_cache[flag//8] = (await bizhawk.read(
+                ctx.bizhawk_ctx, (
+                    (self.save_data_address + self.flags_offset + (flag//8), 1, self.ram_read_write_domain),
+                )
+            ))[0][0]
+        self.flags_cache[flag // 8] |= (2 ** (flag % 8))
+
+    async def write_unset_flag(self, ctx: "BizHawkClientContext", flag: int) -> None:
+        while not await bizhawk.guarded_write(
+            ctx.bizhawk_ctx, ((
+                self.save_data_address + self.flags_offset + (flag//8),
+                [self.flags_cache[flag//8] & (255 - (2 ** (flag % 8)))],
+                self.ram_read_write_domain
+            ),), ((
+                self.save_data_address + self.flags_offset + (flag//8),
+                [self.flags_cache[flag//8]],
+                self.ram_read_write_domain
+            ),)
+        ):
+            self.flags_cache[flag//8] = (await bizhawk.read(
+                ctx.bizhawk_ctx, (
+                    (self.save_data_address + self.flags_offset + (flag//8), 1, self.ram_read_write_domain),
+                )
+            ))[0][0]
+        self.flags_cache[flag // 8] &= (255 - (2 ** (flag % 8)))
+
+    async def write_var(self, ctx: "BizHawkClientContext", var: int, value: int, length=2) -> None:
+        await bizhawk.write(
+            ctx.bizhawk_ctx, ((
+                self.save_data_address + self.var_offset + (2 * var),
+                value.to_bytes(length, "little"),
+                self.ram_read_write_domain
+            ),)
+        )
+
+    async def read_var(self, ctx: "BizHawkClientContext", var: int, length=2) -> int:
+        return int.from_bytes((await bizhawk.read(
+            ctx.bizhawk_ctx, (
+                (self.save_data_address + self.var_offset + (2 * var), length, self.ram_read_write_domain),
+            )
+        ))[0], "little")

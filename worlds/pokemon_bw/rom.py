@@ -2,14 +2,10 @@ import os
 import pathlib
 import zipfile
 
-from .ndspy import rom as ndspy_rom
-
 import Utils
 from settings import get_settings
 from worlds.Files import APAutoPatchInterface
 from typing import TYPE_CHECKING, Any, Dict, Callable
-
-from .patch.procedures import base_patch, season_patch, write_wild_pokemon, level_adjustments, write_trainer_pokemon
 
 if TYPE_CHECKING:
     from . import PokemonBWWorld
@@ -17,7 +13,6 @@ if TYPE_CHECKING:
 
 class PokemonBlackPatch(APAutoPatchInterface):
     game = "Pokemon Black and White"
-    bw_patch_format = (0, 3, 0)
     patch_file_ending = ".apblack"
     result_file_ending = ".nds"
 
@@ -45,7 +40,6 @@ class PokemonBlackPatch(APAutoPatchInterface):
 
 class PokemonWhitePatch(APAutoPatchInterface):
     game = "Pokemon Black and White"
-    bw_patch_format = (0, 3, 0)
     patch_file_ending = ".apwhite"
     result_file_ending = ".nds"
 
@@ -78,6 +72,7 @@ class PatchMethods:
 
     @staticmethod
     def write_contents(patch: PokemonBWPatch, opened_zipfile: zipfile.ZipFile) -> None:
+        from patch.procedures import write_text, write_wild_pokemon, write_trainer_pokemon, level_adjustments
 
         write_wild = False
         for encounter in patch.world.wild_encounter.values():
@@ -85,7 +80,8 @@ class PatchMethods:
                 write_wild = True
                 break
 
-        procedures: list[str] = ["base_patch"]
+        procedures: list[str] = ["base_patch", "write_text"]
+        write_text.write_plando(patch, opened_zipfile)
         if patch.world.options.season_control != "vanilla":
             procedures.append("season_patch")
         if write_wild:
@@ -98,39 +94,82 @@ class PatchMethods:
             procedures.append("adjust_wild_levels")
         if "Trainer" in patch.world.options.adjust_levels:
             procedures.append("adjust_trainer_levels")
+        if patch.world.options.modify_levels.is_any_modified():
+            level_adjustments.write_modifiers(patch, opened_zipfile)
+            if patch.world.options.modify_levels.is_trainer_modified():
+                procedures.append("modify_trainer_levels")
+            if patch.world.options.modify_levels.is_wild_modified():
+                procedures.append("modify_wild_levels")
 
         opened_zipfile.writestr("procedures.txt", "\n".join(procedures))
 
     @staticmethod
     def get_manifest(patch: PokemonBWPatch, manifest: dict[str, Any]) -> Dict[str, Any]:
-        manifest["bw_patch_format"] = patch.bw_patch_format
+        from .data import version
+
+        manifest["bw_patch_format"] = version.patch_file()
         return manifest
 
     @staticmethod
-    def patch(patch: PokemonBWPatch, target: str, version: str) -> None:
+    def patch(patch: PokemonBWPatch, target: str, version_name: str) -> None:
+        from .data import version
+
         patch.read()
 
-        if not pathlib.Path(target).exists():
-            base_data = get_base_rom_bytes(version)
-            rom = ndspy_rom.NintendoDSRom(base_data)
-            procedures: list[str] = str(patch.get_file("procedures.txt"), "utf-8").splitlines()
-            for prod in procedures:
-                patch_procedures[prod](rom, __name__, patch)
-            with open(target, 'wb') as f:
-                f.write(rom.save(updateDeviceCapacity=True))
+        if pathlib.Path(target).exists():
+            with open(target, "rb") as f:
+                header_part = f.read(0xA0)
+                found_rom_version = tuple(header_part[0x9D:0xA0])
+                if version.rom() != found_rom_version:
+                    return
+
+        from .ndspy.rom import NintendoDSRom
+        from .patch.procedures import (base_patch, season_patch, write_wild_pokemon, write_trainer_pokemon,
+                                       level_adjustments, write_text)
+
+        patch_procedures: dict[str, Callable[[NintendoDSRom, str, PokemonBWPatch], None]] = {
+            "base_patch": base_patch.patch,
+            "season_patch": season_patch.patch,
+            "write_wild_pokemon": write_wild_pokemon.patch,
+            "write_trainer_pokemon": write_trainer_pokemon.patch_species,
+            "adjust_wild_levels": level_adjustments.patch_wild,
+            "adjust_trainer_levels": level_adjustments.patch_trainer,
+            "modify_wild_levels": level_adjustments.modify_wild,
+            "modify_trainer_levels": level_adjustments.modify_trainers,
+            "write_text": write_text.patch,
+        }
+
+        base_data = get_base_rom_bytes(version_name)
+        rom = NintendoDSRom(base_data)
+        procedures: list[str] = str(patch.get_file("procedures.txt"), "utf-8").splitlines()
+        for prod in procedures:
+            patch_procedures[prod](rom, __name__, patch)
+        if get_settings()["pokemon_bw_settings"]["extract_text"]:
+            from .patch import text_extractor
+            text_extractor.extract(rom, target)
+        with open(target, 'wb') as f:
+            f.write(rom.save(updateDeviceCapacity=True))
 
     @staticmethod
     def read_contents(patch: PokemonBWPatch, opened_zipfile: zipfile.ZipFile,
                       manifest: Dict[str, Any]) -> Dict[str, Any]:
+        from .data import version
 
         for file in opened_zipfile.namelist():
             if file not in ["archipelago.json"]:
                 patch.files[file] = opened_zipfile.read(file)
 
-        if tuple(manifest["bw_patch_format"]) > patch.bw_patch_format:
-            raise Exception(f"File (BW patch version: {'.'.join(manifest['bw_patch_format'])} too new "
-                            f"for this handler (BW patch version: {patch.bw_patch_format}). "
+        found_version: tuple[int, ...] = tuple(manifest["bw_patch_format"])
+        accept = version.patch_accept(found_version)
+
+        if accept == 1:
+            raise Exception(f"File (BW patch version: {'.'.join(str(i) for i in manifest['bw_patch_format'])}) too new "
+                            f"for this handler (BW patch version: {version.patch_file()}). "
                             f"Please update your apworld.")
+        elif accept == -1:
+            raise Exception(f"File (BW patch version: {'.'.join(str(i) for i in manifest['bw_patch_format'])}) too old "
+                            f"for this handler (BW patch version: {version.patch_file()}). "
+                            f"Either re-generate your world or downgrade to an older apworld version.")
 
         return manifest
 
@@ -141,25 +180,17 @@ class PatchMethods:
         return patch.files[file]
 
 
-patch_procedures: dict[str, Callable[[ndspy_rom.NintendoDSRom, str, PokemonBWPatch], None]] = {
-    "base_patch": base_patch.patch,
-    "season_patch": season_patch.patch,
-    "write_wild_pokemon": write_wild_pokemon.patch,
-    "write_trainer_pokemon": write_trainer_pokemon.patch_species,
-    "adjust_wild_levels": level_adjustments.patch_wild,
-    "adjust_trainer_levels": level_adjustments.patch_trainer,
-}
-
-
 def get_base_rom_bytes(version: str, file_name: str = "") -> bytes:
     if not file_name:
         file_name = get_base_rom_path(version, file_name)
     with open(file_name, "rb") as file:
         base_rom_bytes = bytes(file.read())
     if version == "black" and base_rom_bytes[:18] != b'POKEMON\x20B\0\0\0IRBO01':
-        raise Exception(f"Supplied Base Rom appears to not be an english copy of Pokémon Black Version.")
+        raise Exception(f"Supplied Base Rom appears to not be an english copy of Pokémon Black Version: "
+                        f"{base_rom_bytes[:18]}")
     if version == "white" and base_rom_bytes[:18] != b'POKEMON\x20W\0\0\0IRAO01':
-        raise Exception(f"Supplied Base Rom appears to not be an english copy of Pokémon White Version.")
+        raise Exception(f"Supplied Base Rom appears to not be an english copy of Pokémon White Version: "
+                        f"{base_rom_bytes[:18]}")
     return base_rom_bytes
 
 

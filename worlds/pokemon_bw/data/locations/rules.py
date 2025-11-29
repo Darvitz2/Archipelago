@@ -1,5 +1,5 @@
 from .. import ExtendedRule, InclusionRule
-from ..pokemon import pokedex
+from ..pokemon import species
 from ..items import tm_hm
 
 
@@ -105,8 +105,14 @@ can_set_other_than_winter: ExtendedRule = lambda state, world: (
     )
 )
 
+can_use_strength_and_set_other_than_winter: ExtendedRule = lambda state, world: (
+    can_use_strength(state, world) and can_set_other_than_winter(state, world)
+)
+
 can_catch_all_deerlings: ExtendedRule = lambda state, world: (
-    world.options.season_control == "vanilla" or state.has_all((
+    "Randomize" in world.options.randomize_wild_pokemon
+    or world.options.season_control == "vanilla"
+    or state.has_all((
         "Deerling (Spring)", "Deerling (Summer)", "Deerling (Autumn)", "Deerling (Winter)"
     ), world.player)
 )
@@ -144,6 +150,7 @@ can_cut_dreamyard_tree: ExtendedRule = lambda state, world: state.can_reach_regi
 can_go_deeper_into_relic_castle: ExtendedRule = lambda state, world: state.can_reach_region("Relic Castle Lower Floors", world.player)
 can_go_to_relic_castle_basement: ExtendedRule = lambda state, world: state.can_reach_region("Relic Castle Tower Lower Floors", world.player)
 can_find_woman_on_village_bridge: ExtendedRule = lambda state, world: state.can_reach_region("Village Bridge", world.player)
+can_go_to_nimbasa_city: ExtendedRule = lambda state, world: state.can_reach_region("Nimbasa City", world.player)
 
 
 # Encounter requirements
@@ -151,22 +158,10 @@ can_find_woman_on_village_bridge: ExtendedRule = lambda state, world: state.can_
 has_forces_of_nature: ExtendedRule = lambda state, world: state.has_all(("Thundurus", "Tornadus"), world.player)
 has_celebi: ExtendedRule = lambda state, world: state.has("Celebi", world.player)
 has_legendary_beasts: ExtendedRule = lambda state, world: state.has_all(("Entei", "Raikou", "Suicune"), world.player)
-has_25_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 25
-    or state.can_reach_region("N's Castle", world.player)
-)
-has_51_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 51
-    or state.can_reach_region("N's Castle", world.player)
-)
-has_60_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 60
-    or state.can_reach_region("N's Castle", world.player)
-)
-has_115_species: ExtendedRule = lambda state, world: (
-    state.count_from_list_unique(pokedex.by_name, world.player) >= 115
-    or state.can_reach_region("N's Castle", world.player)
-)
+has_25_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 25
+has_51_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 51
+has_60_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 60
+has_115_species: ExtendedRule = lambda state, world: state.count_from_list_unique(species.unova_species, world.player) >= 115
 
 
 # Miscellaneous requirements
@@ -180,6 +175,12 @@ has_any_tm_hm: ExtendedRule = lambda state, world: (
 )
 
 striaton_hidden_item: ExtendedRule = lambda state, world: state.can_reach_region("Route 3", world.player) or can_use_surf(state, world)
+
+dark_cave: ExtendedRule = lambda state, world: "Require Flash" not in world.options.modify_logic or state.has("Out of logic", world.player) or can_use_flash(state, world)
+
+challengers_cave: ExtendedRule = lambda state, world: has_red_chain(state, world) and dark_cave(state, world)
+
+mistralton_cave: ExtendedRule = lambda state, world: can_use_surf(state, world) and dark_cave(state, world)
 
 extended_rules_list: tuple = (
     can_use_strength, can_use_surf, can_use_cut, can_use_waterfall, can_use_dive, can_use_flash,
@@ -195,16 +196,16 @@ extended_rules_list: tuple = (
     has_trio_badge, has_basic_badge, has_insect_badge, has_bolt_badge,
     has_quake_badge, has_jet_badge, has_freeze_badge, has_legend_badge,
 
-    can_set_winter, can_set_other_than_winter, can_catch_all_deerlings,
+    can_set_winter, can_set_other_than_winter, can_catch_all_deerlings, can_use_strength_and_set_other_than_winter,
     encounter_can_set_spring, encounter_can_set_summer, encounter_can_set_autumn, encounter_can_set_winter,
 
     can_beat_ghetsis, can_encounter_swords_of_justice, can_cut_dreamyard_tree, can_go_deeper_into_relic_castle,
-    can_go_to_relic_castle_basement, can_find_woman_on_village_bridge,
+    can_go_to_relic_castle_basement, can_find_woman_on_village_bridge, can_go_to_nimbasa_city,
 
     has_forces_of_nature, has_celebi, has_legendary_beasts,
     has_25_species, has_51_species, has_60_species, has_115_species,
 
-    has_fighting_type_species, has_any_tm_hm, striaton_hidden_item,
+    has_fighting_type_species, has_any_tm_hm, striaton_hidden_item, dark_cave, challengers_cave, mistralton_cave,
 )
 
 

@@ -17,15 +17,17 @@ region_list: set[str] = {
     "Striaton City",
     "Dreamyard Entrance",
     "Dreamyard North",  # behind cuttable tree
+    "Dreamyard Grass North",  # reachable from either cuttable tree or basement key
     "Dreamyard Basement",
     "Dreamyard South",  # only accessible from basement
     "Route 3",
     "Wellspring Cave Entrance",
     "Wellspring Cave Inner",  # behind water
+    "Wellspring Cave B1F",
     "Nacrene City",
     "Pinwheel Forest Outside",
     "Pinwheel Forest West",  # area accessible in main story
-    "Pinwheel Forest East",  # accessible after reaching Mistralton Cave
+    "Pinwheel Forest East",  # accessible after reaching nimbasa city, rumination field then after mistralton cave
     "Skyarrow Bridge",
     "Castelia City",
     "Liberty Garden",

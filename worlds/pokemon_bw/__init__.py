@@ -1,12 +1,13 @@
 import datetime
+import logging
 import os
-from typing import ClassVar, Mapping, Any, List
+from typing import ClassVar, Mapping, Any, List, TextIO
 
 import settings
 from BaseClasses import MultiWorld, Tutorial, Item, Location, Region
-from Options import Option, OptionError
+from Options import Option
 from worlds.AutoWorld import World, WebWorld
-from . import items, locations, options, bizhawk_client, rom, groups
+from . import items, locations, options, bizhawk_client, rom, groups, tracker
 from .generate import EncounterEntry, StaticEncounterEntry, TradeEncounterEntry, TrainerPokemonEntry
 from .data import RulesDict
 
@@ -33,10 +34,15 @@ class PokemonBWSettings(settings.Group):
         """Toggles whether Encounter Plando is enabled for players in generation.
         If disabled, yamls that use Encounter Plando do not raise OptionErrors, but display a warning."""
 
+    class ExtractText(settings.Bool):
+        """If enabled, running a patch file for this game will also produce a text file
+        containing all ingame text alongside the rom."""
+
     black_rom: PokemonBlackRomFile = PokemonBlackRomFile(PokemonBlackRomFile.copy_to)
     white_rom: PokemonWhiteRomFile = PokemonWhiteRomFile(PokemonWhiteRomFile.copy_to)
     # remove_collected_field_items: RemoveCollectedFieldItems | bool = False
     enable_encounter_plando: EnableEncounterPlando | bool = True
+    extract_text: ExtractText | bool = False
 
 
 class PokemonBWWeb(WebWorld):
@@ -76,14 +82,29 @@ class PokemonBWWorld(World):
     location_name_groups = groups.get_location_groups()
 
     ut_can_gen_without_yaml = True
+    glitches_item_name = "Out of logic"
     tracker_world = {
         "map_page_folder": "tracker",
         "map_page_maps": "maps/maps.json",
-        "map_page_locations": "locations/locations.json"
+        "map_page_locations": {
+            "locations/locations.json",
+            "locations/submaps_cities.json",
+            "locations/submaps_dungeons.json",
+            "locations/submaps_routes.json",
+            "locations/old_compat.json",
+        },
+        "map_page_index": tracker.map_page_index,
+        "map_page_setting_key": "pokemon_bw_map_{team}_{player}",
     }
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
+
+        from .data.version import ap_minimum
+        from Utils import version_tuple
+        if version_tuple < ap_minimum():
+            raise Exception(f"Archipelago version too old for Pokémon BW "
+                            f"(requires minimum {ap_minimum()}, found {version_tuple}")
 
         self.strength_species: set[str] = set()
         self.cut_species: set[str] = set()
@@ -94,7 +115,6 @@ class PokemonBWWorld(World):
         self.fighting_type_species: set[str] = set()  # Needed for challenge rock outside of pinwheel forest
         self.to_be_filled_locations: int = 0
         self.seed: int = 0
-        self.to_be_locked_items: dict[str, list[items.PokemonBWItem] | dict[str, items.PokemonBWItem]] = {}
         self.wild_encounter: dict[str, EncounterEntry] = {}
         self.static_encounter: dict[str, StaticEncounterEntry] | None = None
         self.trade_encounter: dict[str, TradeEncounterEntry] | None = None
@@ -104,18 +124,17 @@ class PokemonBWWorld(World):
         self.master_ball_seller_cost: int = 0
 
         self.ut_active: bool = False
+        self.location_id_to_alias: dict[int, str] = {}
 
     def generate_early(self) -> None:
         from .generate.encounter import wild, checklist, static, plando
         from .generate import trainers
 
-        if self.options.randomize_wild_pokemon.value and "Randomize" not in self.options.randomize_wild_pokemon.value:
-            self.options.randomize_wild_pokemon.value.add("Randomize")
-
-
         # Load values from UT if this is a regenerated world
         if hasattr(self.multiworld, "re_gen_passthrough"):
             if self.game in self.multiworld.re_gen_passthrough:
+                from .data import version
+
                 self.ut_active = True
                 re_ge_slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
                 re_gen_options: dict[str, Any] = re_ge_slot_data["options"]
@@ -125,29 +144,27 @@ class PokemonBWWorld(World):
                     if opt is not None:
                         setattr(self.options, key, opt.from_any(value))
                 self.seed = re_ge_slot_data["seed"]
+                loaded_ut_version = re_ge_slot_data.get("ut_compatibility", (0, 3, 2))
+                if version.ut() != loaded_ut_version:
+                    logging.warning("UT compatibility mismatch detected. You can continue tracking with this "
+                                    "apworld version, but tracking might not be entirely accurate.")
 
         if not self.ut_active:
             self.seed = self.random.getrandbits(64)
 
         self.random.seed(self.seed)
-        cost_start, cost_end = -1, -1
-        if "Cost: Free" in self.options.master_ball_seller:
-            cost_start = 0
-            cost_end = 0
-        if "Cost: 1000" in self.options.master_ball_seller:
-            cost_start = 1000 if cost_start == -1 else cost_start
-            cost_end = 1000
-        if "Cost: 3000" in self.options.master_ball_seller:
-            cost_start = 3000 if cost_start == -1 else cost_start
-            cost_end = 3000
-        if "Cost: 10000" in self.options.master_ball_seller:
-            cost_start = 10000 if cost_start == -1 else cost_start
-            cost_end = 10000
-        if cost_start == -1 and len(self.options.master_ball_seller.value) > 0:
-            raise OptionError(f"Player {self.player} ({self.player_name}) added "
-                              f"{len(self.options.master_ball_seller.value)} Master Ball seller(s) "
-                              f"without adding any cost modifier")
-        self.master_ball_seller_cost = self.random.randrange(cost_start, cost_end+1, 500) if cost_start != -1 else 0
+
+        cost_start, cost_end = 999999, -1
+        for modifier in self.options.master_ball_seller.value:
+            if modifier.casefold().startswith("cost"):
+                if modifier.casefold().endswith("free"):
+                    cost = 0
+                else:
+                    cost = int(modifier[modifier.index(" ")+1:])
+                cost_start = min(cost_start, cost)
+                cost_end = max(cost_end, cost)
+        self.master_ball_seller_cost = self.random.randrange(cost_start, cost_end+1, 500) if cost_end != -1 else 3000
+
         self.regions = locations.get_regions(self)
         self.rules_dict = locations.create_rule_dict(self)
         locations.connect_regions(self)
@@ -184,25 +201,8 @@ class PokemonBWWorld(World):
                             f"Please report this to the devs and provide the yaml used for generating.")
         for _ in range(self.to_be_filled_locations-len(item_pool)):
             item_pool.append(self.create_item(self.get_filler_item_name()))
-        items.reserve_locked_items(self, item_pool)
-        self.multiworld.itempool += item_pool
-
-    def get_pre_fill_items(self) -> List[Item]:
-        return [
-            item
-            for item_list in self.to_be_locked_items if isinstance(item_list, list)
-            for item in item_list
-        ] + [
-            item_dict[name]
-            for item_dict in self.to_be_locked_items if isinstance(item_dict, dict)
-            for name in item_dict
-        ]
-
-    def pre_fill(self) -> None:
-        from .generate.locked_placement import place_badges_pre_fill, place_tm_hm_pre_fill
-
-        place_badges_pre_fill(self)
-        place_tm_hm_pre_fill(self)
+        items.place_locked_items(self, item_pool)
+        self.multiworld.itempool.extend(item_pool)
 
     def fill_hook(self,
                   progitempool: List[Item],
@@ -211,8 +211,17 @@ class PokemonBWWorld(World):
                   fill_locations: List[Location]) -> None:
         from .generate.locked_placement import place_tm_hm_fill, place_badges_fill
 
-        place_badges_fill(self, progitempool, fill_locations)
+        place_badges_fill(self, progitempool, usefulitempool, filleritempool, fill_locations)
         place_tm_hm_fill(self, progitempool, usefulitempool, filleritempool, fill_locations)
+
+    def extend_hint_information(self, hint_data: dict[int, dict[int, str]]):
+        hint_data[self.player] = {}
+        locations.extend_dexsanity_hints(self, hint_data)
+
+    def write_spoiler(self, spoiler_handle: TextIO) -> None:
+        from .generate.spoiler import write_spoiler_encounter, write_spoiler_trainer
+        write_spoiler_encounter(self, spoiler_handle)
+        write_spoiler_trainer(self, spoiler_handle)
 
     def generate_output(self, output_directory: str) -> None:
         if self.options.version == "black":
@@ -231,6 +240,8 @@ class PokemonBWWorld(World):
             ).write()
 
     def fill_slot_data(self) -> Mapping[str, Any]:
+        from .data import version
+
         # Some options and data are included for UT
         return {
             "options": {
@@ -239,21 +250,28 @@ class PokemonBWWorld(World):
                 "randomize_wild_pokemon": self.options.randomize_wild_pokemon.value,
                 "randomize_trainer_pokemon": self.options.randomize_trainer_pokemon.value,
                 "pokemon_randomization_adjustments": self.options.pokemon_randomization_adjustments.value,
-                "encounter_plando": self.options.encounter_plando.value,
+                "encounter_plando": self.options.encounter_plando.to_slot_data(),
                 "shuffle_badges": self.options.shuffle_badges.current_key,
                 "shuffle_tm_hm": self.options.shuffle_tm_hm.current_key,
                 "dexsanity": self.options.dexsanity.value,
                 "season_control": self.options.season_control.current_key,
                 "adjust_levels": self.options.adjust_levels.value,
+                "modify_levels": self.options.modify_levels.value,
                 "master_ball_seller": self.options.master_ball_seller.value,
                 "modify_item_pool": self.options.modify_item_pool.value,
                 "modify_logic": self.options.modify_logic.value,
+                "funny_dialog": self.options.funny_dialog.current_key,
+                "text_plando": self.options.text_plando.to_slot_data(),
+                "reusable_tms": self.options.reusable_tms.current_key,
             },
-            "seed": self.seed,  # Needed for UT
-            "master_ball_seller_cost": self.master_ball_seller_cost,  # NOT needed for UT
+            # Needed for UT
+            "seed": self.seed,
+            "ut_compatibility": version.ut(),
+            # NOT needed for UT
+            "master_ball_seller_cost": self.master_ball_seller_cost,
         }
 
-    def interpret_slot_data(self, slot_data: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
         """Helper function for Universal Tracker"""
-        _ = self  # Damn PyCharm screaming "meThoD mAy bE stAtiC"
         return slot_data

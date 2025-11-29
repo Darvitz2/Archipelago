@@ -18,6 +18,7 @@ def lookup(domain: int) -> dict[str, int]:
 
 def create(world: "PokemonBWWorld", catchable_species_data: dict[str, "SpeciesData"]) -> None:
     from ...data.locations.dexsanity import location_table
+    from ...data.pokemon.pokedex import by_number
 
     # These lambdas have to be created from functions, because else they would all use the same 'name' variable
     def get_standard_rule(x: str) -> Callable[[CollectionState], bool]:
@@ -26,18 +27,34 @@ def create(world: "PokemonBWWorld", catchable_species_data: dict[str, "SpeciesDa
     def get_special_rule(x: str) -> Callable[[CollectionState], bool]:
         return lambda state: location_table[x].special_rule(state, world)
 
-    catchable_dex: set[str] = {data.dex_name for data in catchable_species_data.values()}
-    count = min(world.options.dexsanity.value, len(catchable_dex))
-    possible = [f"Pokédex - {species}" for species in catchable_dex]
-    world.random.shuffle(possible)
+    r: "Region" = world.regions["Pokédex"]
+    catchable_dex: list[str] = []
+    for data in catchable_species_data.values():
+        if data.dex_name not in catchable_dex:
+            catchable_dex.append(data.dex_name)
 
-    for _ in range(count):
-        name = possible.pop()  # location name
-        r: "Region" = world.regions["Pokédex"]
-        l: PokemonBWLocation = PokemonBWLocation(world.player, name, world.location_name_to_id[name], r)
+    def create_location(loc_name: str) -> None:
+        data = location_table[loc_name]
+        l: PokemonBWLocation = PokemonBWLocation(world.player, loc_name, world.location_name_to_id[loc_name], r)
         l.progress_type = LocationProgressType.DEFAULT
-        if location_table[name].special_rule is not None:
-            l.access_rule = get_special_rule(name)
+        if data.special_rule is not None:
+            l.access_rule = get_special_rule(loc_name)
         else:
-            l.access_rule = get_standard_rule(name)
+            l.access_rule = get_standard_rule(loc_name)
+        if data.ut_alias is not None:
+            world.location_id_to_alias[world.location_name_to_id[loc_name]] = data.ut_alias
         r.locations.append(l)
+
+    if isinstance(world.options.dexsanity.value, list):
+        for dex_num in world.options.dexsanity.value:
+            dex_num: int
+            pokemon = by_number[dex_num]
+            if pokemon in catchable_dex:
+                name = f"Pokédex - {pokemon}"
+                create_location(name)
+    else:
+        world.random.shuffle(catchable_dex)
+        count = min(world.options.dexsanity.value, len(catchable_dex))
+        for _ in range(count):
+            name = f"Pokédex - {catchable_dex.pop()}"
+            create_location(name)

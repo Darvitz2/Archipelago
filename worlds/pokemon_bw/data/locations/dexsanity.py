@@ -30,10 +30,10 @@ location_table: dict[str, DexLocationData] = {
     "Pokédex - Raichu": DexLocationData(26),
     "Pokédex - Sandshrew": DexLocationData(27),
     "Pokédex - Sandslash": DexLocationData(28),
-    "Pokédex - Nidoran♀": DexLocationData(29),
+    "Pokédex - Nidoran♀": DexLocationData(29, ut_alias="Pokédex - Nidoran F"),
     "Pokédex - Nidorina": DexLocationData(30),
     "Pokédex - Nidoqueen": DexLocationData(31),
-    "Pokédex - Nidoran♂": DexLocationData(32),
+    "Pokédex - Nidoran♂": DexLocationData(32, ut_alias="Pokédex - Nidoran M"),
     "Pokédex - Nidorino": DexLocationData(33),
     "Pokédex - Nidoking": DexLocationData(34),
     "Pokédex - Clefairy": DexLocationData(35),
@@ -541,14 +541,7 @@ location_table: dict[str, DexLocationData] = {
             ("Shaymin", "Shaymin (Sky)"), world.player
         )
     ),
-    "Pokédex - Arceus": DexLocationData(
-        493, lambda state, world: state.has_any(
-            ("Arceus (Normal)", "Arceus (Fire)", "Arceus (Water)", "Arceus (Electric)", "Arceus (Grass)",
-             "Arceus (Ice)", "Arceus (Fighting)", "Arceus (Poison)", "Arceus (Ground)", "Arceus (Flying)",
-             "Arceus (Psychic)", "Arceus (Bug)", "Arceus (Rock)", "Arceus (Ghost)", "Arceus (Dragon)", "Arceus (Dark)",
-             "Arceus (Steel)"), world.player
-        )
-    ),
+    "Pokédex - Arceus": DexLocationData(493),
     "Pokédex - Victini": DexLocationData(494),
     "Pokédex - Snivy": DexLocationData(495),
     "Pokédex - Servine": DexLocationData(496),

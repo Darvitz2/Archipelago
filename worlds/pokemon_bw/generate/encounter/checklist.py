@@ -7,21 +7,48 @@ if TYPE_CHECKING:
 def get_species_checklist(world: "PokemonBWWorld") -> tuple[list[str], set[str]]:
     # Returns ({to be checked species}, {already checked species})
     # Species needed for trade are added in generate_trade_encounters()
-    from ...data.pokemon.species import by_name
+    from ...data.pokemon.species import by_name, unova_species, by_id
 
     if "Randomize" not in world.options.randomize_wild_pokemon:
         return [], set()
     elif "Ensure all obtainable" in world.options.randomize_wild_pokemon:
         return [species for species in by_name], set()
     else:  # Just "Randomize"
-        return [
-            "Tornadus",
-            "Thundurus",
+        always_required = [
             "Celebi",
             "Raikou",
             "Entei",
             "Suicune",
-        ], set()
+        ]
+
+        unova = [name for name in unova_species]
+        world.random.shuffle(unova)
+        for spec in unova:
+            if "Fighting" in (unova_species[spec].type_1, unova_species[spec].type_2):
+                always_required.append(spec)
+                unova.remove(spec)
+                break
+        always_required += unova[:114]
+
+        unova_guaranteed = [
+            "Tornadus",
+            "Thundurus",
+            "Deerling (Spring)",
+            "Deerling (Summer)",
+            "Deerling (Autumn)",
+            "Deerling (Winter)",
+        ]
+        for species in unova_guaranteed:
+            if species not in always_required:
+                always_required.append(species)
+
+        if isinstance(world.options.dexsanity.value, list):
+            for dex_num in world.options.dexsanity.value:
+                spec = by_id[(dex_num, 0)]
+                if spec not in always_required:
+                    always_required.append(spec)
+
+        return always_required, set()
 
 
 def check_species(world: "PokemonBWWorld", checklist: tuple[list[str], set[str]], species: str, loop=0) -> None:

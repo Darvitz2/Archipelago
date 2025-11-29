@@ -28,6 +28,7 @@ def create(world: "PokemonBWWorld") -> dict[str, "SpeciesData"]:
                 species_name: str = species_by_id[species_id]
                 item: PokemonBWItem = PokemonBWItem(species_name, ItemClassification.progression, None, world.player)
                 l.place_locked_item(item)
+                l.show_in_spoiler = False
                 if type(data) is StaticEncounterEntry:
                     if data.access_rule is not None:
                         l.access_rule = world.rules_dict[data.access_rule]

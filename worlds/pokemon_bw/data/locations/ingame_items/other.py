@@ -79,7 +79,7 @@ table: dict[str, FlagLocationData] = {
     "Castelia City - Item from manager in Café Sonata": FlagLocationData(164, always_default, "Castelia City", None, None),
     "Castelia City - Item from Iris in Plasma hideout": FlagLocationData(0x199, always_default, "Castelia City", None, None),
     "Castelia City - Item from dancers": FlagLocationData(0x196, always_default, "Castelia City", None, None),
-    "Castelia City - Item from scientist in building in northern street": FlagLocationData(328, always_default, "Castelia City", None, has_25_species),
+    "Castelia City - Item from scientist in northern street for seeing 20 species": FlagLocationData(328, always_default, "Castelia City", None, has_25_species),
     # The rom editor cannot decompile the script for the Passerby Analytics HQ properly
     # "Passerby Analytics HQ - Item for answering all questionnaires": FlagLocationData(0000000, always_default, "Castelia City", None, None),
     # I think this one requires connecting with other save files too
@@ -148,7 +148,6 @@ table: dict[str, FlagLocationData] = {
     "Cold Storage - Item from worker": FlagLocationData(316, always_default, "Cold Storage", None, None),
     "Route 6 - Item from ranger Shanti": FlagLocationData(1420+186, always_default, "Route 6", None, None),
     "Route 6 - Item from ranger Richard": FlagLocationData(1420+182, always_default, "Route 6", None, None),
-    "Route 6 - Item from scientist for all Deerling forms": FlagLocationData(350, season_dependant, "Route 6", None, can_catch_all_deerlings),
     "Route 6 - Item from child in western house": FlagLocationData(261, always_default, "Route 6", None, None),
     "Chargestone Cave - Item from Professor Juniper": FlagLocationData(0x1A3, always_default, "Chargestone Cave", None, None),
     "Chargestone Cave - Item from nugget brothers #1": FlagLocationData(169, always_default, "Chargestone Cave", None, None),
@@ -158,8 +157,8 @@ table: dict[str, FlagLocationData] = {
     "Route 7 - Item from ranger Mary": FlagLocationData(1420+187, always_default, "Route 7", None, None),
     "Route 7 - Item from ranger Pedro": FlagLocationData(1420+183, always_default, "Route 7", None, None),
     "Twist Mountain - Item from worker near ice rock cave": FlagLocationData(0x1BF, always_default, "Twist Mountain", None, can_beat_ghetsis),
-    "Icirrus City - Item from Aha if answer was correct": FlagLocationData(0x1A6, always_default, "Icirrus City", None, None),
-    "Icirrus City - Item from Aha if answer was incorrect": FlagLocationData(0x1A7, always_default, "Icirrus City", None, None),
+    "Icirrus City - Item from Aha if answer was correct": FlagLocationData(0x1A7, always_default, "Icirrus City", None, None),
+    "Icirrus City - Item from Aha if answer was incorrect": FlagLocationData(0x1A6, always_default, "Icirrus City", None, None),
     "Icirrus City - Item from Pokémon Fan Club chairman for gaining 25 levels": FlagLocationData(251, always_default, "Icirrus City", None, None),
     "Icirrus City - Item from Pokémon Fan Club chairman for gaining 50 levels": FlagLocationData(252, always_default, "Icirrus City", None, None),
     # This is not only unreasonable, but also has an astronomically low softlock chance if we don't document breeding data and consider it during generation
@@ -167,7 +166,7 @@ table: dict[str, FlagLocationData] = {
     "Icirrus City - Item from the former Team Rocket member's wife (Winter)": FlagLocationData(134, season_dependant, "Icirrus City", None, can_set_winter),
     "Icirrus Gym - Gym guide item": FlagLocationData(124, always_default, "Icirrus City", None, None),
     "Dragonspiral Tower - Item from Cedric Juniper": FlagLocationData(310, always_default, "Dragonspiral Tower", None, None),
-    "Route 8 - Item from Bianca": FlagLocationData(0x1A8, always_default, "Route 8", None, can_go_deeper_into_relic_castle),
+    "Route 8 - Item from Bianca": FlagLocationData(0x1A8, always_default, "Route 8", None, None),
     "Route 8 - Item from ranger Lewis": FlagLocationData(1420+184, always_default, "Route 8", None, None),
     "Route 8 - Item from ranger Annie": FlagLocationData(1420+188, always_default, "Route 8", None, None),
     "Route 8 - Item from eastern parasol lady": FlagLocationData(0x1C2, always_default, "Route 8", None, None),
@@ -210,7 +209,11 @@ table: dict[str, FlagLocationData] = {
     # "Opelucid City - Item from NPC for showing a pokémon knowing Charge from opposite version": FlagLocationData(0000000, always_default, "Opelucid City", None, None),
     "Opelucid City - Item from Professor Juniper": FlagLocationData(0x1B1, always_default, "Opelucid City", None, None),
     "Route 10 - Item from veteran near northern bridge": FlagLocationData(263, always_default, "Route 10", None, None),
-    "Route 10 - Item from Bianka #1": FlagLocationData(0x1B2, always_default, "Route 10", None, None),
-    "Route 10 - Item from Bianka #2": FlagLocationData(0x1B2, always_default, "Route 10", None, None),
+    "Route 10 - Item from Bianca #1": FlagLocationData(0x1B2, always_default, "Route 10", None, None),
+    "Route 10 - Item from Bianca #2": FlagLocationData(0x1B2, always_default, "Route 10", None, None),
     "N's Castle - Item from grunt in 3F left room": FlagLocationData(362, always_default, "N's Castle", None, None),
+}
+
+seasonal: dict[str, FlagLocationData] = {
+    "Route 6 - Item from scientist for all Deerling forms": FlagLocationData(350, deerling_dependant, "Route 6", None, can_catch_all_deerlings),
 }

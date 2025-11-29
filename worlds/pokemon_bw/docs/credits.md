@@ -1,25 +1,32 @@
-### Contributors
+## Contributors
 
-BlastSlimey
+### Main development
 
-SparkyDaDoggo / Eevee658
+- BlastSlimey
+- SparkyDaDoggo / Eevee658
 
-palex00
+### Universal Tracker integration
 
-Various users in the #future-game-design thread
+- palex00
+- RadisNoir
+- darkfire
+- Darvitz
 
-### Resources
+### Other contributions
 
-Bulbapedia (various contributors)
+- Darvitz
+- Seatori
 
-Action Replay cheat codes (various contributors)
+### Testing and bug reporting
 
-Various other APWorlds as references
+- Various users in the #future-game-design thread and custom games channel
 
-CTRMap & CTRMapV (HelloOO7)
+## Resources
 
-DS Modding Community & Kingdom of DS Hacking
-
-FrostsGen5Editor (FrostFalcon)
-
-ndspy (RoadrunnerWMC)
+- Bulbapedia (various contributors)
+- Action Replay cheat codes (various contributors)
+- Various other APWorlds as references
+- CTRMap & CTRMapV (HelloOO7)
+- DS Modding Community & Kingdom of DS Hacking
+- FrostsGen5Editor (FrostFalcon)
+- ndspy (RoadrunnerWMC)

@@ -29,9 +29,9 @@ connections: dict[str, ERCData] = {
     "Icirrus City (Winter) - Surfing (Rippling Water)": ERCData("Icirrus City", "IcCity (Winter) - SR", (has_trio_badge, can_use_surf, encounter_can_set_winter), changeable_seasons),
     "Icirrus City (Winter) - Fishing":                  ERCData("Icirrus City", "IcCity (Winter) - F", (can_fish, encounter_can_set_winter), changeable_seasons),
     "Icirrus City (Winter) - Fishing (Rippling Water)": ERCData("Icirrus City", "IcCity (Winter) - FR", (has_trio_badge, can_fish, encounter_can_set_winter), changeable_seasons),
-    "Dreamyard (Ruins) - Grass":          ERCData("Dreamyard North", "Dyard (R) - G", None, None),
+    "Dreamyard (Ruins) - Grass":          ERCData("Dreamyard Grass North", "Dyard (R) - G", None, None),
     "Dreamyard (Ruins) - Dark Grass":     ERCData("Dreamyard South", "Dyard (R) - DG", None, None),
-    "Dreamyard (Ruins) - Rustling Grass": ERCData("Dreamyard North", "Dyard (R) - RG", has_trio_badge, None),
+    "Dreamyard (Ruins) - Rustling Grass": ERCData("Dreamyard Grass North", "Dyard (R) - RG", has_trio_badge, None),
     "Dreamyard (Basement) - Dark Grass":  ERCData("Dreamyard Basement", "Dyard (B) - DG", None, None),
     "Pinwheel Forest (Outer) - Grass":          ERCData("Pinwheel Forest Outside", "PiForest (O) - G", None, None),
     "Pinwheel Forest (Outer) - Dark Grass":     ERCData("Pinwheel Forest Outside", "PiForest (O) - DG", None, None),
@@ -266,12 +266,12 @@ connections: dict[str, ERCData] = {
     "Wellspring Cave (1F) - Surfing (Rippling Water)": ERCData("Wellspring Cave Inner", "WeCave (1F) - SR", (has_trio_badge, can_use_surf), None),
     "Wellspring Cave (1F) - Fishing":                  ERCData("Wellspring Cave Entrance", "WeCave (1F) - F", can_fish, None),
     "Wellspring Cave (1F) - Fishing (Rippling Water)": ERCData("Wellspring Cave Entrance", "WeCave (1F) - FR", (has_trio_badge, can_fish), None),
-    "Wellspring Cave (B1F) - Grass":          ERCData("Wellspring Cave Inner", "WeCave (B1F) - G", None, None),
-    "Wellspring Cave (B1F) - Rustling Grass": ERCData("Wellspring Cave Inner", "WeCave (B1F) - RG", has_trio_badge, None),
-    "Wellspring Cave (B1F) - Surfing":                  ERCData("Wellspring Cave Inner", "WeCave (B1F) - S", can_use_surf, None),
-    "Wellspring Cave (B1F) - Surfing (Rippling Water)": ERCData("Wellspring Cave Inner", "WeCave (B1F) - SR", (has_trio_badge, can_use_surf), None),
-    "Wellspring Cave (B1F) - Fishing":                  ERCData("Wellspring Cave Inner", "WeCave (B1F) - F", can_fish, None),
-    "Wellspring Cave (B1F) - Fishing (Rippling Water)": ERCData("Wellspring Cave Inner", "WeCave (B1F) - FR", (has_trio_badge, can_fish), None),
+    "Wellspring Cave (B1F) - Grass":          ERCData("Wellspring Cave B1F", "WeCave (B1F) - G", None, None),
+    "Wellspring Cave (B1F) - Rustling Grass": ERCData("Wellspring Cave B1F", "WeCave (B1F) - RG", has_trio_badge, None),
+    "Wellspring Cave (B1F) - Surfing":                  ERCData("Wellspring Cave B1F", "WeCave (B1F) - S", can_use_surf, None),
+    "Wellspring Cave (B1F) - Surfing (Rippling Water)": ERCData("Wellspring Cave B1F", "WeCave (B1F) - SR", (has_trio_badge, can_use_surf), None),
+    "Wellspring Cave (B1F) - Fishing":                  ERCData("Wellspring Cave B1F", "WeCave (B1F) - F", can_fish, None),
+    "Wellspring Cave (B1F) - Fishing (Rippling Water)": ERCData("Wellspring Cave B1F", "WeCave (B1F) - FR", (has_trio_badge, can_fish), None),
     "Route 4 - Grass":                    ERCData("Route 4 South", "r4 - G", None, None),
     "Route 4 - Surfing":                  ERCData("Route 4 South", "r4 - S", can_use_surf, None),
     "Route 4 - Surfing (Rippling Water)": ERCData("Route 4 South", "r4 - SR", (has_trio_badge, can_use_surf), None),
@@ -446,4 +446,9 @@ connections: dict[str, ERCData] = {
     "Route 17 - Surfing (Rippling Water)": ERCData("Route 17 South", "r17 - SR", (has_trio_badge, can_use_surf), None),
     "Route 17 - Fishing":                  ERCData("Route 17 South", "r17 - F", can_fish, None),
     "Route 17 - Fishing (Rippling Water)": ERCData("Route 17 South", "r17 - FR", (has_trio_badge, can_fish), None),
+}
+
+
+connection_by_region: dict[str, str] = {
+    reg.entering_region: con for con, reg in connections.items()
 }

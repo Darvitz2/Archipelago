@@ -29,6 +29,7 @@ def create(world: "PokemonBWWorld") -> dict[str, "SpeciesData"]:
             l: PokemonBWLocation = PokemonBWLocation(world.player, name, None, r)
             item: PokemonBWItem = PokemonBWItem(species_name, ItemClassification.progression, None, world.player)
             l.place_locked_item(item)
+            l.show_in_spoiler = False
             r.locations.append(l)
 
             species_data: "SpeciesData" = species_by_name[species_name]

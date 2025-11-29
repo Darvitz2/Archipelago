@@ -1,3 +1,4 @@
+
 import logging
 import typing
 from copy import deepcopy
@@ -6,10 +7,76 @@ from dataclasses import dataclass
 import settings
 from BaseClasses import PlandoOptions
 from Options import (Choice, PerGameCommonOptions, OptionSet, Range, Toggle,
-                     PlandoTexts, OptionError, OptionDict, Option)
+                     PlandoTexts, OptionError, Option, OptionCounter, OptionDict, StartInventoryPool)
 
 if typing.TYPE_CHECKING:
     from worlds.AutoWorld import World
+
+
+# Order of Option classes being rendered on the WebHost
+# toggle
+# textchoice
+# choice
+# namedrange
+# range
+# freetext
+# optioncounter if valid keys or verify item name or verify location name
+# optionlist if valid keys
+# locationset if verify location names
+# itemset if verify item names
+# optionset if valid keys
+
+
+class CasefoldOptionSet(OptionSet):
+    valid_keys_casefold = True
+
+    def __init__(self, value: typing.Iterable[str]):
+        self.value = set(val.casefold() for val in value)
+        super(OptionSet, self).__init__()  # To make it not call super.__init__? Not sure
+
+    def __contains__(self, item: str):
+        return item.casefold() in self.value
+
+    def verify_keys(self) -> None:
+        if self.valid_keys:
+            dataset = set(word.casefold() for word in self.value)
+            extra = dataset - set(key.casefold() for key in self._valid_keys)
+            if extra:
+                raise OptionError(
+                    f"Found unexpected key {', '.join(extra)} in {getattr(self, 'display_name', self)}. "
+                    f"Allowed keys: {self._valid_keys}."
+                )
+
+
+class ExtendedOptionCounter(OptionCounter):
+    individual_min_max: dict[str, tuple[int, int]] = {}
+
+    @classmethod
+    def from_any(cls, data: typing.Dict[str, typing.Any]):
+        if not isinstance(data, dict):
+            raise NotImplementedError(f"Cannot Convert from non-dictionary, got {type(data)}")
+        for key in cls.valid_keys:
+            if key not in data:
+                if key in cls.default:
+                    data[key] = cls.default[key]
+                else:
+                    data[key] = 0
+        return cls(data)
+
+    def verify(self, world: type["World"], player_name: str, plando_options: PlandoOptions) -> None:
+        super().verify(world, player_name, plando_options)
+
+        errors = []
+
+        for key in self.value:
+            if key in self.individual_min_max:
+                _min, _max = self.individual_min_max[key]
+                if not _min <= self.value[key] <= _max:
+                    errors.append(f"{key}: {self.value[key]} not in range {_min} to {_max}")
+
+        if len(errors) != 0:
+            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
+            raise OptionError("\n".join(errors))
 
 
 class GameVersion(Choice):
@@ -30,14 +97,14 @@ class Goal(Choice):
     - **Champion** - Become the champion by defeating Alder
     - **Cynthia** - Defeat Cynthia in Undella Town
     - **Cobalion** - Reach and defeat/catch Cobalion in Mistralton Cave
-    - **Regional pokedex** - Complete the Unova pokedex (requires wild Pokemon being randomized)
-    - **National pokedex** - Complete the national pokedex (requires wild Pokemon being randomized)
-    - **Custom pokedex** - Complete all dexsanity locations (requires wild Pokemon being randomized and dexsanity being set to at least 100)
     - **TM/HM hunt** - Get all TMs and HMs
     - **Seven Sages hunt** - Find the Seven Sages
     - **Legendary hunt** - Find and defeat/catch all (stationary available) legendary encounters, including Volcarona
     - **Pokemon master** - Complete the requirements of all other goals combined
     """
+    # - **Regional pokedex** - Complete the Unova pokedex (requires wild Pokemon being randomized)
+    # - **National pokedex** - Complete the national pokedex (requires wild Pokemon being randomized)
+    # - **Custom pokedex** - Complete all dexsanity locations (requires wild Pokemon being randomized and dexsanity being set to at least 100)
     display_name = "Goal"
     option_ghetsis = 0
     option_champion = 1
@@ -53,18 +120,23 @@ class Goal(Choice):
     default = 0
 
 
-class RandomizeWildPokemon(OptionSet):
+class RandomizeWildPokemon(CasefoldOptionSet):
     """
     Randomizes wild pokemon encounters.
-    - **Randomize** - Toggles wild pokemon being randomized. Required for any other modifier below.
+
+    - **Randomize** - Toggles wild pokemon being randomized. Automatically added if any other modifier is added.
     - **Ensure all obtainable** - Ensures that every pokemon species is obtainable by either catching or evolving. This is automatically checked if **National pokedex** is chosen as the goal.
     - **Similar base stats** - Tries to keep every randomized pokemon at a similar base stat total as the replaced encounter.
     - **Type themed areas** - Tries to make every pokemon in an area have a certain same type.
     - **Area 1-to-1** - Keeps the amount of different encounters and their encounter rate in every area.
     - **Merge phenomenons** - Makes rustling grass, rippling water spots, dust clouds, and flying shadows in the same area have only one encounter. Takes priority over **Area 1-to-1**.
     - **Prevent rare encounters** - Randomizes the encounter slots with the lowest chance in each area to the same pokemon. Takes priority over **Area 1-to-1**.
+
+    It is **highly recommended** to include **Prevent rare encounters** if you want to randomize wild pokemon,
+    else you might find yourself searching for two 1% encounters on every route.
     """
     display_name = "Randomize Wild Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Ensure all obtainable",
@@ -76,22 +148,32 @@ class RandomizeWildPokemon(OptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+        return option
 
-class RandomizeTrainerPokemon(OptionSet):
+
+class RandomizeTrainerPokemon(CasefoldOptionSet):
     """
     Randomizes trainer pokemon.
-    - **Randomize** - Toggles trainer pokemon being randomized. Required for any modifier below.
+    - **Randomize** - Toggles trainer pokemon being randomized. Automatically added if any other modifier is added.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
     """
-    # - **Type themed areas** - All pokemon of a trainer have to share at least one randomly chosen type.
+    # - **Type themed** - All pokemon of a trainer have to share at least one randomly chosen type.
     #                           Gym leaders will always have themed teams, regardless of this modifier.
     # - **Themed gym trainers** - All pokemon of gym trainers will share the type assigned to the gym leader.
     display_name = "Randomize Trainer Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Similar base stats",
-        # "Type themed areas",
+        # "Type themed",
         # "Themed gym trainers",
+
+        # Not sure whether I really want to implement these:
         # "Randomize abilities",
         # "Randomize natures",
         # "Randomize held items",
@@ -99,19 +181,32 @@ class RandomizeTrainerPokemon(OptionSet):
         # "Allow no held item",
         # "Randomize unique moves",
     ]
+    require_randomize = {
+        "Similar base stats",
+        # "Type themed",
+        # "Themed gym trainers",
+    }
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value.intersection(cls.require_randomize)) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+        return option
 
-class RandomizeStarterPokemon(OptionSet):
+
+class RandomizeStarterPokemon(CasefoldOptionSet):
     """
     Randomizes the starter pokemon you receive at the start of the game.
-    - **Randomize** - Toggles starter pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles starter pokemon being randomized. Automatically added if any other modifier is added.
     - **Any base** - Only use unevolved/baby pokemon.
     - **Base with 2 evolutions** - Only use unevolved/baby pokemon that can evolve twice. Overrides **Any base**.
     - **Only official starters** - Only use pokemon that have been a starter in any mainline game. Overrides **Any base** and **Base with 2 evolutions**.
     - **Type variety** - Every starter will have types that are different from the other two.
     """
     display_name = "Randomize Starter Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Any base",
@@ -121,16 +216,24 @@ class RandomizeStarterPokemon(OptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+        return option
 
-class RandomizeStaticPokemon(OptionSet):
+
+class RandomizeStaticPokemon(CasefoldOptionSet):
     """
     Randomizes static encounters you can battle and catch throughout the game, e.g. Volcarona in Relic Castle.
-    - **Randomize** - Toggles static pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles static pokemon being randomized. Automatically added if any other modifier is added.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
     - **Only base** - Only use unevolved Pokemon.
     - **No legendaries** - Exclude legendaries from being placed into static encounters.
     """
     display_name = "Randomize Static Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Similar base stats",
@@ -139,15 +242,23 @@ class RandomizeStaticPokemon(OptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+        return option
 
-class RandomizeGiftPokemon(OptionSet):
+
+class RandomizeGiftPokemon(CasefoldOptionSet):
     """
     Randomizes gift pokemon that you receive for free, e.g. the Larvesta egg on route 18.
-    - **Randomize** - Toggles gift pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles gift pokemon being randomized. Automatically added if any other modifier is added.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
     - **No legendaries** - Exclude legendaries from being placed into gift encounters.
     """
     display_name = "Randomize Gift Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Similar base stats",
@@ -155,47 +266,79 @@ class RandomizeGiftPokemon(OptionSet):
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+        return option
 
-class RandomizeTradePokemon(OptionSet):
+
+class RandomizeTradePokemon(CasefoldOptionSet):
     """
-    Randomizes trade offers from NPCs. Any **Randomize ...** is required for the other modifiers.
+    Randomizes trade offers from NPCs. Both **Randomize...** are automatically added if none of them but any other
+    modifier is added.
     - **Randomize offer** - Toggles offered pokemon being randomized.
     - **Randomize request** - Toggles requested pokemon being randomized.
-    - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one.
+    - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced ones.
+    - **Coupled base stats** - Tries to make offered and requested pokemon have similar base stats
     - **No legendaries** - Exclude legendaries from being placed into trades.
     """
     display_name = "Randomize Trade Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize offer",
         "Randomize request",
         "Similar base stats",
+        "Coupled base stats",
         "No legendaries",
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize offer" not in option.value and "Randomize request" not in option.value:
+            option.value.add("randomize offer")
+            option.value.add("randomize request")
+        return option
 
-class RandomizeLegendaryPokemon(OptionSet):
+
+class RandomizeLegendaryPokemon(CasefoldOptionSet):
     """
     Randomizes legendary and mythical encounters.
-    - **Randomize** - Toggles legendary pokemon being randomized. Required for any other modifier.
+    - **Randomize** - Toggles legendary pokemon being randomized. Automatically added if any other modifier is added.
     - **Keep legendary** - Randomized pokemon will all still be legendaries or mythicals.
+    - **No legendaries** - Exclude legendaries from being placed into these encounters.
     - **Similar base stats** - Tries to keep the randomized pokemon at a similar base stat total as the replaced one. Overrides **Keep legendary**.
     - **Same type** - Tries to keep at least one type of every encounter.
+
+    Including **Keep legendary** AND **No legendaries** will instead only put pseudo legendaries into these encounters.
     """
     display_name = "Randomize Legendary Pokemon"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep legendary",
+        "No legendaries",
+        "Similar base stats",
         "Same type",
     ]
     default = []
 
+    @classmethod
+    def from_any(cls, data: typing.Any):
+        option = super().from_any(data)
+        if len(option.value) > 0 and "Randomize" not in option.value:
+            option.value.add("randomize")
+        return option
 
-class PokemonRandomizationAdjustments(OptionDict):
+
+class PokemonRandomizationAdjustments(ExtendedOptionCounter):
     """
     Adjust various parameters in various pokemon randomization options (more modifiers are planned).
     Any minimum parameter cannot be higher than its corresponding maximum parameter.
-    - **Stats leniency** - The minimum difference between base stat totals of vanilla and randomized species (for option with **Similar base stats** activated). Allowed values are integers in range 0 to 1530.
+    - **Stats leniency** - The minimum difference between base stat totals of vanilla and randomized species (for options with **Similar base stats** activated). Allowed values are integers in range 0 to 1530.
     """
     display_name = "Pokemon Randomization Adjustments"
     valid_keys = [
@@ -204,18 +347,9 @@ class PokemonRandomizationAdjustments(OptionDict):
     default = {
         "Stats leniency": 10,
     }
-
-    def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
-        super().verify(world, player_name, plando_options)
-
-        errors = []
-
-        if not 0 <= self.value["Stats leniency"] <= 1530:
-            errors.append(f"Stats leniency: {self.value['Stats leniency']} not in range 0 to 1530")
-
-        if len(errors) != 0:
-            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
-            raise OptionError("\n".join(errors))
+    individual_min_max = {
+        "Stats leniency": (0, 1530),
+    }
 
 
 class PlandoEncounter(typing.NamedTuple):
@@ -250,7 +384,7 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
 
     @classmethod
     def from_any(cls, data: typing.Any) -> typing.Self:
-        if not isinstance(data, typing.Iterable):
+        if not isinstance(data, typing.Iterable) or isinstance(data, str):
             raise OptionError(f"Expected iterable for Encounter Plando, got {type(data)}")
         plandos: list[PlandoEncounter] = []
         for plando in data:
@@ -259,17 +393,28 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
                 continue
             if not isinstance(plando, typing.Mapping):
                 raise OptionError(f"Expected Encounter Plando entries to be Mappings, got {type(plando)}")
-            if "map" not in plando:
+            plando: typing.Mapping
+            plando_casefold = {}
+            for key in plando:
+                casefold = str(key).casefold()
+                if casefold not in ("map", "seasons", "season", "method", "slots", "slot", "species"):
+                    raise OptionError(f"Unknown argument in Encounter Plando Entry: {str(key)}")
+                if casefold in ("season", "slot"):
+                    casefold += "s"
+                if casefold in plando_casefold:
+                    raise OptionError(f"Duplicate argument with different casing in Encounter Plando Entry: {str(key)}")
+                plando_casefold[casefold] = plando[key]
+            if "map" not in plando_casefold:
                 raise OptionError("Encounter Plando entry is missing the map argument")
-            if "method" not in plando:
+            if "method" not in plando_casefold:
                 raise OptionError("Encounter Plando entry is missing the method argument")
-            if "species" not in plando:
+            if "species" not in plando_casefold:
                 raise OptionError("Encounter Plando entry is missing the species argument")
-            map_ = plando["map"]
-            seasons = plando.get("seasons", [])
-            method = plando["method"]
-            slots = plando.get("slots", [])
-            species = plando["species"]
+            map_ = plando_casefold["map"]
+            seasons = plando_casefold.get("seasons", [])
+            method = plando_casefold["method"]
+            slots = plando_casefold.get("slots", [])
+            species = plando_casefold["species"]
             # IMPORTANT strings are also Iterables
             if not isinstance(map_, str):
                 raise OptionError(f"Expected map argument to be a string, got {type(map_)}")
@@ -324,23 +469,23 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
             if plando.map not in encounter_maps.maps:
                 reasons.append(f"Unknown map {plando.map}")
             for season in plando.seasons:
-                if season not in ("Spring", "Summer", "Autumn", "Winter"):
+                if season.casefold() not in ("spring", "summer", "autumn", "winter"):
                     reasons.append(f"Unknown season {season}")
                 if plando.map not in encounter_maps.multiple_seasons:
                     reasons.append(f"Map {plando.map} does not have multiple seasons")
-            if plando.method not in (
-                "Grass", "Dark grass", "Rustling grass", "Surfing", "Surfing rippling", "Fishing", "Fishing rippling"
+            if plando.method.casefold() not in (
+                "grass", "dark grass", "rustling grass", "surfing", "surfing rippling", "fishing", "fishing rippling"
             ):
                 reasons.append(f"Unknown method {plando.method}")
             for slot in plando.slots:
                 if slot >= 12 or slot < 0:
                     reasons.append(f"Slot {slot} out of bounds (0-11)")
-                elif slot >= 5 and plando.method not in ("Grass", "Dark grass", "Rustling grass"):
+                elif slot >= 5 and plando.method.casefold() not in ("grass", "dark grass", "rustling grass"):
                     reasons.append(f"Slot {slot} out of bounds for method {plando.method} (0-5)")
             if len(plando.species) == 0:
                 reasons.append("No species provided")
             for species in plando.species:
-                if species not in by_name:
+                if species.casefold() != "none" and species not in by_name:
                     reasons.append(f"Unknown species {species}")
             if reasons:
                 invalid.append(f"{plando.map}: " + ", ".join(reasons))
@@ -350,6 +495,18 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
                 "\n".join(invalid) +
                 "\nRefer to the Text Plando guide of this game for further information."
             )
+
+    def to_slot_data(self) -> list[dict[str, str | list[str] | list[int]]]:
+        return [
+            {
+                "map": plando.map,
+                "seasons": plando.seasons,
+                "method": plando.method,
+                "slots": plando.slots,
+                "species": plando.species,
+            }
+            for plando in self
+        ]
 
     @classmethod
     def get_option_name(cls, value: list[PlandoEncounter]) -> str:
@@ -368,7 +525,7 @@ class EncounterPlando(Option[list[PlandoEncounter]]):
         return len(self.value)
 
 
-class RandomizeBaseStats(OptionSet):
+class RandomizeBaseStats(CasefoldOptionSet):
     """
     Randomizes the base stats of every pokemon species.
     - **Randomize** - Toggles base stats being randomized. Required for any other modifier.
@@ -376,6 +533,7 @@ class RandomizeBaseStats(OptionSet):
     - **Follow evolutions** - Evolved species will use their pre-evolution's base stats and add on top of that.
     """
     display_name = "Randomize Base Stats"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep total",
@@ -384,7 +542,7 @@ class RandomizeBaseStats(OptionSet):
     default = []
 
 
-class RandomizeEvolutions(OptionSet):
+class RandomizeEvolutions(CasefoldOptionSet):
     """
     Randomizes the evolutions of every pokemon species.
     - **Randomize** - Toggles evolutions being randomized. Required for any other modifier.
@@ -394,6 +552,7 @@ class RandomizeEvolutions(OptionSet):
     - **Allow more or less branches** - Allows all species to be able to evolve into more or less species than before.
     """
     display_name = "Randomize Evolutions"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep method",
@@ -404,7 +563,7 @@ class RandomizeEvolutions(OptionSet):
     default = []
 
 
-class RandomizeCatchRates(OptionSet):
+class RandomizeCatchRates(CasefoldOptionSet):
     """
     Randomizes the catch rate of every pokemon species.
     - **Shuffle** - Gives every species a commonly used catch rate (e.g. 255, 45, 3, ...).
@@ -412,6 +571,7 @@ class RandomizeCatchRates(OptionSet):
     - **Follow evolutions** - Evolved species will have a catch rate equal to or lower than their pre-evolution(s).
     """
     display_name = "Randomize Catch Rates"
+    valid_keys_casefold = True
     valid_keys = [
         "Shuffle",
         "Randomize",
@@ -420,7 +580,7 @@ class RandomizeCatchRates(OptionSet):
     default = []
 
 
-class RandomizeLevelUpMovesets(OptionSet):
+class RandomizeLevelUpMovesets(CasefoldOptionSet):
     """
     Randomizes the moves a pokemon species learns by leveling up.
     - **Randomize** - Toggles level up movesets being randomized. Required for any other modifier.
@@ -431,6 +591,7 @@ class RandomizeLevelUpMovesets(OptionSet):
     - **Follow evolutions** - Evolved species will have at least 50% of the level up moveset(s) of their pre-evolution(s). Overrides all **Keep ...** modifiers.
     """
     display_name = "Randomize Level Up Movesets"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Keep types",
@@ -442,7 +603,7 @@ class RandomizeLevelUpMovesets(OptionSet):
     default = []
 
 
-class RandomizeTypes(OptionSet):
+class RandomizeTypes(CasefoldOptionSet):
     """
     Randomizes the type(s) of every pokemon species.
     - **Randomize** - Toggles types being randomized. Required for any other modifier.
@@ -451,6 +612,7 @@ class RandomizeTypes(OptionSet):
     - **Follow evolutions** - Evolved species will share at least one type with (one of) their pre-evolutions.
     """
     display_name = "Randomize Types"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "Only secondary type",
@@ -460,7 +622,7 @@ class RandomizeTypes(OptionSet):
     default = []
 
 
-class RandomizeAbilities(OptionSet):
+class RandomizeAbilities(CasefoldOptionSet):
     """
     Randomizes the abilities of every pokemon species.
     - **Randomize** - Toggles abilities being randomized. Required for any other modifier.
@@ -469,6 +631,7 @@ class RandomizeAbilities(OptionSet):
     - **Include hidden abilities** - Includes hidden abilities being randomized. Note that only a few select pokemon that originate from these games can have their hidden ability.
     """
     display_name = "Randomize Abilities"
+    valid_keys_casefold = True
     valid_keys = [
         "Randomize",
         "One per pokemon",
@@ -478,7 +641,7 @@ class RandomizeAbilities(OptionSet):
     default = []
 
 
-class RandomizeGenderRatio(OptionSet):
+class RandomizeGenderRatio(CasefoldOptionSet):
     """
     Randomizes the gender ratio of every pokemon species.
     - **Shuffle** - Gives every species a commonly used gender ratio (e.g. 50/50, 1 in 8, ...).
@@ -486,6 +649,7 @@ class RandomizeGenderRatio(OptionSet):
     - **Follow evolutions** - Evolved species will have the same gender ratio as (one of) their pre-evolution(s).
     """
     display_name = "Randomize Gender Ratio"
+    valid_keys_casefold = True
     valid_keys = [
         "Shuffle",
         "Randomize",
@@ -494,7 +658,7 @@ class RandomizeGenderRatio(OptionSet):
     default = []
 
 
-class RandomizeTMHMCompatibility(OptionSet):
+class RandomizeTMHMCompatibility(CasefoldOptionSet):
     """
     Randomizes the TM and HM compatibility of every pokemon species.
     - **Force all TMs** - Forces all TMs to be compatible with every pokemon species.
@@ -505,6 +669,7 @@ class RandomizeTMHMCompatibility(OptionSet):
     - **Follow evolutions** - Evolved species will have at least 50% of the learnable TMs and HMs of their pre-evolution(s). Overrides all **Keep ...** modifiers.
     """
     display_name = "Randomize TM/HM Compatibility"
+    valid_keys_casefold = True
     valid_keys = [
         "Force all TMs",
         "Force all HMs",
@@ -516,7 +681,7 @@ class RandomizeTMHMCompatibility(OptionSet):
     default = []
 
 
-class StatsRandomizationAdjustments(OptionDict):
+class StatsRandomizationAdjustments(ExtendedOptionCounter):
     """
     Adjust various parameters in various randomization options (more modifiers are planned).
     Any minimum parameter cannot be higher than its corresponding maximum parameter.
@@ -555,27 +720,20 @@ class StatsRandomizationAdjustments(OptionDict):
         # "Gender ratio minimum": 0,
         # "Gender ratio maximum": 255,
     }
-
-    def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
-        super().verify(world, player_name, plando_options)
-
-        errors = []
-
-        if not 6 <= self.value["Stats total minimum"] <= 1530:
-            errors.append(f"Stats total minimum: {self.value['Stats total minimum']} not in range 0 to 1530")
-        if not 6 <= self.value["Stats total maximum"] <= 1530:
-            errors.append(f"Stats total maximum: {self.value['Stats total maximum']} not in range 0 to 1530")
-
-        # Need to add other parameters when implemented
-
-        if len(errors) != 0:
-            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
-            raise OptionError("\n".join(errors))
+    individual_min_max = {
+        # "Stats total minimum": (6, 1530),
+        # "Stats total maximum": (6, 1530),
+        # "Catch rates minimum": (3, 255),
+        # "Catch rates maximum": (3, 255),
+        # "Gender ratio minimum": (0, 255),
+        # "Gender ratio maximum": (0, 255),
+    }
 
 
 class ShuffleBadgeRewards(Choice):
     """
     Determines how gym badges are randomized and what items gym badge locations can have.
+    This option might not be entirely strict (depending on other options and worlds).
     - **Vanilla** - Gym badges will stay at their vanilla locations.
     - **Shuffle** - Gym badges are shuffled between the gym leaders.
     - **Any badge** - Puts the badges into the item pool, while only allowing items that have the word "badge" in their name (which also applies to gym badges of other games/worlds) being placed at gym leaders.
@@ -592,6 +750,7 @@ class ShuffleBadgeRewards(Choice):
 class ShuffleTMRewards(Choice):
     """
     Determines what items NPCs, who would normally give TMs or HMs, can have.
+    This option might not be entirely strict (depending on other options and worlds).
     - **Shuffle** - These NPCs will always give a TM or HM from the same world.
     - **HM with Badge** - Like "Shuffle", but puts each HM (and TM70 Flash) at a gym leader's badge reward (including the TM from Clay on route 6).
     - **Any TM/HM** - These NPCs will give any item that starts with "TM" or "HM" followed by any digit (which also applies to TMs and HMs of other games/worlds).
@@ -633,11 +792,38 @@ class Dexsanity(Range):
 
     If you want to have all 649 possible checks, then you need to randomize wild
     encounters and add the **Ensure all obtainable** modifier.
+
+    Alternatively, you can input a list of dex numbers in order to plando what Pokemon you want to have locations for.
+    However, without wild Pokemon randomization being enabled, Pokemon that are not obtainable in the vanilla game
+    will be ignored.
     """
     display_name = "Dexsanity"
+    value: int | list[int]
     default = 0
     range_start = 0
     range_end = 649
+
+    def __init__(self, value: typing.Any):
+        if isinstance(value, typing.Iterable):
+            for val in value:
+                if not type(val) is int:
+                    raise Exception(f"Option {self.__class__.__name__} as a list expects integers, found {type(val)}")
+                if val < 1:
+                    raise Exception(f"Option {self.__class__.__name__} contains dex number {val}, "
+                                    f"which is lower than minimum 1")
+                elif val > self.range_end:
+                    raise Exception(f"Option {self.__class__.__name__} contains dex number {val}, "
+                                    f"which is higher than maximum {self.range_end}")
+            self.value = list(set(value))  # Get rid of duplicates
+            self.value.sort()  # Very important to not make it non-deterministic
+        else:
+            super().__init__(value)
+
+    @classmethod
+    def from_any(cls, data: typing.Any) -> Range:
+        if type(data) is int or isinstance(data, typing.Iterable):
+            return cls(data)
+        return cls.from_text(str(data))
 
 
 class Trainersanity(Range):
@@ -665,7 +851,7 @@ class Seensanity(Range):
     range_end = 649
 
 
-class DoorShuffle(OptionSet):
+class DoorShuffle(CasefoldOptionSet):
     """
     Shuffles or randomizes door warps.
     - **Gates** - Shuffles city gate entrances, leading to the region having a different layout than normally.
@@ -676,6 +862,7 @@ class DoorShuffle(OptionSet):
     - **Decoupled** - Removes the requirement for all shuffled door warps leading to each other.
     """
     display_name = "Door Shuffle"
+    valid_keys_casefold = True
     valid_keys = [
         "Gates",
         "Buildings per map",
@@ -701,7 +888,7 @@ class SeasonControl(Choice):
     default = 0
 
 
-class AdjustLevels(OptionSet):
+class AdjustLevels(CasefoldOptionSet):
     """
     Adjusts the levels of wild and trainer pokemon in areas that are in AP earlier accessible than in vanilla
     to not be significantly higher than in surrounding areas (regardless of randomization).
@@ -710,12 +897,217 @@ class AdjustLevels(OptionSet):
     - **Trainer** - Normalizes trainer pokemon levels, excluding Cynthia.
     """
     display_name = "Adjust levels"
+    valid_keys_casefold = True
     valid_keys = [
         "Wild",
         "Trainer",
         # "Static",
     ]
     default = ["Wild", "Trainer"]
+
+
+class ModifyLevels(OptionCounter):
+    """
+    Modifies the level of all trainer and/or wild pokemon. You can choose a certain mode for each type of encounter.
+    This is applied **after Adjust Levels**.
+    The mode decides how to apply the value to every pokemon. You can write either the name of the mode
+    or the corresponding number:
+    - **Multiply** or **0** - Multiply each level with value being seen as a percentage, i.e. 100 means no modifying. Allowed values are in range 1 to 10000.
+    - **Add** or **1** - Add the value directly to each level (with negative values being allowed), i.e. 0 means no modifying. Allowed values are in range -99 to 99.
+    - **Power** or **2** - Raise each level to the power of the value (which is seen as a percentage), i.e. 100 means no modifying. Allowed values are in range 1 to 700.
+
+    An alternative way with more capabilities is to write this as a list with multiple key names (like most plando options).
+    Every entry must include the keys `type`, `mode`, and `value`.
+    All entries are individual calculations that are applied one after another. Be aware of rounding errors.
+    Here is an example of how an entry can look like:
+    ```
+    - type: Either "Trainer" or "Wild"
+      mode: Any mode described above (can as well be either the name or the number)
+      value: The value like described above
+    ```
+    """
+    display_name = "Modify levels"
+    valid_keys = [
+        "Trainer value",
+        "Wild value",
+        "Trainer mode",
+        "Wild mode",
+    ]
+    default = {
+        "Trainer value": 100,
+        "Wild value": 100,
+        "Trainer mode": 0,
+        "Wild mode": 0,
+    }
+    value: dict[str, int] | list[dict[str, int | str]]
+
+    def __init__(self, data: typing.Any):
+        if isinstance(data, dict):
+            super().__init__(data)
+        elif isinstance(data, list):
+            self.value = deepcopy(data)
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(data)}")
+
+    def get_option_name(self, value):
+        if isinstance(value, dict):
+            return super().get_option_name(value)
+        elif isinstance(value, list):
+            return ", ".join(map(str, value))
+
+    @classmethod
+    def from_any(cls, data: typing.Any) -> OptionDict:
+        aliases = {
+            "Multiply": 0,
+            "Add": 1,
+            "Power": 2,
+        }
+        if isinstance(data, dict):
+            data: dict
+            for key in cls.valid_keys:
+                if key not in data:
+                    if key in cls.default:
+                        data[key] = cls.default[key]
+                    else:
+                        data[key] = 0
+            for encounter in ("Trainer", "Wild"):
+                key = encounter + " mode"
+                if data[key] in aliases:
+                    data[key] = aliases[data[key]]
+            return cls(data)
+        elif isinstance(data, list):
+            data: list
+            list_defaults = {
+                "type": "Trainer",
+                "mode": 0,
+                "value": 100,
+            }
+            for entry in data:
+                if not isinstance(entry, dict):
+                    raise NotImplementedError(f"Cannot convert list entry from non-dictionary, got {type(entry)}")
+                entry: dict
+                for key in list_defaults:
+                    if key not in entry:
+                        entry[key] = list_defaults[key]
+                if entry["mode"] in aliases:
+                    entry["mode"] = aliases[entry["mode"]]
+            return cls(data)
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(data)}")
+
+    def verify(self, world: typing.Type["World"], player_name: str, plando_options: PlandoOptions) -> None:
+
+        errors = []
+        mode_min_max: dict[int, tuple[int, int]] = {
+            0: (1, 10000),
+            1: (-99, 99),
+            2: (1, 700),
+        }
+
+        if isinstance(self.value, dict):
+            for encounter in ("Trainer", "Wild"):
+                mode = self.value[f'{encounter} mode']
+                if mode not in mode_min_max:
+                    errors.append(f"Bad {encounter} mode {mode}")
+                _min, _max = mode_min_max[mode]
+                if not _min <= self.value[f"{encounter} value"] <= _max:
+                    errors.append(f"{encounter} value {self.value[f'{encounter} value']} "
+                                  f"out of range {_min} to {_max} for mode {mode}")
+        elif isinstance(self.value, list):
+            for entry in self.value:
+                entry: dict[str, int | str]
+                mode = entry["mode"]
+                if mode not in mode_min_max:
+                    errors.append(f"Bad {entry['type']} mode {mode}")
+                _min, _max = mode_min_max[mode]
+                if not _min <= entry["value"] <= _max:
+                    errors.append(f"{entry['type']} value {entry['value']} "
+                                  f"out of range {_min} to {_max} for mode {mode}")
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
+
+        if len(errors) != 0:
+            errors = [f"For option {getattr(self, 'display_name', self)} of player {player_name}:"] + errors
+            raise OptionError("\n".join(errors))
+
+    @staticmethod
+    def is_modified(mode: int, value: int) -> bool:
+        match mode:
+            case 0:
+                return value != 100
+            case 1:
+                return value != 0
+            case 2:
+                return value != 100
+            case _:
+                raise Exception(f"Bad mode {mode} in Modify Levels option")
+
+    def is_trainer_modified(self) -> bool:
+        if isinstance(self.value, dict):
+            return self.is_modified(self.value["Trainer mode"], self.value["Trainer value"])
+        elif isinstance(self.value, list):
+            for entry in self.value:
+                if entry["type"] == "Trainer" and self.is_modified(entry["mode"], entry["value"]):
+                    return True
+            return False
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
+
+    def is_wild_modified(self) -> bool:
+        if isinstance(self.value, dict):
+            return self.is_modified(self.value["Wild mode"], self.value["Wild value"])
+        elif isinstance(self.value, list):
+            for entry in self.value:
+                if entry["type"] == "Wild" and self.is_modified(entry["mode"], entry["value"]):
+                    return True
+            return False
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(self.value)}")
+
+    def is_any_modified(self) -> bool:
+        return self.is_wild_modified() or self.is_trainer_modified()
+
+    @staticmethod
+    def cap(level: int):
+        return max(min(level, 100), 1)
+
+    @classmethod
+    def modify_trainer(cls, value: dict[str, int] | list[dict[str, int | str]], level) -> int:
+        if isinstance(value, dict):
+            return cls.modify(value["Trainer mode"], value["Trainer value"], level)
+        elif isinstance(value, list):
+            calc = level
+            for entry in value:
+                if entry["type"] == "Trainer":
+                    calc = cls.modify(entry["mode"], entry["value"], calc)
+            return calc
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(value)}")
+
+    @classmethod
+    def modify_wild(cls, value: dict[str, int] | list[dict[str, int | str]], level) -> int:
+        if isinstance(value, dict):
+            return cls.modify(value["Wild mode"], value["Wild value"], level)
+        elif isinstance(value, list):
+            calc = level
+            for entry in value:
+                if entry["type"] == "Wild":
+                    calc = cls.modify(entry["mode"], entry["value"], calc)
+            return calc
+        else:
+            raise NotImplementedError(f"Cannot convert from non-dictionary, got {type(value)}")
+
+    @classmethod
+    def modify(cls, mode: int, value: int, level: int) -> int:
+        match mode:
+            case 0:
+                return cls.cap((level * value) // 100)
+            case 1:
+                return cls.cap(level + value)
+            case 2:
+                return cls.cap(int(level ** (value / 100)))
+            case _:
+                raise Exception(f"Bad mode {mode} in Modify Levels option")
 
 
 class ExpModifier(Range):
@@ -753,7 +1145,7 @@ class AddFairyType(Choice):
     default = 0
 
 
-class ReplaceEvoMethods(OptionSet):
+class ReplaceEvoMethods(CasefoldOptionSet):
     """
     Replaces certain vanilla evolution methods with other methods that are easier to achieve.
     This also excludes them from randomized evolutions.
@@ -765,6 +1157,7 @@ class ReplaceEvoMethods(OptionSet):
     - **Stats** - Replaces Tyrogue's stat based evolutions with level up while holding a protein, iron, or carbos.
     """
     display_name = "Replace Evolution Methods"
+    valid_keys_casefold = True
     valid_keys = [
         "Locations",
         "Friendship",
@@ -774,34 +1167,64 @@ class ReplaceEvoMethods(OptionSet):
     default = []
 
 
-class MasterBallSeller(OptionSet):
+class MasterBallSeller(CasefoldOptionSet):
     """
     Adds the possibility to buy or obtain an unlimited amount of Master Balls.
     You can select multiple sellers.
-    If multiple cost modifiers are added, a random cost in range between them gets selected.
-    Adding any seller, but no cost modifier, will raise an OptionError.
+    If multiple cost modifiers are added, a random cost in range between them (snapped to 500-steps) gets selected.
+    Adding no cost modifier defaults to 3000.
 
-    - **N's Castle** - Repurposes an NPC in N's Castle, who can be found in the same room as the grunt who gives Ultra Balls to the player, who gives/sells Master Balls to the player.
+    - **Ns Castle** - Repurposes an NPC in N's Castle, who can be found in the same room as the grunt giving Ultra Balls to the player, to give/sell Master Balls to the player.
     - **PC** - Adds an option to every PC in Pokémon Centers to buy/obtain Master Balls.
-    - **Cheren's Mom** - Repurposes Cheren's Mom in Nuvema Town to give/sell Master Balls.
-    - **Undella Mansion seller** - Adds the Master Ball to the pool of items that you can buy for a random price. His offers are not affected by any cost modifier.
-    - **Cost: Free** - Makes Master Balls (potentially) cost nothing.
-    - **Cost: 1000** - Makes Master Balls (potentially) cost 1000 Pokédollars.
-    - **Cost: 3000** - Makes Master Balls (potentially) cost 3000 Pokédollars.
-    - **Cost: 10000** - Makes Master Balls (potentially) cost 10000 Pokédollars.
+    - **Cherens Mom** - Repurposes Cheren's Mom in Nuvema Town to give/sell Master Balls.
+    - **Undella Mansion seller** - Adds the Master Ball to the pool of items that you can buy from the evolution items seller in the Undella Mansion for a random price. His offers are not affected by any cost modifier.
+    - **Cost Free** - Makes Master Balls (potentially) cost nothing.
+    - **Cost x** - Makes Master Balls (potentially) cost x Pokédollars. x can be any number in range of 0 to 30000.
     """
-    display_name = "Replace Evolution Methods"
+    display_name = "Master Ball Seller"
+    valid_keys_casefold = True
     valid_keys = [
-        "N's Castle",
+        "Ns Castle",
         "PC",
-        "Cheren's Mom",
+        "Cherens Mom",
         "Undella Mansion seller",
-        "Cost: Free",
-        "Cost: 1000",
-        "Cost: 3000",
-        "Cost: 10000",
+        "Cost Free",
+        "Cost 1000",
+        "Cost 3000",
+        "Cost 10000",
     ]
     default = []
+
+    def __init__(self, value: typing.Iterable[str]):
+        compatible = set()
+        for val in value:
+            if val in ("Cost: Free", "Cost: 1000", "Cost: 3000", "Cost: 10000"):
+                compatible.add(val.replace(":", ""))
+            elif val in ("N's Castle", "Cheren's Mom"):
+                compatible.add(val.replace("'", ""))
+            else:
+                compatible.add(val)
+        super().__init__(compatible)
+
+    def verify_keys(self) -> None:
+        dataset = set(word.casefold() for word in self.value)
+        extra = dataset - set(key.casefold() for key in self._valid_keys)
+        if extra:
+            bad = []
+            for key in extra:
+                split = key.split()
+                if (
+                    len(split) != 2
+                    or split[0] != "cost"
+                    or not split[1].isnumeric()
+                    or int(split[1]) not in range(0, 30001)
+                ):
+                    bad.append(key)
+            if bad:
+                raise OptionError(
+                    f"Found unexpected key {', '.join(bad)} in {getattr(self, 'display_name', self)}. "
+                    f"Allowed keys: {self._valid_keys} and \"Cost x\" for any x in range 0 to 30000."
+                )
 
 
 class WonderTrade(Toggle):
@@ -832,7 +1255,7 @@ class TrapsProbability(Range):
     range_end = 100
 
 
-class ModifyItemPool(OptionSet):
+class ModifyItemPool(CasefoldOptionSet):
     """
     Modifies what items your world puts into the item pool.
 
@@ -841,6 +1264,7 @@ class ModifyItemPool(OptionSet):
     - **Ban bad filler** - Bans niche berries and mail from being generated as filler items.
     """
     display_name = "Modify Item Pool"
+    valid_keys_casefold = True
     valid_keys = [
         "Useless key items",
         "Useful filler",
@@ -849,7 +1273,7 @@ class ModifyItemPool(OptionSet):
     default = []
 
 
-class ModifyLogic(OptionSet):
+class ModifyLogic(CasefoldOptionSet):
     """
     Modifies parts of what's logically required for various locations.
 
@@ -857,22 +1281,40 @@ class ModifyLogic(OptionSet):
     - **Prioritize key item locations** - Marks locations, that normally contain key items (which also includes
                                           badge rewards in gyms), as priority locations, making them mostly contain
                                           progressive items.
+    - **Require Flash** - Makes Mistralton Cave, Challenger's Cave, and the basement of Wellspring Cave
+                          logically require TM70 Flash.
     """
     display_name = "Modify Item Pool"
+    valid_keys_casefold = True
     valid_keys = [
         "Require Dowsing Machine",
         "Prioritize key item locations",
+        "Require Flash",
     ]
-    default = ["Require Dowsing Machine", "Prioritize key item locations"]
+    default = ["Require Dowsing Machine", "Prioritize key item locations", "Require Flash"]
 
 
-class FunnyDialogue(Toggle):
+class FunnyDialog(Choice):
     """
-    Adds humorous dialogue submitted by the folks in the Pokemon Black and White thread of the
-    Archipelago Discord server. This option requires Text Plando being enabled in the host settings.
+    Adds humorous dialogue submitted by the folks in the Pokemon Black and White thread/channel of the
+    Archipelago Discord server. Alternatively, the efficient mode shortens many story lines for quicker playthroughs.
+    This option requires Text Plando being enabled in the host settings.
     """
     display_name = "Funny Dialogue"
+    option_none = 0
+    option_funny = 1
+    option_efficient = 2
     default = 0
+
+    def verify(self, world: typing.Type["World"], player_name: str, plando_options: "PlandoOptions") -> None:
+        from BaseClasses import PlandoOptions
+        if self.current_key != "none" and not (PlandoOptions.texts & plando_options):
+            # plando is disabled but plando options were given so overwrite the options
+            self.value = []
+            logging.warning(f"The plando texts module is turned off, "
+                            f"so funny/efficient dialog for {player_name} will be ignored.")
+        else:
+            super().verify(world, player_name, plando_options)
 
 
 class PokemonBWTextPlando(PlandoTexts):
@@ -887,27 +1329,36 @@ class PokemonBWTextPlando(PlandoTexts):
     """
     display_name = "Text Plando"
     default = [
-        # ("story 160 0 7", "[vMisc_0] received [vPkmn_1]![NextLine] Congratulations![Terminate]", 100),
+        # ("story 160 0 7", "[c_100_#1_0] received [c_101_#1_1]![NextLine] Congratulations![Terminate]", 100),
         # ("system 172 0 1", "Huh? Why did you press the[NextLine]B button?[Terminate]", 100),
     ]
 
     def verify_keys(self) -> None:
+        from .patch.text import is_bad_text
         invalid = []
         for word in self:
             parts = word.at.casefold().split()
             reasons = []
             if len(parts) < 4:
-                reasons.append("Not enough arguments")
+                reasons.append("Not enough arguments: "+word.at)
             if len(parts) > 4:
-                reasons.append("Too many arguments")
+                reasons.append("Too many arguments: "+word.at)
             if parts[0] not in ("system", "story"):
-                reasons.append("Unknown module")
+                reasons.append("Unknown module: "+parts[0])
             if not parts[1].isnumeric():
-                reasons.append("File index is not a number")
+                reasons.append("File index is not a number: "+parts[1])
+            if parts[0] == "system" and int(parts[1]) > 287:
+                reasons.append(f"System file {parts[1]} does not exist")
+            if parts[0] == "story" and int(parts[1]) > 471:
+                reasons.append(f"Story file {parts[1]} does not exist")
             if not parts[2].isnumeric():
-                reasons.append("Part index is not a number")
+                reasons.append("Block index is not a number: "+parts[2])
             if not parts[3].isnumeric():
-                reasons.append("Line index is not a number")
+                reasons.append("Line index is not a number: "+parts[3])
+            if word.text:
+                bad = is_bad_text(word.text[0])
+                if bad:
+                    reasons.append("Bad text line: "+bad)
             if reasons:
                 invalid.append((" ".join(parts), reasons))
         if invalid:
@@ -917,6 +1368,17 @@ class PokemonBWTextPlando(PlandoTexts):
                 "\n".join((f"{entry[0]}: {', '.join(entry[1])}" for entry in invalid)) +
                 "\nRefer to the Text Plando guide of this game for further information."
             )
+
+    def to_slot_data(self) -> list[dict[str, str | list[str] | int]]:
+        return [
+            {
+                "text": plando.text,
+                "at": plando.at,
+                "percentage": 100,  # Probabilities of all entries in self.value have already been rolled,
+                                    # so passing the original percentage might discard even more
+            }
+            for plando in self
+        ]
 
 
 class ReusableTMs(Choice):
@@ -929,6 +1391,19 @@ class ReusableTMs(Choice):
     option_of_course = 2
     option_im_not_a_masochist = 3
     default = 0
+
+    @classmethod
+    def from_text(cls, text: str) -> Choice:
+        text = text.lower()
+        if text in ("no", "off", "im_serious_no", "im_a_masochist"):
+            return cls(99)
+        return super().from_text(text)
+
+    @property
+    def current_key(self) -> str:
+        if self.value == 99:
+            return "no"
+        return super().current_key
 
 
 @dataclass
@@ -972,6 +1447,7 @@ class PokemonBWOptions(PerGameCommonOptions):
 
     # Miscellaneous
     adjust_levels: AdjustLevels
+    modify_levels: ModifyLevels
     # exp_modifier: ExpModifier
     # all_pokemon_seen: AllPokemonSeen
     # add_fairy_type: AddFairyType
@@ -981,8 +1457,9 @@ class PokemonBWOptions(PerGameCommonOptions):
     # wonder_trade: WonderTrade
     # multiworld_gift_pokemon: MultiworldGiftPokemon
     # traps_percentage: TrapsPercentage
+    start_inventory_from_pool: StartInventoryPool
     modify_item_pool: ModifyItemPool
     modify_logic: ModifyLogic
-    # funny_dialogue: FunnyDialogue
-    # text_plando: TextPlando
+    funny_dialog: FunnyDialog
+    text_plando: PokemonBWTextPlando
     reusable_tms: ReusableTMs
